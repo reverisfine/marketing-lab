@@ -1,0 +1,1676 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔬 은또링쌤의 마케팅Lab | 1주차 2차시</title>
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Black+Han+Sans&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --lab-mint: #00D4AA;
+            --lab-blue: #4A90D9;
+            --lab-purple: #7B68EE;
+            --lab-green: #32CD32;
+            --lab-orange: #FF8C42;
+            --lab-pink: #FF6B9D;
+            --lab-dark: #1E2A3A;
+            --lab-gray: #F0F4F8;
+            --lab-white: #FFFFFF;
+            --correct: #00C853;
+            --wrong: #FF5252;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Gowun Dodum', sans-serif;
+            background: linear-gradient(135deg, #E8F5E9 0%, #E3F2FD 50%, #F3E5F5 100%);
+            min-height: 100vh;
+            padding: 15px;
+            position: relative;
+        }
+
+        .molecule {
+            position: fixed;
+            font-size: 1.5rem;
+            opacity: 0.12;
+            animation: float 8s ease-in-out infinite;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(15deg); }
+        }
+
+        .container { max-width: 900px; margin: 0 auto; position: relative; z-index: 10; }
+
+        .header {
+            background: var(--lab-white);
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            margin-bottom: 15px;
+            box-shadow: 0 8px 32px rgba(0, 212, 170, 0.15);
+            border: 3px solid var(--lab-mint);
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--lab-mint), var(--lab-blue), var(--lab-purple), var(--lab-pink));
+        }
+
+        .header-icons { position: absolute; top: 15px; left: 20px; font-size: 1.5rem; display: flex; gap: 8px; }
+        .header-icons span { animation: bubble 2s ease-in-out infinite; }
+        .header-icons span:nth-child(2) { animation-delay: 0.3s; }
+        .header-icons span:nth-child(3) { animation-delay: 0.6s; }
+
+        @keyframes bubble { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-5px) scale(1.1); } }
+
+        .header-badge {
+            position: absolute; top: 15px; right: 20px;
+            background: linear-gradient(135deg, var(--lab-mint), var(--lab-blue));
+            color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold;
+        }
+
+        .header h1 {
+            font-family: 'Gowun Dodum', sans-serif;
+            font-size: 2rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--lab-mint), var(--lab-blue));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 8px; margin-top: 10px;
+        }
+
+        .header .subtitle { font-size: 1.15rem; color: var(--lab-dark); font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .header .week-info { display: inline-block; background: linear-gradient(135deg, var(--lab-purple), var(--lab-pink)); color: white; padding: 6px 16px; border-radius: 20px; font-size: 0.85rem; margin-top: 12px; font-weight: bold; }
+
+        .student-info {
+            background: var(--lab-white); border-radius: 15px; padding: 15px 20px; margin-bottom: 15px;
+            display: flex; gap: 15px; flex-wrap: wrap; align-items: center; justify-content: center;
+            border: 2px solid #E0E7EE; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .student-info label { font-weight: bold; color: var(--lab-dark); display: flex; align-items: center; gap: 5px; }
+        .student-info input { padding: 10px 15px; border: 2px solid #E0E7EE; border-radius: 10px; font-family: 'Gowun Dodum', sans-serif; font-size: 0.95rem; width: 130px; transition: all 0.3s ease; }
+        .student-info input:focus { outline: none; border-color: var(--lab-mint); box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.1); }
+
+        .tab-nav {
+            display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; justify-content: center;
+            background: var(--lab-white); padding: 10px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .tab-btn {
+            padding: 12px 18px; border: 2px solid #E0E7EE; border-radius: 12px;
+            font-family: 'Gowun Dodum', sans-serif; font-size: 0.85rem; font-weight: bold;
+            cursor: pointer; transition: all 0.3s ease; background: var(--lab-white); color: var(--lab-dark);
+        }
+        .tab-btn.active { background: linear-gradient(135deg, var(--lab-mint), var(--lab-blue)); color: white; border-color: transparent; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0, 212, 170, 0.3); }
+        .tab-btn:hover:not(.active) { border-color: var(--lab-mint); background: rgba(0, 212, 170, 0.05); }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .progress-section { background: var(--lab-white); border-radius: 15px; padding: 18px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 2px solid #E0E7EE; }
+        .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .progress-title { font-weight: bold; color: var(--lab-dark); display: flex; align-items: center; gap: 8px; }
+        .progress-bar-container { background: #E8F5E9; border-radius: 10px; height: 20px; overflow: hidden; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--lab-mint), var(--lab-blue)); border-radius: 10px; transition: width 0.5s ease; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.75rem; }
+        .progress-stats { display: flex; justify-content: space-between; margin-top: 10px; font-size: 0.85rem; color: var(--lab-dark); }
+        .progress-stats span { display: flex; align-items: center; gap: 5px; }
+
+        .section-card { background: var(--lab-white); border-radius: 20px; padding: 25px; margin-bottom: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 2px solid #E0E7EE; }
+        .section-title {
+            font-family: 'Gowun Dodum', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--lab-dark);
+            margin-bottom: 18px; display: flex; align-items: center; gap: 10px; padding-bottom: 12px; border-bottom: 2px dashed #E0E7EE;
+        }
+        .section-title .icon { font-size: 1.4rem; }
+
+        .objective-item { display: flex; align-items: flex-start; gap: 12px; padding: 15px; background: linear-gradient(135deg, #F8FFF8, #F0F8FF); border-radius: 12px; margin-bottom: 10px; transition: all 0.3s ease; cursor: pointer; border: 2px solid transparent; }
+        .objective-item:hover { transform: translateX(5px); border-color: var(--lab-mint); }
+        .objective-item.checked { background: linear-gradient(135deg, #E8F5E9, #C8E6C9); border-color: var(--correct); }
+        .objective-checkbox { width: 26px; height: 26px; border: 3px solid #CBD5E0; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; transition: all 0.3s ease; background: white; }
+        .objective-item.checked .objective-checkbox { background: var(--correct); border-color: var(--correct); color: white; }
+        .objective-text { font-size: 0.95rem; color: var(--lab-dark); line-height: 1.6; }
+
+        .concept-card { background: linear-gradient(135deg, #FAFFFE, #F5FAFF); border-radius: 15px; padding: 18px; margin-bottom: 12px; border-left: 5px solid var(--lab-mint); transition: all 0.3s ease; }
+        .concept-card:nth-child(5n+1) { border-left-color: var(--lab-mint); }
+        .concept-card:nth-child(5n+2) { border-left-color: var(--lab-blue); }
+        .concept-card:nth-child(5n+3) { border-left-color: var(--lab-purple); }
+        .concept-card:nth-child(5n+4) { border-left-color: var(--lab-orange); }
+        .concept-card:nth-child(5n) { border-left-color: var(--lab-pink); }
+        .concept-card.correct { background: linear-gradient(135deg, #E8F5E9, #C8E6C9); border-left-color: var(--correct); }
+        .concept-card.wrong { background: linear-gradient(135deg, #FFEBEE, #FFCDD2); border-left-color: var(--wrong); }
+        .concept-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .concept-number { display: inline-flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--lab-mint), var(--lab-blue)); color: white; width: 28px; height: 28px; border-radius: 8px; font-weight: bold; font-size: 0.85rem; }
+        .concept-label { font-weight: bold; color: var(--lab-dark); }
+        .concept-text { font-size: 0.95rem; color: var(--lab-dark); line-height: 1.9; }
+        .blank-select { display: inline-block; min-width: 120px; padding: 6px 10px; border: 2px dashed var(--lab-blue); border-radius: 8px; background: white; font-family: 'Gowun Dodum', sans-serif; font-size: 0.9rem; cursor: pointer; transition: all 0.3s ease; appearance: none; text-align: center; }
+        .blank-select:focus { outline: none; border-color: var(--lab-mint); box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.15); }
+        .blank-select.correct { background: var(--correct); color: white; border-color: var(--correct); border-style: solid; }
+        .blank-select.wrong { background: var(--wrong); color: white; border-color: var(--wrong); border-style: solid; }
+
+        .quiz-card { background: linear-gradient(135deg, #FAFFFE, #F5FAFF); border-radius: 15px; padding: 18px; margin-bottom: 15px; border: 2px solid #E0E7EE; }
+        .quiz-question { font-weight: bold; color: var(--lab-dark); margin-bottom: 15px; font-size: 0.95rem; display: flex; align-items: flex-start; gap: 10px; }
+        .quiz-badge { background: linear-gradient(135deg, var(--lab-purple), var(--lab-pink)); color: white; padding: 3px 10px; border-radius: 15px; font-size: 0.75rem; flex-shrink: 0; }
+        .quiz-options { display: flex; flex-direction: column; gap: 10px; }
+        .quiz-option { padding: 14px 18px; background: white; border: 2px solid #E0E7EE; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; font-size: 0.9rem; }
+        .quiz-option:hover { border-color: var(--lab-mint); background: rgba(0, 212, 170, 0.05); transform: translateX(5px); }
+        .quiz-option.selected { border-color: var(--lab-blue); background: #E3F2FD; }
+        .quiz-option.correct { border-color: var(--correct); background: #E8F5E9; }
+        .quiz-option.wrong { border-color: var(--wrong); background: #FFEBEE; }
+
+        .activity-section { margin-bottom: 25px; }
+        .activity-title { font-weight: bold; color: var(--lab-dark); margin-bottom: 12px; font-size: 1rem; display: flex; align-items: center; gap: 8px; }
+        .activity-instruction { font-size: 0.85rem; color: #666; margin-bottom: 15px; background: linear-gradient(135deg, #FFF8E1, #FFECB3); padding: 12px 15px; border-radius: 10px; border-left: 4px solid var(--lab-orange); }
+        .drag-container { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; min-height: 50px; padding: 12px; background: #F8FAFC; border-radius: 12px; border: 2px dashed #CBD5E0; }
+        .drag-item { padding: 10px 18px; background: linear-gradient(135deg, var(--lab-blue), var(--lab-purple)); color: white; border-radius: 25px; cursor: grab; font-size: 0.9rem; font-weight: bold; transition: all 0.3s ease; user-select: none; box-shadow: 0 3px 10px rgba(74, 144, 217, 0.3); }
+        .drag-item:active { cursor: grabbing; transform: scale(1.05); }
+        .drag-item.selected { box-shadow: 0 0 0 3px var(--lab-orange), 0 3px 15px rgba(255, 140, 66, 0.4); }
+        .drag-item.placed { opacity: 0.4; pointer-events: none; }
+        .drop-zones { display: flex; gap: 15px; flex-wrap: wrap; }
+        .drop-zone-group { flex: 1; min-width: 200px; background: white; border-radius: 15px; padding: 15px; border: 2px solid #E0E7EE; }
+        .drop-zone-title { font-family: 'Gowun Dodum', sans-serif; font-weight: 600; font-size: 1rem; text-align: center; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 2px dashed #E0E7EE; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .drop-zone { min-height: 80px; border: 2px dashed #CBD5E0; border-radius: 12px; padding: 10px; display: flex; flex-wrap: wrap; gap: 8px; align-content: flex-start; transition: all 0.3s ease; background: #FAFAFA; }
+        .drop-zone.drag-over { border-color: var(--lab-mint); background: rgba(0, 212, 170, 0.05); }
+        .dropped-item { padding: 8px 14px; background: linear-gradient(135deg, var(--lab-mint), #00C49A); color: white; border-radius: 20px; font-size: 0.85rem; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+        .dropped-item .remove-btn { background: rgba(255,255,255,0.25); border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; color: white; transition: all 0.2s; }
+        .dropped-item .remove-btn:hover { background: rgba(255,255,255,0.4); }
+        .dropped-item.correct { background: linear-gradient(135deg, var(--correct), #00B548); }
+        .dropped-item.wrong { background: linear-gradient(135deg, var(--wrong), #E04545); }
+
+        .matching-container { display: flex; gap: 15px; flex-wrap: wrap; align-items: stretch; }
+        .matching-column { flex: 1; min-width: 140px; display: flex; flex-direction: column; gap: 10px; }
+        .matching-item { padding: 12px; background: white; border: 2px solid #E0E7EE; border-radius: 12px; text-align: center; cursor: pointer; transition: all 0.3s ease; font-size: 0.85rem; }
+        .matching-item:hover { border-color: var(--lab-mint); transform: scale(1.02); }
+        .matching-item.selected { border-color: var(--lab-orange); background: #FFF8E1; box-shadow: 0 0 0 3px rgba(255, 140, 66, 0.2); }
+        .matching-item.matched { border-color: var(--correct); background: #E8F5E9; pointer-events: none; }
+        .matching-item.wrong-match { border-color: var(--wrong); background: #FFEBEE; animation: shake 0.3s ease; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        .matching-lines { flex: 0 0 40px; display: flex; flex-direction: column; justify-content: space-around; align-items: center; }
+        .match-indicator { width: 25px; height: 3px; background: #E0E7EE; border-radius: 2px; transition: all 0.3s; }
+        .match-indicator.connected { background: var(--correct); width: 35px; }
+
+        /* 타임라인 도식 */
+        .timeline-diagram {
+            background: linear-gradient(135deg, #F8FFFE, #F0F8FF);
+            border-radius: 15px;
+            padding: 20px 15px;
+            margin: 20px 0;
+            border: 2px solid #E0E7EE;
+            overflow-x: auto;
+        }
+        .timeline-title {
+            text-align: center;
+            font-weight: bold;
+            color: var(--lab-dark);
+            margin-bottom: 20px;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .timeline-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            min-width: fit-content;
+            padding: 10px 0;
+        }
+        .timeline-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            min-width: 100px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .timeline-item:hover {
+            transform: translateY(-5px);
+        }
+        .timeline-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            position: relative;
+            z-index: 2;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .timeline-item:hover .timeline-circle {
+            transform: scale(1.15);
+            box-shadow: 0 6px 25px rgba(0,0,0,0.25);
+        }
+        .timeline-item:nth-child(1) .timeline-circle { background: linear-gradient(135deg, #78909C, #546E7A); }
+        .timeline-item:nth-child(3) .timeline-circle { background: linear-gradient(135deg, var(--lab-blue), #3A80C9); }
+        .timeline-item:nth-child(5) .timeline-circle { background: linear-gradient(135deg, var(--lab-purple), #6A5ACD); }
+        .timeline-item:nth-child(7) .timeline-circle { background: linear-gradient(135deg, var(--lab-mint), #00C49A); border: 3px solid var(--lab-dark); }
+        .timeline-item:nth-child(9) .timeline-circle { background: linear-gradient(135deg, var(--lab-pink), #FF5A8A); }
+        
+        /* 툴팁 스타일 */
+        .timeline-tooltip {
+            position: absolute;
+            bottom: calc(100% + 15px);
+            left: 50%;
+            transform: translateX(-50%) scale(0.8);
+            background: linear-gradient(135deg, var(--lab-dark), #2C3E50);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 100;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        .timeline-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 8px solid transparent;
+            border-top-color: var(--lab-dark);
+        }
+        .timeline-tooltip .tooltip-label {
+            color: var(--lab-mint);
+            font-size: 0.7rem;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .timeline-tooltip .tooltip-goal {
+            color: white;
+            font-size: 0.85rem;
+        }
+        .timeline-item:hover .timeline-tooltip {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) scale(1);
+        }
+        
+        .timeline-era {
+            font-size: 0.7rem;
+            color: #666;
+            margin-top: 8px;
+            font-weight: bold;
+        }
+        .timeline-name {
+            font-size: 0.75rem;
+            color: var(--lab-dark);
+            margin-top: 4px;
+            font-weight: bold;
+            text-align: center;
+            max-width: 80px;
+        }
+        .timeline-slogan {
+            font-size: 0.65rem;
+            color: var(--lab-mint);
+            margin-top: 3px;
+            text-align: center;
+            max-width: 90px;
+            line-height: 1.3;
+        }
+        .timeline-arrow {
+            font-size: 1.5rem;
+            color: var(--lab-blue);
+            margin: 0 -5px;
+            position: relative;
+            top: -20px;
+        }
+        .timeline-line {
+            position: absolute;
+            top: 25px;
+            left: 50%;
+            width: calc(100% + 20px);
+            height: 4px;
+            background: linear-gradient(90deg, var(--lab-mint), var(--lab-blue));
+            z-index: 1;
+        }
+        .timeline-item:last-child .timeline-line { display: none; }
+        
+        @media (max-width: 600px) {
+            .timeline-wrapper {
+                flex-direction: column;
+                gap: 5px;
+            }
+            .timeline-arrow {
+                transform: rotate(90deg);
+                top: 0;
+                margin: 5px 0;
+            }
+            .timeline-item {
+                min-width: auto;
+                flex-direction: row;
+                gap: 15px;
+            }
+            .timeline-circle {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+            .timeline-info {
+                text-align: left;
+            }
+            .timeline-name, .timeline-slogan {
+                max-width: none;
+                text-align: left;
+            }
+            .timeline-tooltip {
+                bottom: auto;
+                left: calc(100% + 15px);
+                top: 50%;
+                transform: translateY(-50%) scale(0.8);
+                white-space: normal;
+                min-width: 150px;
+            }
+            .timeline-tooltip::after {
+                top: 50%;
+                left: -8px;
+                transform: translateY(-50%);
+                border: 8px solid transparent;
+                border-right-color: var(--lab-dark);
+                border-top-color: transparent;
+            }
+            .timeline-item:hover .timeline-tooltip {
+                transform: translateY(-50%) scale(1);
+            }
+        }
+
+        /* 순서 정렬용 드롭존 */
+        .sequence-container { display: flex; flex-direction: column; gap: 10px; }
+        .sequence-slot { display: flex; align-items: center; gap: 12px; padding: 12px 15px; background: white; border: 2px dashed #CBD5E0; border-radius: 12px; min-height: 50px; transition: all 0.3s ease; }
+        .sequence-slot.drag-over { border-color: var(--lab-mint); background: rgba(0, 212, 170, 0.05); }
+        .sequence-slot.filled { border-style: solid; border-color: var(--lab-blue); }
+        .sequence-number { width: 35px; height: 35px; background: linear-gradient(135deg, var(--lab-mint), var(--lab-blue)); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1rem; flex-shrink: 0; }
+        .sequence-era { font-size: 0.75rem; color: #666; min-width: 50px; }
+        .sequence-arrow { font-size: 1.2rem; color: var(--lab-blue); text-align: center; padding: 5px 0; }
+        .sequence-slot .dropped-item { margin: 0; flex: 1; justify-content: center; }
+
+        .btn-group { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+        .btn { padding: 14px 28px; border: none; border-radius: 12px; font-family: 'Gowun Dodum', sans-serif; font-size: 1rem; font-weight: bold; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+        .btn-check { background: linear-gradient(135deg, var(--lab-mint), #00C49A); color: white; }
+        .btn-save { background: linear-gradient(135deg, var(--lab-blue), #3A80C9); color: white; }
+        .btn-submit { background: linear-gradient(135deg, var(--lab-purple), var(--lab-pink)); color: white; }
+        .btn-reset { background: linear-gradient(135deg, #78909C, #546E7A); color: white; }
+        .btn-section-reset { background: white; color: #78909C; border: 2px solid #CBD5E0; padding: 10px 20px; font-size: 0.85rem; }
+        .btn-section-reset:hover { background: #F8FAFC; border-color: #78909C; }
+        .btn-item-reset { background: transparent; color: #9CA3AF; border: 1px solid #E0E7EE; padding: 4px 10px; font-size: 0.75rem; border-radius: 6px; margin-top: 10px; }
+        .btn-item-reset:hover { background: #F8FAFC; color: #78909C; border-color: #78909C; box-shadow: none; transform: none; }
+
+        .result-section { background: var(--lab-white); border-radius: 20px; padding: 30px; text-align: center; margin-top: 20px; display: none; border: 3px solid var(--lab-mint); box-shadow: 0 8px 30px rgba(0, 212, 170, 0.2); }
+        .result-section.show { display: block; animation: popIn 0.5s ease; }
+        @keyframes popIn { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .result-icon { font-size: 4rem; margin-bottom: 10px; }
+        .result-grade { font-family: 'Gowun Dodum', sans-serif; font-weight: bold; font-size: 3.5rem; background: linear-gradient(135deg, var(--lab-mint), var(--lab-blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .result-message { font-size: 1.2rem; color: var(--lab-dark); margin: 12px 0; font-weight: bold; }
+        .result-details { font-size: 0.95rem; color: var(--lab-dark); margin-top: 20px; text-align: left; background: #F8FAFC; padding: 18px; border-radius: 12px; border: 2px solid #E0E7EE; }
+        .result-details h4 { margin-bottom: 12px; color: var(--lab-blue); }
+        .result-details ul { list-style: none; padding: 0; }
+        .result-details li { padding: 8px 0; display: flex; justify-content: space-between; border-bottom: 1px solid #E0E7EE; }
+        .result-details li:last-child { border-bottom: none; }
+
+        .toast { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--lab-dark); color: white; padding: 15px 30px; border-radius: 30px; font-weight: bold; z-index: 1000; transition: transform 0.3s ease; box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+
+        .confirm-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        .confirm-modal.show { display: flex; }
+        .confirm-box {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 350px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        .confirm-box p { font-size: 1.1rem; font-weight: bold; color: var(--lab-dark); margin-bottom: 20px; }
+        .confirm-btns { display: flex; gap: 10px; justify-content: center; }
+        .confirm-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Gowun Dodum', sans-serif;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .confirm-yes { background: var(--wrong); color: white; }
+        .confirm-no { background: #E0E7EE; color: var(--lab-dark); }
+
+        .footer { text-align: center; color: var(--lab-dark); margin-top: 30px; font-size: 0.85rem; opacity: 0.7; }
+
+        @media (max-width: 600px) {
+            .header h1 { font-size: 1.5rem; }
+            .tab-btn { padding: 10px 12px; font-size: 0.8rem; }
+            .student-info { flex-direction: column; }
+            .student-info input { width: 100%; }
+            .drop-zones { flex-direction: column; }
+            .matching-container { flex-direction: column; }
+            .matching-lines { flex-direction: row; height: 40px; }
+            .btn { padding: 12px 20px; font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-icons"><span>🔬</span><span>🧪</span><span>💡</span></div>
+            <div class="header-badge">DIMIGO</div>
+            <h1>🔬 은또링쌤의 마케팅Lab</h1>
+            <p class="subtitle"><span>📈</span> 2차시. 마케팅 개념의 발전 과정</p>
+            <span class="week-info">🗓️ 1주차 | 마케팅의 이해</span>
+        </header>
+
+        <div class="student-info">
+            <label>🧑‍🔬 연구원</label>
+            <input type="text" id="studentName" placeholder="이름 입력">
+            <label>🔢 연구원 번호</label>
+            <input type="text" id="studentId" placeholder="예: 10101">
+        </div>
+
+        <div class="tab-nav">
+            <button class="tab-btn active" data-tab="objectives">🎯 학습목표</button>
+            <button class="tab-btn" data-tab="concepts">🧬 개념정리</button>
+            <button class="tab-btn" data-tab="quiz">🔍 형성평가</button>
+            <button class="tab-btn" data-tab="activity">⚗️ 실험실</button>
+        </div>
+
+        <div class="progress-section">
+            <div class="progress-header"><span class="progress-title">📈 연구 진행률</span></div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar" style="width: 0%">0%</div>
+            </div>
+            <div class="progress-stats">
+                <span>✅ 정답: <strong id="correctCount">0</strong>개</span>
+                <span>📋 진행: <strong id="answeredCount">0</strong> / <strong id="totalCount">0</strong></span>
+            </div>
+        </div>
+
+        <!-- 탭 1: 학습목표 -->
+        <div class="tab-content active" id="tab-objectives">
+            <div class="section-card">
+                <h2 class="section-title"><span class="icon">🎯</span> 오늘의 연구 목표</h2>
+                <p style="font-size: 0.9rem; color: #666; margin-bottom: 18px;">연구를 시작하기 전, 오늘의 학습 목표를 확인하고 이해한 목표를 클릭해주세요!</p>
+                
+                <div class="objective-item" data-objective="1">
+                    <div class="objective-checkbox"></div>
+                    <span class="objective-text">마케팅 개념의 발전 과정 5단계(생산→제품→판매→마케팅→사회적 마케팅)를 시대 순서대로 설명할 수 있다</span>
+                </div>
+                <div class="objective-item" data-objective="2">
+                    <div class="objective-checkbox"></div>
+                    <span class="objective-text">각 마케팅 개념의 핵심 관점(Perspective)과 한계(Limitation)를 비교하여 설명할 수 있다</span>
+                </div>
+                <div class="objective-item" data-objective="3">
+                    <div class="objective-checkbox"></div>
+                    <span class="objective-text">이전 단계의 한계를 극복하며 고객과 사회 중심으로 진화하는 과정을 설명할 수 있다</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 탭 2: 핵심 개념 정리 -->
+        <div class="tab-content" id="tab-concepts">
+            <div class="section-card">
+                <h2 class="section-title"><span class="icon">🧬</span> 핵심 개념 연구노트</h2>
+                <p style="font-size: 0.9rem; color: #666; margin-bottom: 18px;">빈칸에 알맞은 답을 선택하여 연구노트를 완성해보세요!</p>
+
+                <div class="concept-card">
+                    <div class="concept-header">
+                        <span class="concept-number">1</span>
+                        <span class="concept-label">마케팅 개념 발전의 배경</span>
+                    </div>
+                    <p class="concept-text">
+                        시대의 흐름과 
+                        <select class="blank-select" data-answer="시장 상황" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="시장 상황">시장 상황</option>
+                            <option value="정부 정책">정부 정책</option>
+                            <option value="기술 발전">기술 발전</option>
+                        </select>
+                        에 따라 기업이 중요하게 생각하는 가치는 계속해서 변화해왔다. 마케팅 개념은 이전 단계의 
+                        <select class="blank-select" data-answer="한계" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="한계">한계</option>
+                            <option value="장점">장점</option>
+                            <option value="이익">이익</option>
+                        </select>
+                        를 극복하며 고객과 사회 중심으로 진화해왔다.
+                    </p>
+                    <button class="btn btn-item-reset" onclick="resetConceptItem(this)">🔄 초기화</button>
+                </div>
+
+                <div class="concept-card">
+                    <div class="concept-header">
+                        <span class="concept-number">2</span>
+                        <span class="concept-label">① 생산 중심 개념 (1910s~)</span>
+                    </div>
+                    <p class="concept-text">
+                        <strong>"만들기만 하면 팔린다"</strong><br><br>
+                        • 시대 배경: 
+                        <select class="blank-select" data-answer="수요 > 공급" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="수요 > 공급">수요 > 공급</option>
+                            <option value="수요 < 공급">수요 < 공급</option>
+                            <option value="수요 = 공급">수요 = 공급</option>
+                        </select>
+                        (물자 부족 시대)<br>
+                        • 목표/전략: 
+                        <select class="blank-select" data-answer="원가 절감" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="원가 절감">원가 절감</option>
+                            <option value="품질 개선">품질 개선</option>
+                            <option value="고객 만족">고객 만족</option>
+                        </select>
+                        , 규모의 경제, 생산성/효율성 증대<br>
+                        • 핵심 관점: "
+                        <select class="blank-select" data-answer="만들 수 있는가" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="만들 수 있는가">만들 수 있는가</option>
+                            <option value="팔 수 있는가">팔 수 있는가</option>
+                            <option value="고객이 원하는가">고객이 원하는가</option>
+                        </select>
+                        ?"<br>
+                        • 한계: 
+                        <select class="blank-select" data-answer="고객 욕구 무시" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="고객 욕구 무시">고객 욕구 무시</option>
+                            <option value="비용 증가">비용 증가</option>
+                            <option value="품질 저하">품질 저하</option>
+                        </select>
+                    </p>
+                    <button class="btn btn-item-reset" onclick="resetConceptItem(this)">🔄 초기화</button>
+                </div>
+
+                <div class="concept-card">
+                    <div class="concept-header">
+                        <span class="concept-number">3</span>
+                        <span class="concept-label">② 제품 중심 개념 (1920s~)</span>
+                    </div>
+                    <p class="concept-text">
+                        <strong>"더 좋은 품질은 팔린다"</strong><br><br>
+                        • 시대 배경: 경쟁 발생, 기술 개발과 
+                        <select class="blank-select" data-answer="품질 혁신" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="품질 혁신">품질 혁신</option>
+                            <option value="가격 인하">가격 인하</option>
+                            <option value="광고 확대">광고 확대</option>
+                        </select>
+                        에 집중<br>
+                        • 목표/전략: 품질 개선, 다양한 기능 추가, 우수한 제품 개발(R&D)<br>
+                        • 핵심 관점: "
+                        <select class="blank-select" data-answer="최고로 만들 수 있는가" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="최고로 만들 수 있는가">최고로 만들 수 있는가</option>
+                            <option value="싸게 만들 수 있는가">싸게 만들 수 있는가</option>
+                            <option value="많이 팔 수 있는가">많이 팔 수 있는가</option>
+                        </select>
+                        ?"<br>
+                        • 한계: '
+                        <select class="blank-select" data-answer="더 좋은 쥐덫" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="더 좋은 쥐덫">더 좋은 쥐덫</option>
+                            <option value="더 싼 쥐덫">더 싼 쥐덫</option>
+                            <option value="더 예쁜 쥐덫">더 예쁜 쥐덫</option>
+                        </select>
+                        '의 오류 (고객의 진짜 필요 간과)
+                    </p>
+                    <button class="btn btn-item-reset" onclick="resetConceptItem(this)">🔄 초기화</button>
+                </div>
+
+                <div class="concept-card">
+                    <div class="concept-header">
+                        <span class="concept-number">4</span>
+                        <span class="concept-label">③ 판매 중심 개념 (1970s~)</span>
+                    </div>
+                    <p class="concept-text">
+                        <strong>"적극적으로 팔아야 한다"</strong><br><br>
+                        • 시대 배경: 
+                        <select class="blank-select" data-answer="공급 > 수요" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="공급 > 수요">공급 > 수요</option>
+                            <option value="공급 < 수요">공급 < 수요</option>
+                            <option value="공급 = 수요">공급 = 수요</option>
+                        </select>
+                        , 광고와 강력한 판매 기술에 총력<br>
+                        • 목표/전략: 
+                        <select class="blank-select" data-answer="영업 및 판촉" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="영업 및 판촉">영업 및 판촉</option>
+                            <option value="제품 개발">제품 개발</option>
+                            <option value="시장 조사">시장 조사</option>
+                        </select>
+                        , 매출 증대를 통한 이윤 창출<br>
+                        • 핵심 관점: "
+                        <select class="blank-select" data-answer="어떻게 팔 것인가" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="어떻게 팔 것인가">어떻게 팔 것인가</option>
+                            <option value="무엇을 만들 것인가">무엇을 만들 것인가</option>
+                            <option value="누구에게 팔 것인가">누구에게 팔 것인가</option>
+                        </select>
+                        ?"<br>
+                        • 한계: 
+                        <select class="blank-select" data-answer="일회성 판매 치중" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="일회성 판매 치중">일회성 판매 치중</option>
+                            <option value="품질 저하">품질 저하</option>
+                            <option value="가격 상승">가격 상승</option>
+                        </select>
+                        , 장기적 관계가 형성되지 않음
+                    </p>
+                    <button class="btn btn-item-reset" onclick="resetConceptItem(this)">🔄 초기화</button>
+                </div>
+
+                <div class="concept-card">
+                    <div class="concept-header">
+                        <span class="concept-number">5</span>
+                        <span class="concept-label">④ 마케팅 중심 개념 (1980s~)</span>
+                    </div>
+                    <p class="concept-text">
+                        <strong>"고객이 원하는 것을 만든다"</strong><br><br>
+                        • 시대 배경: 관점의 전환, 
+                        <select class="blank-select" data-answer="고객 욕구 파악" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="고객 욕구 파악">고객 욕구 파악</option>
+                            <option value="생산 효율화">생산 효율화</option>
+                            <option value="가격 경쟁">가격 경쟁</option>
+                        </select>
+                        을 최우선으로<br>
+                        • 목표/전략: 고객의 필요, 
+                        <select class="blank-select" data-answer="4P" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="4P">4P</option>
+                            <option value="3C">3C</option>
+                            <option value="5W">5W</option>
+                        </select>
+                        중심의 마케팅, 고객 만족을 통한 이윤 창출<br>
+                        • 핵심 관점: "
+                        <select class="blank-select" data-answer="고객은 무엇을 원하는가" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="고객은 무엇을 원하는가">고객은 무엇을 원하는가</option>
+                            <option value="어떻게 팔 것인가">어떻게 팔 것인가</option>
+                            <option value="얼마에 팔 것인가">얼마에 팔 것인가</option>
+                        </select>
+                        ?"<br>
+                        • 위험: 
+                        <select class="blank-select" data-answer="사회적 문제 야기 가능" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="사회적 문제 야기 가능">사회적 문제 야기 가능</option>
+                            <option value="비용 증가">비용 증가</option>
+                            <option value="품질 저하">품질 저하</option>
+                        </select>
+                        (단기적 고객 욕구에만 집중할 경우 발생)
+                    </p>
+                    <button class="btn btn-item-reset" onclick="resetConceptItem(this)">🔄 초기화</button>
+                </div>
+
+                <div class="concept-card">
+                    <div class="concept-header">
+                        <span class="concept-number">6</span>
+                        <span class="concept-label">⑤ 사회적 마케팅 개념 (현재~)</span>
+                    </div>
+                    <p class="concept-text">
+                        <strong>"사회 전체의 이익도 고려"</strong><br><br>
+                        • 핵심 가치: 
+                        <select class="blank-select" data-answer="이윤" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="이윤">이윤</option>
+                            <option value="시장점유율">시장점유율</option>
+                            <option value="브랜드">브랜드</option>
+                        </select>
+                        + 소비자 만족 + 
+                        <select class="blank-select" data-answer="사회적 책임" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="사회적 책임">사회적 책임</option>
+                            <option value="기술 혁신">기술 혁신</option>
+                            <option value="가격 경쟁">가격 경쟁</option>
+                        </select>
+                        (환경 등) 고려<br>
+                        • 목표/전략: 공익적 마케팅, 
+                        <select class="blank-select" data-answer="친환경적 생산" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="친환경적 생산">친환경적 생산</option>
+                            <option value="대량 생산">대량 생산</option>
+                            <option value="공격적 판매">공격적 판매</option>
+                        </select>
+                        , 기업의 사회적 책임을 통한 이윤 창출<br>
+                        • 핵심 관점: "
+                        <select class="blank-select" data-answer="사회에 어떻게 기여할까" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="사회에 어떻게 기여할까">사회에 어떻게 기여할까</option>
+                            <option value="어떻게 팔 것인가">어떻게 팔 것인가</option>
+                            <option value="무엇을 만들 것인가">무엇을 만들 것인가</option>
+                        </select>
+                        ?"<br>
+                        • 도전: 
+                        <select class="blank-select" data-answer="균형 유지의 어려움" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="균형 유지의 어려움">균형 유지의 어려움</option>
+                            <option value="비용 절감">비용 절감</option>
+                            <option value="시장 확대">시장 확대</option>
+                        </select>
+                        (이윤 추구 vs 사회적 책임)
+                    </p>
+                    <button class="btn btn-item-reset" onclick="resetConceptItem(this)">🔄 초기화</button>
+                </div>
+
+                <div class="concept-card">
+                    <div class="concept-header">
+                        <span class="concept-number">7</span>
+                        <span class="concept-label">마케팅 개념 발전 순서 정리</span>
+                    </div>
+
+                    <!-- 타임라인 도식 -->
+                    <div class="timeline-diagram">
+                        <div class="timeline-title">📊 MARKETING EVOLUTION | Production → Societal</div>
+                        <p style="text-align: center; font-size: 0.75rem; color: #888; margin-bottom: 15px;">💡 각 단계에 마우스를 올려보세요!</p>
+                        <div class="timeline-wrapper">
+                            <div class="timeline-item">
+                                <div class="timeline-tooltip">
+                                    <span class="tooltip-label">🎯 지향 목표</span>
+                                    <span class="tooltip-goal">생산량 및 효율성 증대</span>
+                                </div>
+                                <div class="timeline-circle">🏭</div>
+                                <span class="timeline-era">1910s~</span>
+                                <span class="timeline-name">생산 중심</span>
+                                <span class="timeline-slogan">"만들기만 하면 팔린다"</span>
+                            </div>
+                            <div class="timeline-arrow">→</div>
+                            <div class="timeline-item">
+                                <div class="timeline-tooltip">
+                                    <span class="tooltip-label">🎯 지향 목표</span>
+                                    <span class="tooltip-goal">제품의 품질 및 혁신</span>
+                                </div>
+                                <div class="timeline-circle">📦</div>
+                                <span class="timeline-era">1920s~</span>
+                                <span class="timeline-name">제품 중심</span>
+                                <span class="timeline-slogan">"더 좋은 품질은 팔린다"</span>
+                            </div>
+                            <div class="timeline-arrow">→</div>
+                            <div class="timeline-item">
+                                <div class="timeline-tooltip">
+                                    <span class="tooltip-label">🎯 지향 목표</span>
+                                    <span class="tooltip-goal">매출 증대를 통한 이윤 창출</span>
+                                </div>
+                                <div class="timeline-circle">🏪</div>
+                                <span class="timeline-era">1970s~</span>
+                                <span class="timeline-name">판매 중심</span>
+                                <span class="timeline-slogan">"적극적으로 팔아야 한다"</span>
+                            </div>
+                            <div class="timeline-arrow">→</div>
+                            <div class="timeline-item">
+                                <div class="timeline-tooltip">
+                                    <span class="tooltip-label">🎯 지향 목표</span>
+                                    <span class="tooltip-goal">고객 만족을 통한 이윤 창출</span>
+                                </div>
+                                <div class="timeline-circle">🎯</div>
+                                <span class="timeline-era">1980s~</span>
+                                <span class="timeline-name">마케팅 중심</span>
+                                <span class="timeline-slogan">"고객이 원하는 것을 만든다"</span>
+                            </div>
+                            <div class="timeline-arrow">→</div>
+                            <div class="timeline-item">
+                                <div class="timeline-tooltip">
+                                    <span class="tooltip-label">🎯 지향 목표</span>
+                                    <span class="tooltip-goal">기업의 사회적 책임을 통한 이윤 창출</span>
+                                </div>
+                                <div class="timeline-circle">🌍</div>
+                                <span class="timeline-era">현재~</span>
+                                <span class="timeline-name">사회적 마케팅</span>
+                                <span class="timeline-slogan">"사회 전체의 이익도 고려"</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="concept-text" style="margin-top: 15px;">
+                        <strong>👆 위 도식을 참고하여 빈칸을 채워보세요!</strong><br><br>
+                        <select class="blank-select" data-answer="생산" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="생산">생산</option>
+                            <option value="판매">판매</option>
+                            <option value="제품">제품</option>
+                        </select>
+                        중심 (1910s~) → 
+                        <select class="blank-select" data-answer="제품" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="생산">생산</option>
+                            <option value="제품">제품</option>
+                            <option value="판매">판매</option>
+                        </select>
+                        중심 (1920s~) → 
+                        <select class="blank-select" data-answer="판매" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="마케팅">마케팅</option>
+                            <option value="판매">판매</option>
+                            <option value="사회적">사회적</option>
+                        </select>
+                        중심 (1970s~) → 
+                        <select class="blank-select" data-answer="마케팅" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="판매">판매</option>
+                            <option value="마케팅">마케팅</option>
+                            <option value="생산">생산</option>
+                        </select>
+                        중심 (1980s~) → 
+                        <select class="blank-select" data-answer="사회적 마케팅" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="제품">제품</option>
+                            <option value="판매">판매</option>
+                            <option value="사회적 마케팅">사회적 마케팅</option>
+                        </select>
+                        (현재~)
+                    </p>
+                    <button class="btn btn-item-reset" onclick="resetConceptItem(this)">🔄 초기화</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 탭 3: 형성평가 (10문항) -->
+        <div class="tab-content" id="tab-quiz">
+            <div class="section-card">
+                <h2 class="section-title"><span class="icon">🔍</span> 연구 결과 확인</h2>
+                <p style="font-size: 0.9rem; color: #666; margin-bottom: 18px;">배운 내용을 확인해봅시다! 정답을 선택해주세요.</p>
+
+                <div class="quiz-card" data-quiz="1">
+                    <p class="quiz-question"><span class="quiz-badge">Q1</span>마케팅 개념의 발전 순서로 올바른 것은?</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-value="1">① 생산 → 마케팅 → 제품 → 판매 → 사회적</div>
+                        <div class="quiz-option" data-value="2" data-correct="true">② 생산 → 제품 → 판매 → 마케팅 → 사회적</div>
+                        <div class="quiz-option" data-value="3">③ 제품 → 생산 → 판매 → 마케팅 → 사회적</div>
+                        <div class="quiz-option" data-value="4">④ 판매 → 생산 → 제품 → 마케팅 → 사회적</div>
+                    </div>
+                </div>
+
+                <div class="quiz-card" data-quiz="2">
+                    <p class="quiz-question"><span class="quiz-badge">Q2</span>1910년대 생산 중심 개념의 핵심 관점은?</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-value="1" data-correct="true">① "만들 수 있는가?"</div>
+                        <div class="quiz-option" data-value="2">② "최고로 만들 수 있는가?"</div>
+                        <div class="quiz-option" data-value="3">③ "어떻게 팔 것인가?"</div>
+                        <div class="quiz-option" data-value="4">④ "고객은 무엇을 원하는가?"</div>
+                    </div>
+                </div>
+
+                <div class="quiz-card" data-quiz="3">
+                    <p class="quiz-question"><span class="quiz-badge">Q3</span>제품 중심 개념의 한계인 '더 좋은 쥐덫의 오류'가 의미하는 것은?</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-value="1">① 가격이 너무 비싸지는 것</div>
+                        <div class="quiz-option" data-value="2" data-correct="true">② 고객의 진짜 필요를 간과하는 것</div>
+                        <div class="quiz-option" data-value="3">③ 생산 비용이 증가하는 것</div>
+                        <div class="quiz-option" data-value="4">④ 경쟁사보다 뒤처지는 것</div>
+                    </div>
+                </div>
+
+                <div class="quiz-card" data-quiz="4">
+                    <p class="quiz-question"><span class="quiz-badge">Q4</span>1970년대 판매 중심 개념이 등장한 시대 배경은?</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-value="1">① 수요 > 공급 (물자 부족)</div>
+                        <div class="quiz-option" data-value="2" data-correct="true">② 공급 > 수요 (공급 과잉)</div>
+                        <div class="quiz-option" data-value="3">③ 수요 = 공급 (균형 상태)</div>
+                        <div class="quiz-option" data-value="4">④ 경쟁이 없는 독점 시장</div>
+                    </div>
+                </div>
+
+                <div class="quiz-card" data-quiz="5">
+                    <p class="quiz-question"><span class="quiz-badge">Q5</span>판매 중심 개념의 한계로 적절한 것은?</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-value="1">① 고객 욕구 무시</div>
+                        <div class="quiz-option" data-value="2">② 더 좋은 쥐덫의 오류</div>
+                        <div class="quiz-option" data-value="3" data-correct="true">③ 일회성 판매 치중, 장기적 관계 미형성</div>
+                        <div class="quiz-option" data-value="4">④ 사회적 문제 야기</div>
+                    </div>
+                </div>
+
+                <div class="quiz-card" data-quiz="6">
+                    <p class="quiz-question"><span class="quiz-badge">Q6</span>마케팅 중심 개념(1980s~)의 핵심 관점은?</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-value="1">① "만들 수 있는가?"</div>
+                        <div class="quiz-option" data-value="2">② "어떻게 팔 것인가?"</div>
+                        <div class="quiz-option" data-value="3" data-correct="true">③ "고객은 무엇을 원하는가?"</div>
+                        <div class="quiz-option" data-value="4">④ "사회에 어떻게 기여할까?"</div>
+                    </div>
+                </div>
+
+                <div class="quiz-card" data-quiz="7">
+                    <p class="quiz-question"><span class="quiz-badge">Q7</span>사회적 마케팅 개념에서 균형을 맞춰야 하는 세 가지 요소는?</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-value="1">① 품질, 가격, 유통</div>
+                        <div class="quiz-option" data-value="2">② 생산, 판매, 광고</div>
+                        <div class="quiz-option" data-value="3" data-correct="true">③ 이윤, 소비자 만족, 사회적 책임</div>
+                        <div class="quiz-option" data-value="4">④ 제품, 서비스, 브랜드</div>
+                    </div>
+                </div>
+
+                <div class="quiz-card" data-quiz="8">
+                    <p class="quiz-question"><span class="quiz-badge">Q8</span>사회적 마케팅 개념의 핵심 관점은?</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-value="1">① "최고로 만들 수 있는가?"</div>
+                        <div class="quiz-option" data-value="2">② "고객은 무엇을 원하는가?"</div>
+                        <div class="quiz-option" data-value="3">③ "어떻게 팔 것인가?"</div>
+                        <div class="quiz-option" data-value="4" data-correct="true">④ "사회에 어떻게 기여할까?"</div>
+                    </div>
+                </div>
+
+                <div class="quiz-card" data-quiz="9">
+                    <p class="quiz-question"><span class="quiz-badge">Q9</span>마케팅 중심 개념의 위험(Risk)으로 적절한 것은?</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-value="1">① 고객 욕구 무시</div>
+                        <div class="quiz-option" data-value="2" data-correct="true">② 단기적 고객 욕구에만 집중 시 사회적 문제 야기 가능</div>
+                        <div class="quiz-option" data-value="3">③ 일회성 판매에 치중</div>
+                        <div class="quiz-option" data-value="4">④ 품질 개선에만 몰두</div>
+                    </div>
+                </div>
+
+                <div class="quiz-card" data-quiz="10">
+                    <p class="quiz-question"><span class="quiz-badge">Q10</span>사회적 마케팅 개념의 도전(Challenge)은?</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-value="1">① 생산 비용 절감</div>
+                        <div class="quiz-option" data-value="2">② 판매 기술 향상</div>
+                        <div class="quiz-option" data-value="3" data-correct="true">③ 이윤 추구와 사회적 책임 간의 균형 유지</div>
+                        <div class="quiz-option" data-value="4">④ 제품 품질 향상</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 탭 4: 활동지 (실험실) -->
+        <div class="tab-content" id="tab-activity">
+            <div class="section-card">
+                <h2 class="section-title"><span class="icon">⚗️</span> 마케팅 실험실</h2>
+
+                <!-- 실험 1: 마케팅 개념 5단계 순서 정렬 -->
+                <div class="activity-section">
+                    <h3 class="activity-title">🧪 실험 1: 마케팅 개념 5단계 순서 정렬</h3>
+                    <div class="activity-instruction">
+                        💡 PC: 아래 개념들을 드래그하여 올바른 시대 순서대로 배치하세요<br>
+                        📱 모바일: 개념을 터치하여 선택 후, 순서 칸을 터치하여 배치하세요
+                    </div>
+
+                    <div class="drag-container" id="dragContainer1">
+                        <div class="drag-item" data-order="3" draggable="true">🏪 판매 중심 (1970s~)</div>
+                        <div class="drag-item" data-order="1" draggable="true">🏭 생산 중심 (1910s~)</div>
+                        <div class="drag-item" data-order="5" draggable="true">🌍 사회적 마케팅 (현재~)</div>
+                        <div class="drag-item" data-order="2" draggable="true">📦 제품 중심 (1920s~)</div>
+                        <div class="drag-item" data-order="4" draggable="true">🎯 마케팅 중심 (1980s~)</div>
+                    </div>
+
+                    <div class="sequence-container" id="sequenceContainer">
+                        <div class="sequence-slot" data-order="1">
+                            <span class="sequence-number">1</span>
+                            <span class="sequence-era">1910s~</span>
+                        </div>
+                        <div class="sequence-arrow">↓</div>
+                        <div class="sequence-slot" data-order="2">
+                            <span class="sequence-number">2</span>
+                            <span class="sequence-era">1920s~</span>
+                        </div>
+                        <div class="sequence-arrow">↓</div>
+                        <div class="sequence-slot" data-order="3">
+                            <span class="sequence-number">3</span>
+                            <span class="sequence-era">1970s~</span>
+                        </div>
+                        <div class="sequence-arrow">↓</div>
+                        <div class="sequence-slot" data-order="4">
+                            <span class="sequence-number">4</span>
+                            <span class="sequence-era">1980s~</span>
+                        </div>
+                        <div class="sequence-arrow">↓</div>
+                        <div class="sequence-slot" data-order="5">
+                            <span class="sequence-number">5</span>
+                            <span class="sequence-era">현재~</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 실험 2: 핵심 관점(Perspective) 매칭 -->
+                <div class="activity-section" style="margin-top: 30px;">
+                    <h3 class="activity-title">🔗 실험 2: 마케팅 개념과 핵심 관점(Perspective) 매칭</h3>
+                    <div class="activity-instruction">
+                        💡 왼쪽의 마케팅 개념을 클릭한 후, 오른쪽의 알맞은 핵심 관점을 클릭하여 연결하세요
+                    </div>
+
+                    <div class="matching-container">
+                        <div class="matching-column" id="matchingLeft1">
+                            <div class="matching-item" data-match="production">생산 중심</div>
+                            <div class="matching-item" data-match="product">제품 중심</div>
+                            <div class="matching-item" data-match="selling">판매 중심</div>
+                            <div class="matching-item" data-match="marketing">마케팅 중심</div>
+                            <div class="matching-item" data-match="societal">사회적 마케팅</div>
+                        </div>
+                        <div class="matching-lines" id="matchingLines1">
+                            <div class="match-indicator" data-for="production"></div>
+                            <div class="match-indicator" data-for="product"></div>
+                            <div class="match-indicator" data-for="selling"></div>
+                            <div class="match-indicator" data-for="marketing"></div>
+                            <div class="match-indicator" data-for="societal"></div>
+                        </div>
+                        <div class="matching-column" id="matchingRight1">
+                            <div class="matching-item" data-match="marketing">"고객은 무엇을 원하는가?"</div>
+                            <div class="matching-item" data-match="societal">"사회에 어떻게 기여할까?"</div>
+                            <div class="matching-item" data-match="production">"만들 수 있는가?"</div>
+                            <div class="matching-item" data-match="selling">"어떻게 팔 것인가?"</div>
+                            <div class="matching-item" data-match="product">"최고로 만들 수 있는가?"</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 실험 3: 한계(Limitation) 매칭 -->
+                <div class="activity-section" style="margin-top: 30px;">
+                    <h3 class="activity-title">🔗 실험 3: 마케팅 개념과 한계/위험 매칭</h3>
+                    <div class="activity-instruction">
+                        💡 왼쪽의 마케팅 개념을 클릭한 후, 오른쪽의 알맞은 한계/위험/도전을 클릭하여 연결하세요
+                    </div>
+
+                    <div class="matching-container">
+                        <div class="matching-column" id="matchingLeft2">
+                            <div class="matching-item" data-match="production2">생산 중심</div>
+                            <div class="matching-item" data-match="product2">제품 중심</div>
+                            <div class="matching-item" data-match="selling2">판매 중심</div>
+                            <div class="matching-item" data-match="marketing2">마케팅 중심</div>
+                            <div class="matching-item" data-match="societal2">사회적 마케팅</div>
+                        </div>
+                        <div class="matching-lines" id="matchingLines2">
+                            <div class="match-indicator" data-for="production2"></div>
+                            <div class="match-indicator" data-for="product2"></div>
+                            <div class="match-indicator" data-for="selling2"></div>
+                            <div class="match-indicator" data-for="marketing2"></div>
+                            <div class="match-indicator" data-for="societal2"></div>
+                        </div>
+                        <div class="matching-column" id="matchingRight2">
+                            <div class="matching-item" data-match="selling2">일회성 판매 치중</div>
+                            <div class="matching-item" data-match="societal2">균형 유지의 어려움</div>
+                            <div class="matching-item" data-match="production2">고객 욕구 무시</div>
+                            <div class="matching-item" data-match="marketing2">사회적 문제 야기 가능</div>
+                            <div class="matching-item" data-match="product2">'더 좋은 쥐덫'의 오류</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 실험 4: 목표/전략 분류 -->
+                <div class="activity-section" style="margin-top: 30px;">
+                    <h3 class="activity-title">🧪 실험 4: 목표/전략 분류하기</h3>
+                    <div class="activity-instruction">
+                        💡 PC: 아래 전략들을 드래그하여 해당하는 마케팅 개념에 분류하세요<br>
+                        📱 모바일: 전략을 터치하여 선택 후, 영역을 터치하여 배치하세요
+                    </div>
+
+                    <div class="drag-container" id="dragContainer2">
+                        <div class="drag-item" data-category="production" draggable="true">원가 절감</div>
+                        <div class="drag-item" data-category="product" draggable="true">R&D 투자</div>
+                        <div class="drag-item" data-category="selling" draggable="true">영업 및 판촉</div>
+                        <div class="drag-item" data-category="marketing" draggable="true">고객 만족</div>
+                        <div class="drag-item" data-category="societal" draggable="true">친환경적 생산</div>
+                        <div class="drag-item" data-category="production" draggable="true">규모의 경제</div>
+                    </div>
+
+                    <div class="drop-zones" style="flex-wrap: wrap;">
+                        <div class="drop-zone-group" style="min-width: 150px;">
+                            <div class="drop-zone-title" style="color: var(--lab-mint);">🏭 생산 중심</div>
+                            <div class="drop-zone" data-accept="production" id="productionZone"></div>
+                        </div>
+                        <div class="drop-zone-group" style="min-width: 150px;">
+                            <div class="drop-zone-title" style="color: var(--lab-blue);">📦 제품 중심</div>
+                            <div class="drop-zone" data-accept="product" id="productZone"></div>
+                        </div>
+                        <div class="drop-zone-group" style="min-width: 150px;">
+                            <div class="drop-zone-title" style="color: var(--lab-purple);">🏪 판매 중심</div>
+                            <div class="drop-zone" data-accept="selling" id="sellingZone"></div>
+                        </div>
+                        <div class="drop-zone-group" style="min-width: 150px;">
+                            <div class="drop-zone-title" style="color: var(--lab-orange);">🎯 마케팅 중심</div>
+                            <div class="drop-zone" data-accept="marketing" id="marketingZone"></div>
+                        </div>
+                        <div class="drop-zone-group" style="min-width: 150px;">
+                            <div class="drop-zone-title" style="color: var(--lab-pink);">🌍 사회적 마케팅</div>
+                            <div class="drop-zone" data-accept="societal" id="societalZone"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-check" onclick="checkActivity()">✅ 실험 결과 확인</button>
+                    <button class="btn btn-section-reset" onclick="resetActivity()">🔄 실험실 초기화</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn btn-save" onclick="saveProgress()">💾 저장하기</button>
+            <button class="btn btn-submit" onclick="submitWorksheet()">📤 제출하기</button>
+            <button class="btn btn-reset" onclick="resetAll()">🔄 초기화</button>
+        </div>
+
+        <div class="result-section" id="resultSection">
+            <div class="result-icon">🏆</div>
+            <div class="result-grade" id="resultGrade">A+</div>
+            <p class="result-message" id="resultMessage">완벽해요!</p>
+            <div class="result-details" id="resultDetails"></div>
+            <div class="btn-group">
+                <button class="btn btn-reset" onclick="resetAll()">🔄 다시 연구하기</button>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>🔬 은또링쌤의 마케팅Lab | 한국디지털미디어고등학교</p>
+            <p>Made with 💙 for DIMIGO Students</p>
+        </footer>
+    </div>
+
+    <div class="toast" id="toast">저장되었습니다!</div>
+
+    <!-- 확인 모달 -->
+    <div class="confirm-modal" id="confirmModal">
+        <div class="confirm-box">
+            <p>🔄 모든 연구 기록을 초기화하시겠습니까?</p>
+            <div class="confirm-btns">
+                <button class="confirm-btn confirm-yes" onclick="doReset()">초기화</button>
+                <button class="confirm-btn confirm-no" onclick="closeConfirm()">취소</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 분자 생성
+        function createMolecules() {
+            const molecules = ['🔬', '🧪', '⚗️', '💡', '📊', '🧬', '📈', '🔍'];
+            for (let i = 0; i < 12; i++) {
+                const mol = document.createElement('div');
+                mol.className = 'molecule';
+                mol.textContent = molecules[Math.floor(Math.random() * molecules.length)];
+                mol.style.left = Math.random() * 100 + '%';
+                mol.style.top = Math.random() * 100 + '%';
+                mol.style.animationDelay = Math.random() * 5 + 's';
+                mol.style.animationDuration = (6 + Math.random() * 4) + 's';
+                document.body.appendChild(mol);
+            }
+        }
+        createMolecules();
+
+        // 탭 전환
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                tabBtns.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+            });
+        });
+
+        // 학습목표 체크
+        const objectiveItems = document.querySelectorAll('.objective-item');
+        objectiveItems.forEach(item => {
+            item.addEventListener('click', () => {
+                item.classList.toggle('checked');
+                item.querySelector('.objective-checkbox').textContent = item.classList.contains('checked') ? '✓' : '';
+                updateProgress();
+            });
+        });
+
+        // 개념정리 빈칸
+        const conceptSelects = document.querySelectorAll('.blank-select[data-type="concept"]');
+        conceptSelects.forEach(select => {
+            select.addEventListener('change', function() {
+                this.classList.remove('correct', 'wrong');
+                if (this.value) this.classList.add(this.value === this.dataset.answer ? 'correct' : 'wrong');
+                updateProgress();
+            });
+        });
+
+        // 퀴즈
+        const quizCards = document.querySelectorAll('.quiz-card');
+        quizCards.forEach(card => {
+            card.querySelectorAll('.quiz-option').forEach(opt => {
+                opt.addEventListener('click', function() {
+                    if (card.classList.contains('answered')) return;
+                    card.querySelectorAll('.quiz-option').forEach(o => o.classList.remove('selected', 'correct', 'wrong'));
+                    this.classList.add('selected', this.dataset.correct === 'true' ? 'correct' : 'wrong');
+                    if (this.dataset.correct !== 'true') {
+                        card.querySelectorAll('.quiz-option').forEach(o => { if (o.dataset.correct === 'true') o.classList.add('correct'); });
+                    }
+                    card.classList.add('answered');
+                    updateProgress();
+                });
+            });
+        });
+
+        // 드래그앤드롭 - 순서 정렬용
+        let selectedDragItem = null;
+        const dragItems1 = document.querySelectorAll('#dragContainer1 .drag-item');
+        const sequenceSlots = document.querySelectorAll('.sequence-slot');
+
+        dragItems1.forEach(item => {
+            item.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', item.textContent);
+                e.dataTransfer.setData('order', item.dataset.order);
+            });
+            item.addEventListener('click', () => {
+                if (item.classList.contains('placed')) return;
+                dragItems1.forEach(i => i.classList.remove('selected'));
+                item.classList.add('selected');
+                selectedDragItem = item;
+            });
+        });
+
+        sequenceSlots.forEach(slot => {
+            slot.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                slot.classList.add('drag-over');
+            });
+            slot.addEventListener('dragleave', () => slot.classList.remove('drag-over'));
+            slot.addEventListener('drop', (e) => {
+                e.preventDefault();
+                slot.classList.remove('drag-over');
+                if (slot.querySelector('.dropped-item')) return;
+                const text = e.dataTransfer.getData('text/plain');
+                const order = e.dataTransfer.getData('order');
+                addToSequenceSlot(slot, text, order);
+                dragItems1.forEach(item => { if (item.textContent === text) item.classList.add('placed'); });
+            });
+            slot.addEventListener('click', () => {
+                if (selectedDragItem && !selectedDragItem.classList.contains('placed') && !slot.querySelector('.dropped-item')) {
+                    addToSequenceSlot(slot, selectedDragItem.textContent, selectedDragItem.dataset.order);
+                    selectedDragItem.classList.add('placed');
+                    selectedDragItem.classList.remove('selected');
+                    selectedDragItem = null;
+                }
+            });
+        });
+
+        function addToSequenceSlot(slot, text, order) {
+            const item = document.createElement('div');
+            item.className = 'dropped-item';
+            item.dataset.order = order;
+            item.innerHTML = `${text} <button class="remove-btn" onclick="removeSequenceItem(this, '${text}')">✕</button>`;
+            slot.appendChild(item);
+            slot.classList.add('filled');
+            updateProgress();
+        }
+
+        function removeSequenceItem(btn, text) {
+            const slot = btn.parentElement.parentElement;
+            btn.parentElement.remove();
+            slot.classList.remove('filled');
+            dragItems1.forEach(item => { if (item.textContent === text) item.classList.remove('placed'); });
+            updateProgress();
+        }
+
+        // 드래그앤드롭 - 분류용
+        const dragItems2 = document.querySelectorAll('#dragContainer2 .drag-item');
+        const dropZones2 = document.querySelectorAll('#productionZone, #productZone, #sellingZone, #marketingZone, #societalZone');
+
+        dragItems2.forEach(item => {
+            item.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', item.textContent);
+                e.dataTransfer.setData('category', item.dataset.category);
+            });
+            item.addEventListener('click', () => {
+                if (item.classList.contains('placed')) return;
+                dragItems2.forEach(i => i.classList.remove('selected'));
+                item.classList.add('selected');
+                selectedDragItem = item;
+            });
+        });
+
+        dropZones2.forEach(zone => {
+            zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('drag-over'); });
+            zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                zone.classList.remove('drag-over');
+                const text = e.dataTransfer.getData('text/plain');
+                const category = e.dataTransfer.getData('category');
+                addToDropZone(zone, text, category);
+                dragItems2.forEach(item => { if (item.textContent === text) item.classList.add('placed'); });
+            });
+            zone.addEventListener('click', () => {
+                if (selectedDragItem && selectedDragItem.parentElement.id === 'dragContainer2' && !selectedDragItem.classList.contains('placed')) {
+                    addToDropZone(zone, selectedDragItem.textContent, selectedDragItem.dataset.category);
+                    selectedDragItem.classList.add('placed');
+                    selectedDragItem.classList.remove('selected');
+                    selectedDragItem = null;
+                }
+            });
+        });
+
+        function addToDropZone(zone, text, category) {
+            const item = document.createElement('div');
+            item.className = 'dropped-item';
+            item.dataset.category = category;
+            item.innerHTML = `${text} <button class="remove-btn" onclick="removeDroppedItem(this, '${text}')">✕</button>`;
+            zone.appendChild(item);
+            updateProgress();
+        }
+
+        function removeDroppedItem(btn, text) {
+            btn.parentElement.remove();
+            dragItems2.forEach(item => { if (item.textContent === text) item.classList.remove('placed'); });
+            updateProgress();
+        }
+
+        // 매칭
+        function setupMatching(leftId, rightId, linesId) {
+            let selected = null;
+            document.querySelectorAll(`#${leftId} .matching-item`).forEach(item => {
+                item.addEventListener('click', function() {
+                    if (this.classList.contains('matched')) return;
+                    document.querySelectorAll(`#${leftId} .matching-item`).forEach(i => i.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selected = this;
+                });
+            });
+            document.querySelectorAll(`#${rightId} .matching-item`).forEach(item => {
+                item.addEventListener('click', function() {
+                    if (!selected || this.classList.contains('matched')) return;
+                    if (selected.dataset.match === this.dataset.match) {
+                        selected.classList.remove('selected');
+                        selected.classList.add('matched');
+                        this.classList.add('matched');
+                        const indicator = document.querySelector(`#${linesId} .match-indicator[data-for="${selected.dataset.match}"]`);
+                        if (indicator) indicator.classList.add('connected');
+                    } else {
+                        this.classList.add('wrong-match');
+                        setTimeout(() => this.classList.remove('wrong-match'), 500);
+                    }
+                    selected = null;
+                    updateProgress();
+                });
+            });
+        }
+        setupMatching('matchingLeft1', 'matchingRight1', 'matchingLines1');
+        setupMatching('matchingLeft2', 'matchingRight2', 'matchingLines2');
+
+        function checkActivity() {
+            // 순서 정렬 채점
+            document.querySelectorAll('.sequence-slot .dropped-item').forEach(item => {
+                item.classList.remove('correct', 'wrong');
+                const slot = item.parentElement;
+                item.classList.add(slot.dataset.order === item.dataset.order ? 'correct' : 'wrong');
+            });
+            
+            // 분류 채점
+            dropZones2.forEach(zone => {
+                zone.querySelectorAll('.dropped-item').forEach(item => {
+                    item.classList.remove('correct', 'wrong');
+                    item.classList.add(zone.dataset.accept === item.dataset.category ? 'correct' : 'wrong');
+                });
+            });
+            
+            showToast('🔬 실험 결과를 확인했습니다!');
+        }
+
+        function updateProgress() {
+            let total = 0, answered = 0, correct = 0;
+            
+            // 학습목표
+            objectiveItems.forEach(item => {
+                total++;
+                if (item.classList.contains('checked')) { answered++; correct++; }
+            });
+            
+            // 개념정리
+            conceptSelects.forEach(select => {
+                total++;
+                if (select.value) { answered++; if (select.classList.contains('correct')) correct++; }
+            });
+            
+            // 퀴즈
+            quizCards.forEach(card => {
+                total++;
+                if (card.classList.contains('answered')) {
+                    answered++;
+                    const sel = card.querySelector('.quiz-option.selected');
+                    if (sel && sel.dataset.correct === 'true') correct++;
+                }
+            });
+            
+            // 순서 정렬
+            total += 5;
+            document.querySelectorAll('.sequence-slot .dropped-item').forEach(item => {
+                answered++;
+                if (item.parentElement.dataset.order === item.dataset.order) correct++;
+            });
+            
+            // 분류
+            total += dragItems2.length;
+            dropZones2.forEach(zone => {
+                zone.querySelectorAll('.dropped-item').forEach(item => {
+                    answered++;
+                    if (zone.dataset.accept === item.dataset.category) correct++;
+                });
+            });
+            
+            // 매칭
+            ['matchingLeft1', 'matchingLeft2'].forEach(id => {
+                document.querySelectorAll(`#${id} .matching-item`).forEach(item => {
+                    total++;
+                    if (item.classList.contains('matched')) { answered++; correct++; }
+                });
+            });
+            
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('answeredCount').textContent = answered;
+            document.getElementById('correctCount').textContent = correct;
+            const pct = total > 0 ? Math.round((answered / total) * 100) : 0;
+            const bar = document.getElementById('progressBar');
+            bar.style.width = pct + '%';
+            bar.textContent = pct + '%';
+        }
+
+        function saveProgress() {
+            const data = {
+                studentName: document.getElementById('studentName').value,
+                studentId: document.getElementById('studentId').value,
+                timestamp: new Date().toISOString()
+            };
+            localStorage.setItem('marketinglab_week1_class2_v2', JSON.stringify(data));
+            showToast('💾 연구 기록이 저장되었습니다!');
+        }
+
+        function submitWorksheet() {
+            const name = document.getElementById('studentName').value;
+            const id = document.getElementById('studentId').value;
+            if (!name || !id) { showToast('⚠️ 연구원 정보를 입력해주세요!'); return; }
+            saveProgress();
+            
+            let total = 0, correct = 0;
+            objectiveItems.forEach(item => { total++; if (item.classList.contains('checked')) correct++; });
+            conceptSelects.forEach(select => { total++; if (select.classList.contains('correct')) correct++; });
+            quizCards.forEach(card => { total++; const sel = card.querySelector('.quiz-option.selected'); if (sel && sel.dataset.correct === 'true') correct++; });
+            
+            // 순서 정렬 채점
+            document.querySelectorAll('.sequence-slot').forEach(slot => {
+                total++;
+                const item = slot.querySelector('.dropped-item');
+                if (item && slot.dataset.order === item.dataset.order) correct++;
+            });
+            
+            // 분류 채점
+            dragItems2.forEach(() => total++);
+            dropZones2.forEach(zone => {
+                zone.querySelectorAll('.dropped-item').forEach(item => {
+                    if (zone.dataset.accept === item.dataset.category) correct++;
+                });
+            });
+            
+            // 매칭 채점
+            ['matchingLeft1', 'matchingLeft2'].forEach(id => {
+                document.querySelectorAll(`#${id} .matching-item`).forEach(item => {
+                    total++;
+                    if (item.classList.contains('matched')) correct++;
+                });
+            });
+            
+            const pct = Math.round((correct / total) * 100);
+            let grade, message;
+            if (pct >= 90) { grade = 'A+'; message = '완벽한 연구 결과입니다! 🏆'; }
+            else if (pct >= 80) { grade = 'A'; message = '훌륭한 연구원이에요! 👏'; }
+            else if (pct >= 70) { grade = 'B+'; message = '잘했어요! 조금만 더! 💪'; }
+            else if (pct >= 60) { grade = 'B'; message = '좋아요! 복습하면 완벽! 📚'; }
+            else { grade = 'C'; message = '힘내요! 다시 연구해봐요! 🔬'; }
+            
+            // 구글 스프레드시트로 전송
+            const submitData = {
+                week: 1,
+                session: 2,
+                sessionTitle: '마케팅 개념의 발전 과정',
+                name: name,
+                studentId: id,
+                correct: correct,
+                total: total,
+                percentage: pct,
+                grade: grade,
+                timestamp: new Date().toISOString()
+            };
+            
+            fetch('https://script.google.com/macros/s/AKfycbw74Pv4jRMA_3aX-tOShm-Wca50XsW7VHQcQALyT8p26Z5TurhkBDWT0r2Mu-eLG30/exec', {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(submitData)
+            }).then(() => {
+                showToast('📤 연구 보고서가 제출되었습니다!');
+            }).catch(err => {
+                showToast('⚠️ 제출 중 오류가 발생했습니다. 다시 시도해주세요.');
+                console.error(err);
+            });
+            
+            document.getElementById('resultGrade').textContent = grade;
+            document.getElementById('resultMessage').textContent = message;
+            document.getElementById('resultDetails').innerHTML = `<h4>📊 ${name} 연구원 (${id}) 연구 결과</h4><ul><li><span>정답률</span><span>${pct}% (${correct}/${total})</span></li><li><span>연구 등급</span><span>${grade}</span></li><li><span>제출 시간</span><span>${new Date().toLocaleString('ko-KR')}</span></li></ul>`;
+            document.getElementById('resultSection').classList.add('show');
+            document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function resetAll() {
+            document.getElementById('confirmModal').classList.add('show');
+        }
+
+        function closeConfirm() {
+            document.getElementById('confirmModal').classList.remove('show');
+        }
+
+        // 학습목표 초기화
+        function resetObjectives() {
+            document.querySelectorAll('.objective-item').forEach(item => {
+                item.classList.remove('checked');
+                item.querySelector('.objective-checkbox').textContent = '';
+            });
+            updateProgress();
+        }
+
+        // 개념정리 개별 문제 초기화
+        function resetConceptItem(btn) {
+            const card = btn.parentElement;
+            card.querySelectorAll('.blank-select').forEach(select => {
+                select.value = '';
+                select.classList.remove('correct', 'wrong');
+            });
+            updateProgress();
+            showToast('🔄 해당 문제가 초기화되었습니다!');
+        }
+
+        // 개념정리 초기화
+        function resetConcepts() {
+            document.querySelectorAll('.blank-select').forEach(select => {
+                select.value = '';
+                select.classList.remove('correct', 'wrong');
+            });
+            updateProgress();
+        }
+
+        // 형성평가 초기화
+        function resetQuiz() {
+            document.querySelectorAll('.quiz-card').forEach(card => {
+                card.classList.remove('answered');
+                card.querySelectorAll('.quiz-option').forEach(opt => {
+                    opt.classList.remove('selected', 'correct', 'wrong');
+                });
+            });
+            updateProgress();
+        }
+
+        // 실험실 초기화
+        function resetActivity() {
+            // 순서 정렬 초기화
+            document.querySelectorAll('.sequence-slot .dropped-item').forEach(item => item.remove());
+            document.querySelectorAll('.sequence-slot').forEach(slot => slot.classList.remove('filled'));
+            dragItems1.forEach(item => item.classList.remove('placed', 'selected'));
+            
+            // 분류 초기화
+            dropZones2.forEach(zone => {
+                zone.querySelectorAll('.dropped-item').forEach(item => item.remove());
+            });
+            dragItems2.forEach(item => item.classList.remove('placed', 'selected'));
+            
+            // 매칭 초기화
+            document.querySelectorAll('.matching-item').forEach(item => {
+                item.classList.remove('matched', 'selected', 'wrong-match');
+            });
+            document.querySelectorAll('.match-indicator').forEach(ind => {
+                ind.classList.remove('connected');
+            });
+            
+            selectedDragItem = null;
+            updateProgress();
+            showToast('⚗️ 실험실이 초기화되었습니다!');
+        }
+
+        function doReset() {
+            closeConfirm();
+            localStorage.removeItem('marketinglab_week1_class2_v2');
+            
+            resetObjectives();
+            resetConcepts();
+            resetQuiz();
+            resetActivity();
+            
+            document.getElementById('resultSection').classList.remove('show');
+            
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelector('.tab-btn').classList.add('active');
+            document.getElementById('tab-objectives').classList.add('active');
+            
+            showToast('🔄 전체 초기화되었습니다!');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2500);
+        }
+
+        document.addEventListener('DOMContentLoaded', updateProgress);
+    </script>
+</body>
+</html>
