@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔬 은또링쌤의 마케팅Lab | 1주차 최종 정리</title>
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Black+Han+Sans&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --lab-mint: #00D4AA;
+            --lab-blue: #4A90D9;
+            --lab-purple: #7B68EE;
+            --lab-green: #32CD32;
+            --lab-orange: #FF8C42;
+            --lab-pink: #FF6B9D;
+            --lab-dark: #1E2A3A;
+            --lab-gray: #F0F4F8;
+            --lab-white: #FFFFFF;
+            --correct: #00C853;
+            --wrong: #FF5252;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Gowun Dodum', sans-serif; background: linear-gradient(135deg, #E8F5E9 0%, #E3F2FD 50%, #F3E5F5 100%); min-height: 100vh; padding: 15px; position: relative; }
+        .molecule { position: fixed; font-size: 1.5rem; opacity: 0.12; animation: float 8s ease-in-out infinite; z-index: 0; pointer-events: none; }
+        @keyframes float { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-20px) rotate(15deg); } }
+        .container { max-width: 900px; margin: 0 auto; position: relative; z-index: 10; }
+        .header { background: var(--lab-white); border-radius: 20px; padding: 25px; text-align: center; margin-bottom: 15px; box-shadow: 0 8px 32px rgba(0,212,170,0.15); border: 3px solid var(--lab-mint); position: relative; }
+        .header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px; background: linear-gradient(90deg, var(--lab-mint), var(--lab-blue), var(--lab-purple), var(--lab-pink)); border-radius: 20px 20px 0 0; }
+        .header-icons { position: absolute; top: 15px; left: 20px; font-size: 1.5rem; display: flex; gap: 8px; }
+        .header-icons span { animation: bubble 2s ease-in-out infinite; }
+        .header-icons span:nth-child(2) { animation-delay: 0.3s; }
+        .header-icons span:nth-child(3) { animation-delay: 0.6s; }
+        @keyframes bubble { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-5px) scale(1.1); } }
+        .header-badge { position: absolute; top: 15px; right: 20px; background: linear-gradient(135deg, var(--lab-mint), var(--lab-blue)); color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; }
+        .header h1 { font-family: 'Gowun Dodum', sans-serif; font-size: 2rem; font-weight: 600; background: linear-gradient(135deg, var(--lab-mint), var(--lab-blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 8px; margin-top: 10px; }
+        .header .subtitle { font-size: 1.15rem; color: var(--lab-dark); font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .header .week-info { display: inline-block; background: linear-gradient(135deg, var(--lab-purple), var(--lab-pink)); color: white; padding: 6px 16px; border-radius: 20px; font-size: 0.85rem; margin-top: 12px; font-weight: bold; }
+        .student-info { background: var(--lab-white); border-radius: 15px; padding: 15px 20px; margin-bottom: 15px; display: flex; gap: 15px; flex-wrap: wrap; align-items: center; justify-content: center; border: 2px solid #E0E7EE; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .student-info label { font-weight: bold; color: var(--lab-dark); display: flex; align-items: center; gap: 5px; }
+        .student-info input { padding: 10px 15px; border: 2px solid #E0E7EE; border-radius: 10px; font-family: 'Gowun Dodum', sans-serif; font-size: 0.95rem; width: 130px; transition: all 0.3s ease; }
+        .student-info input:focus { outline: none; border-color: var(--lab-mint); box-shadow: 0 0 0 3px rgba(0,212,170,0.1); }
+        .tab-nav { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; justify-content: center; background: var(--lab-white); padding: 10px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .tab-btn { padding: 12px 18px; border: 2px solid #E0E7EE; border-radius: 12px; font-family: 'Gowun Dodum', sans-serif; font-size: 0.85rem; font-weight: bold; cursor: pointer; transition: all 0.3s ease; background: var(--lab-white); color: var(--lab-dark); }
+        .tab-btn.active { background: linear-gradient(135deg, var(--lab-mint), var(--lab-blue)); color: white; border-color: transparent; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,212,170,0.3); }
+        .tab-btn:hover:not(.active) { border-color: var(--lab-mint); background: rgba(0,212,170,0.05); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .progress-section { background: var(--lab-white); border-radius: 15px; padding: 18px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 2px solid #E0E7EE; }
+        .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .progress-title { font-weight: bold; color: var(--lab-dark); display: flex; align-items: center; gap: 8px; }
+        .progress-bar-container { background: #E8F5E9; border-radius: 10px; height: 20px; overflow: hidden; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--lab-mint), var(--lab-blue)); border-radius: 10px; transition: width 0.5s ease; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.75rem; }
+        .progress-stats { display: flex; justify-content: space-between; margin-top: 10px; font-size: 0.85rem; color: var(--lab-dark); }
+        .progress-stats span { display: flex; align-items: center; gap: 5px; }
+        .section-card { background: var(--lab-white); border-radius: 20px; padding: 25px; margin-bottom: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 2px solid #E0E7EE; }
+        .section-title { font-family: 'Gowun Dodum', sans-serif; font-size: 1.3rem; font-weight: 600; color: var(--lab-dark); margin-bottom: 18px; display: flex; align-items: center; gap: 10px; padding-bottom: 12px; border-bottom: 2px dashed #E0E7EE; }
+        .section-title .icon { font-size: 1.4rem; }
+        .subsection-title { font-size: 1.1rem; font-weight: bold; color: var(--lab-dark); margin: 25px 0 15px 0; padding-bottom: 10px; border-bottom: 2px dashed #E0E7EE; display: flex; align-items: center; gap: 8px; }
+
+        /* 드래그앤드롭 카드 */
+        .dnd-card { background: linear-gradient(135deg, #FAFFFE, #F5FAFF); border-radius: 15px; padding: 18px; margin-bottom: 16px; border-left: 5px solid var(--lab-mint); transition: all 0.3s ease; }
+        .dnd-card:nth-child(4n+3) { border-left-color: var(--lab-blue); }
+        .dnd-card:nth-child(4n) { border-left-color: var(--lab-purple); }
+        .dnd-card:nth-child(4n+1) { border-left-color: var(--lab-pink); }
+        .dnd-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+        .dnd-card-number { display: inline-flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--lab-mint), var(--lab-blue)); color: white; width: 28px; height: 28px; border-radius: 8px; font-weight: bold; font-size: 0.85rem; }
+        .dnd-card-label { font-weight: bold; color: var(--lab-dark); font-size: 1rem; }
+        .dnd-card-text { font-size: 0.95rem; color: var(--lab-dark); line-height: 2; }
+
+        .drop-slot { display: inline-flex; align-items: center; justify-content: center; min-width: 80px; min-height: 34px; padding: 4px 12px; border: 2px dashed var(--lab-blue); border-radius: 8px; background: white; font-family: 'Gowun Dodum', sans-serif; font-size: 0.88rem; font-weight: bold; color: var(--lab-dark); cursor: pointer; transition: all 0.3s ease; vertical-align: middle; margin: 2px 1px; }
+        .drop-slot:empty::before { content: attr(data-placeholder); color: #B0BEC5; font-weight: normal; font-size: 0.82rem; }
+        .drop-slot.drag-over { border-color: var(--lab-mint); background: rgba(0,212,170,0.08); transform: scale(1.03); }
+        .drop-slot.filled { border-style: solid; border-color: var(--lab-blue); background: #E3F2FD; cursor: default; }
+        .drop-slot.correct { border-color: var(--correct); background: #E8F5E9; color: #1B5E20; }
+        .drop-slot.wrong { border-color: var(--wrong); background: #FFEBEE; color: #B71C1C; }
+        .drop-slot .slot-remove { margin-left: 6px; background: rgba(0,0,0,0.12); border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 0.65rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: #666; transition: all 0.2s; flex-shrink: 0; }
+        .drop-slot .slot-remove:hover { background: rgba(255,0,0,0.2); color: var(--wrong); }
+        .drop-slot.correct .slot-remove, .drop-slot.wrong .slot-remove { display: none; }
+
+        .word-bank { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; padding: 12px; background: #F8FAFC; border-radius: 12px; border: 2px dashed #CBD5E0; min-height: 44px; align-items: center; }
+        .word-bank-label { font-size: 0.8rem; color: #78909C; font-weight: bold; margin-right: 4px; user-select: none; }
+        .word-chip { padding: 7px 16px; background: linear-gradient(135deg, var(--lab-blue), var(--lab-purple)); color: white; border-radius: 25px; cursor: grab; font-size: 0.85rem; font-weight: bold; transition: all 0.3s ease; user-select: none; box-shadow: 0 3px 8px rgba(74,144,217,0.3); white-space: nowrap; }
+        .word-chip:active { cursor: grabbing; transform: scale(1.05); }
+        .word-chip.selected { box-shadow: 0 0 0 3px var(--lab-orange), 0 3px 12px rgba(255,140,66,0.4); transform: scale(1.05); }
+        .word-chip.used { opacity: 0.35; pointer-events: none; transform: scale(0.95); }
+        .dnd-card-footer { display: flex; justify-content: flex-end; margin-top: 8px; }
+
+        .evolution-flow { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; align-items: center; margin: 8px 0 4px; }
+        .evolution-flow .drop-slot { min-width: 100px; }
+        .evo-arrow { font-size: 1.3rem; color: var(--lab-blue); }
+        .evo-sub { font-size: 0.68rem; color: #999; text-align: center; display: block; margin-top: 2px; }
+
+        .mkt-type-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 12px; margin: 12px 0; }
+        .mkt-type-item { background: white; border-radius: 12px; padding: 14px; border: 2px solid #E0E7EE; transition: all 0.3s; }
+        .mkt-type-item:hover { border-color: var(--lab-mint); }
+        .mkt-type-demand { display: inline-block; background: linear-gradient(135deg, var(--lab-purple), var(--lab-pink)); color: white; padding: 3px 10px; border-radius: 15px; font-size: 0.75rem; font-weight: bold; margin-bottom: 6px; }
+        .mkt-type-slot-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+        .mkt-type-slot-row .arrow-icon { color: var(--lab-blue); font-weight: bold; }
+        .mkt-type-desc { font-size: 0.85rem; color: #666; line-height: 1.6; }
+
+        .special-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; margin: 12px 0; }
+        .special-item { background: white; border-radius: 12px; padding: 14px; border-left: 4px solid var(--lab-mint); box-shadow: 0 3px 10px rgba(0,0,0,0.06); }
+        .special-item:nth-child(2) { border-left-color: var(--lab-blue); }
+        .special-item:nth-child(3) { border-left-color: var(--lab-purple); }
+        .special-item:nth-child(4) { border-left-color: var(--lab-pink); }
+        .special-item:nth-child(5) { border-left-color: var(--lab-orange); }
+        .special-item-title { font-weight: bold; color: var(--lab-dark); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .special-item-desc { font-size: 0.88rem; color: #555; line-height: 1.7; }
+
+        .quiz-card { background: linear-gradient(135deg, #FAFFFE, #F5FAFF); border-radius: 15px; padding: 18px; margin-bottom: 15px; border: 2px solid #E0E7EE; }
+        .quiz-question { font-weight: bold; color: var(--lab-dark); margin-bottom: 15px; font-size: 0.95rem; display: flex; align-items: flex-start; gap: 10px; }
+        .quiz-badge { background: linear-gradient(135deg, var(--lab-purple), var(--lab-pink)); color: white; padding: 3px 10px; border-radius: 15px; font-size: 0.75rem; flex-shrink: 0; }
+        .quiz-options { display: flex; flex-direction: column; gap: 10px; }
+        .quiz-option { padding: 14px 18px; background: white; border: 2px solid #E0E7EE; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; font-size: 0.9rem; }
+        .quiz-option:hover { border-color: var(--lab-mint); background: rgba(0,212,170,0.05); transform: translateX(5px); }
+        .quiz-option.selected { border-color: var(--lab-blue); background: #E3F2FD; }
+        .quiz-option.correct { border-color: var(--correct); background: #E8F5E9; }
+        .quiz-option.wrong { border-color: var(--wrong); background: #FFEBEE; }
+        .quiz-desc-box { background: #F8F9FA; border: 2px solid #E0E7EE; border-radius: 12px; padding: 14px 18px; margin-bottom: 15px; font-size: 0.9rem; line-height: 1.7; color: var(--lab-dark); }
+        .quiz-desc-box .quiz-example { display: flex; align-items: center; gap: 6px; margin-top: 6px; font-size: 0.85rem; color: #666; }
+        .short-answer-card { background: linear-gradient(135deg, #FAFFFE, #F5FAFF); border-radius: 15px; padding: 18px; margin-bottom: 15px; border: 2px solid #E0E7EE; }
+        .short-answer-box { background: #F8F9FA; border: 2px solid #E0E7EE; border-radius: 12px; padding: 14px 18px; margin-bottom: 15px; font-size: 0.9rem; line-height: 1.7; color: var(--lab-dark); }
+        .short-answer-input { width: 100%; padding: 12px 15px; border: 2px dashed var(--lab-blue); border-radius: 10px; font-family: 'Gowun Dodum', sans-serif; font-size: 0.95rem; background: white; transition: all 0.3s; outline: none; }
+        .short-answer-input:focus { border-color: var(--lab-mint); box-shadow: 0 0 0 3px rgba(0,212,170,0.15); }
+        .short-answer-input.correct { background: #E8F5E9; border-color: var(--correct); border-style: solid; }
+        .short-answer-input.wrong { background: #FFEBEE; border-color: var(--wrong); border-style: solid; }
+
+        .btn { padding: 12px 25px; border: none; border-radius: 12px; font-family: 'Gowun Dodum', sans-serif; font-size: 0.95rem; font-weight: bold; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-check { background: linear-gradient(135deg, var(--lab-mint), var(--lab-blue)); color: white; }
+        .btn-check:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0,212,170,0.4); }
+        .btn-save { background: linear-gradient(135deg, var(--lab-blue), #5BA0E0); color: white; }
+        .btn-save:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(74,144,217,0.4); }
+        .btn-submit { background: linear-gradient(135deg, var(--lab-purple), var(--lab-pink)); color: white; }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(123,104,238,0.4); }
+        .btn-reset { background: linear-gradient(135deg, #78909C, #90A4AE); color: white; }
+        .btn-reset:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(120,144,156,0.4); }
+        .btn-section-reset { background: linear-gradient(135deg, #FF8A65, #FF7043); color: white; font-size: 0.85rem; padding: 10px 18px; }
+        .btn-item-reset { background: #E0E7EE; color: var(--lab-dark); font-size: 0.75rem; padding: 6px 12px; }
+        .btn-item-reset:hover { background: #CBD5E0; }
+        .btn-group { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 20px; }
+
+        .result-section { display: none; background: linear-gradient(135deg, #E8F5E9, #C8E6C9); border-radius: 20px; padding: 30px; text-align: center; margin-top: 20px; border: 3px solid var(--correct); }
+        .result-section.show { display: block; animation: fadeIn 0.5s ease; }
+        .result-icon { font-size: 4rem; margin-bottom: 15px; }
+        .result-grade { font-size: 3rem; font-weight: bold; color: var(--correct); margin-bottom: 10px; }
+        .result-message { font-size: 1.2rem; color: var(--lab-dark); margin-bottom: 20px; }
+        .result-details { background: white; border-radius: 15px; padding: 20px; text-align: left; }
+        .result-details h4 { color: var(--lab-dark); margin-bottom: 15px; }
+        .result-details ul { list-style: none; }
+        .result-details li { padding: 10px 0; border-bottom: 1px dashed #E0E7EE; display: flex; justify-content: space-between; }
+        .footer { text-align: center; padding: 25px; color: var(--lab-dark); font-size: 0.85rem; }
+        .footer p { margin: 5px 0; }
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: linear-gradient(135deg, var(--lab-dark), #2C3E50); color: white; padding: 15px 30px; border-radius: 30px; font-weight: bold; opacity: 0; transition: all 0.4s ease; z-index: 1000; }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .confirm-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; }
+        .confirm-modal.show { display: flex; }
+        .confirm-box { background: white; border-radius: 20px; padding: 30px; text-align: center; max-width: 350px; margin: 20px; }
+        .confirm-box p { font-size: 1.1rem; color: var(--lab-dark); margin-bottom: 25px; }
+        .confirm-btns { display: flex; gap: 15px; justify-content: center; }
+        .confirm-btn { padding: 12px 30px; border: none; border-radius: 10px; font-family: 'Gowun Dodum', sans-serif; font-size: 0.95rem; font-weight: bold; cursor: pointer; }
+        .confirm-yes { background: var(--wrong); color: white; }
+        .confirm-no { background: #E0E7EE; color: var(--lab-dark); }
+        @media (max-width: 600px) { .header h1 { font-size: 1.5rem; } .tab-btn { padding: 10px 12px; font-size: 0.8rem; } .mkt-type-grid { grid-template-columns: 1fr; } .special-grid { grid-template-columns: 1fr; } .evolution-flow { flex-direction: column; } .evo-arrow { transform: rotate(90deg); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-icons"><span>🔬</span><span>🧪</span><span>💡</span></div>
+            <div class="header-badge">DIMIGO</div>
+            <h1>🔬 은또링쌤의 마케팅Lab</h1>
+            <p class="subtitle">📋 4차시. 1주차 최종 정리</p>
+            <span class="week-info">🗓️ 1주차 | 마케팅의 이해</span>
+        </header>
+        <div class="student-info">
+            <label>🧑‍🔬 연구원</label><input type="text" id="studentName" placeholder="이름 입력">
+            <label>🔢 연구원 번호</label><input type="text" id="studentId" placeholder="예: 10101">
+        </div>
+        <div class="tab-nav">
+            <button class="tab-btn active" data-tab="review">📖 대단원 학습 정리</button>
+            <button class="tab-btn" data-tab="exam">📝 대단원 평가 문제</button>
+        </div>
+        <div class="progress-section">
+            <div class="progress-header"><span class="progress-title">📈 연구 진행률</span></div>
+            <div class="progress-bar-container"><div class="progress-bar" id="progressBar" style="width:0%">0%</div></div>
+            <div class="progress-stats"><span>✅ 정답: <strong id="correctCount">0</strong>개</span><span>📋 진행: <strong id="answeredCount">0</strong> / <strong id="totalCount">0</strong></span></div>
+        </div>
+
+        <!-- 탭1: 대단원 학습 정리 -->
+        <div class="tab-content active" id="tab-review">
+            <div class="section-card">
+                <h2 class="section-title"><span class="icon">📖</span> 대단원 학습 정리 | Ⅰ. 마케팅의 이해</h2>
+                <p style="font-size:0.9rem;color:#666;margin-bottom:8px;">아래 보기에서 알맞은 용어를 <strong>드래그</strong>하여 빈칸에 넣으세요!</p>
+                <p style="font-size:0.82rem;color:#999;margin-bottom:18px;">📱 모바일: 보기를 터치 선택 후, 빈칸을 터치하면 배치됩니다. 채워진 빈칸을 터치하면 제거됩니다.</p>
+
+                <div class="subsection-title">📌 01. 마케팅의 개념</div>
+
+                <div class="dnd-card" data-group="g1">
+                    <div class="dnd-card-header"><span class="dnd-card-number">1</span><span class="dnd-card-label">마케팅 용어 · 등장 배경</span></div>
+                    <p class="dnd-card-text">• 마케팅 용어: '<span class="drop-slot" data-answer="Market" data-placeholder="(    )"></span>(시장=고객) + ing(활동)'의 합성어로 기업의 고객을 위한 활동</p>
+                    <p class="dnd-card-text" style="margin-top:6px;">• 등장 배경: 수요가 공급보다 많았던 <span class="drop-slot" data-answer="판매자" data-placeholder="(    )"></span> 중심 시장에서, 공급이 수요보다 많은 <span class="drop-slot" data-answer="소비자" data-placeholder="(    )"></span> 중심 시장으로의 전환과 함께 등장</p>
+                    <div class="word-bank"><span class="word-bank-label">보기 ▸</span><span class="word-chip" draggable="true" data-value="Market">Market</span><span class="word-chip" draggable="true" data-value="판매자">판매자</span><span class="word-chip" draggable="true" data-value="소비자">소비자</span><span class="word-chip" draggable="true" data-value="생산자">생산자</span></div>
+                    <div class="dnd-card-footer"><button class="btn btn-item-reset" onclick="resetDndCard(this)">🔄 초기화</button></div>
+                </div>
+
+                <div class="dnd-card" data-group="g2">
+                    <div class="dnd-card-header"><span class="dnd-card-number">2</span><span class="dnd-card-label">마케팅의 의미</span></div>
+                    <p class="dnd-card-text">시장 경제 또는 수요를 관리하는 경영학의 한 분야로서, <span class="drop-slot" data-answer="소비자" data-placeholder="(    )"></span>를 대상으로 고객을 창조하고 유지·관리함으로써 <span class="drop-slot" data-answer="고정 고객" data-placeholder="(    )"></span>으로 만드는 모든 활동</p>
+                    <div class="word-bank"><span class="word-bank-label">보기 ▸</span><span class="word-chip" draggable="true" data-value="소비자">소비자</span><span class="word-chip" draggable="true" data-value="고정 고객">고정 고객</span><span class="word-chip" draggable="true" data-value="생산자">생산자</span><span class="word-chip" draggable="true" data-value="잠재 고객">잠재 고객</span></div>
+                    <div class="dnd-card-footer"><button class="btn btn-item-reset" onclick="resetDndCard(this)">🔄 초기화</button></div>
+                </div>
+
+                <div class="dnd-card" data-group="g3">
+                    <div class="dnd-card-header"><span class="dnd-card-number">3</span><span class="dnd-card-label">마케팅의 핵심 요소</span></div>
+                    <p class="dnd-card-text">① <strong><span class="drop-slot" data-answer="필요" data-placeholder="(    )"></span>(needs)</strong>: 사람이 살아가면서 필요성을 느끼는 상태(근원적 욕구)</p>
+                    <p class="dnd-card-text" style="margin-top:6px;">② <strong><span class="drop-slot" data-answer="욕구" data-placeholder="(    )"></span>(wants)</strong>: 근원적 욕구를 충족시킬 수 있는 구체적인 수단(구체적 욕구)</p>
+                    <p class="dnd-card-text" style="margin-top:6px;">③ <strong><span class="drop-slot" data-answer="교환" data-placeholder="(    )"></span>(exchange)</strong>: 구매자와 판매자 간 가치 있는 것을 자발적으로 서로 제공하는 과정</p>
+                    <p class="dnd-card-text" style="margin-top:6px;">④ <strong><span class="drop-slot" data-answer="시장" data-placeholder="(    )"></span>(market)</strong>: 판매자와 구매자가 접촉하는 특정 장소</p>
+                    <div class="word-bank"><span class="word-bank-label">보기 ▸</span><span class="word-chip" draggable="true" data-value="필요">필요</span><span class="word-chip" draggable="true" data-value="욕구">욕구</span><span class="word-chip" draggable="true" data-value="교환">교환</span><span class="word-chip" draggable="true" data-value="시장">시장</span><span class="word-chip" draggable="true" data-value="수요">수요</span></div>
+                    <div class="dnd-card-footer"><button class="btn btn-item-reset" onclick="resetDndCard(this)">🔄 초기화</button></div>
+                </div>
+
+                <div class="dnd-card" data-group="g4">
+                    <div class="dnd-card-header"><span class="dnd-card-number">4</span><span class="dnd-card-label">마케팅의 중요성</span></div>
+                    <p class="dnd-card-text">① <strong>기업 경영 측면</strong>: <span class="drop-slot" data-answer="이익의 극대화" data-placeholder="(    )"></span>를 위한 대표적인 수단</p>
+                    <p class="dnd-card-text" style="margin-top:6px;">② <strong>사회적 기능 측면</strong>: 수요와 공급을 조정하여 균형 있는 사회·경제적 발전 도모 / 수요 창출과 더불어 <span class="drop-slot" data-answer="고용 창출" data-placeholder="(    )"></span>이라는 경제의 선순환 과정을 창출</p>
+                    <div class="word-bank"><span class="word-bank-label">보기 ▸</span><span class="word-chip" draggable="true" data-value="이익의 극대화">이익의 극대화</span><span class="word-chip" draggable="true" data-value="고용 창출">고용 창출</span><span class="word-chip" draggable="true" data-value="비용 절감">비용 절감</span></div>
+                    <div class="dnd-card-footer"><button class="btn btn-item-reset" onclick="resetDndCard(this)">🔄 초기화</button></div>
+                </div>
+
+                <div class="dnd-card" data-group="g5">
+                    <div class="dnd-card-header"><span class="dnd-card-number">5</span><span class="dnd-card-label">마케팅 개념의 발전 과정</span></div>
+                    <div class="evolution-flow">
+                        <div style="text-align:center;"><span class="drop-slot" data-answer="생산 개념" data-placeholder="( 1단계 )" style="min-width:100px;"></span><span class="evo-sub">production concept</span></div>
+                        <span class="evo-arrow">→</span>
+                        <div style="text-align:center;"><span class="drop-slot" data-answer="제품 개념" data-placeholder="( 2단계 )" style="min-width:100px;"></span><span class="evo-sub">product concept</span></div>
+                        <span class="evo-arrow">→</span>
+                        <div style="text-align:center;"><span class="drop-slot" data-answer="판매 개념" data-placeholder="( 3단계 )" style="min-width:100px;"></span><span class="evo-sub">selling concept</span></div>
+                        <span class="evo-arrow">→</span>
+                        <div style="text-align:center;"><span class="drop-slot" data-answer="마케팅 개념" data-placeholder="( 4단계 )" style="min-width:100px;"></span><span class="evo-sub">marketing concept</span></div>
+                        <span class="evo-arrow">→</span>
+                        <div style="text-align:center;"><span class="drop-slot" data-answer="사회적 개념" data-placeholder="( 5단계 )" style="min-width:100px;"></span><span class="evo-sub">societal concept</span></div>
+                    </div>
+                    <div class="word-bank"><span class="word-bank-label">보기 ▸</span><span class="word-chip" draggable="true" data-value="판매 개념">판매 개념</span><span class="word-chip" draggable="true" data-value="사회적 개념">사회적 개념</span><span class="word-chip" draggable="true" data-value="생산 개념">생산 개념</span><span class="word-chip" draggable="true" data-value="마케팅 개념">마케팅 개념</span><span class="word-chip" draggable="true" data-value="제품 개념">제품 개념</span></div>
+                    <div class="dnd-card-footer"><button class="btn btn-item-reset" onclick="resetDndCard(this)">🔄 초기화</button></div>
+                </div>
+
+                <div class="dnd-card" data-group="g6">
+                    <div class="dnd-card-header"><span class="dnd-card-number">6</span><span class="dnd-card-label">마케팅 관리의 개념과 과정</span></div>
+                    <p class="dnd-card-text"><strong>마케팅 관리의 개념</strong>: 기업의 목표를 달성하기 위한 마케팅 활동을 <span class="drop-slot" data-answer="체계적으로 관리" data-placeholder="(    )"></span>하는 과정</p>
+                    <p class="dnd-card-text" style="margin-top:8px;"><strong>마케팅 관리의 과정</strong>: <span class="drop-slot" data-answer="마케팅 목표 설정" data-placeholder="( 1단계 )" style="min-width:120px;"></span> → <span class="drop-slot" data-answer="시장 기회 분석" data-placeholder="( 2단계 )" style="min-width:120px;"></span> → <span class="drop-slot" data-answer="STP 전략 수립" data-placeholder="( 3단계 )" style="min-width:120px;"></span> → <span class="drop-slot" data-answer="마케팅 믹스 개발" data-placeholder="( 4단계 )" style="min-width:120px;"></span> → <span class="drop-slot" data-answer="마케팅 활동의 조정 및 통제" data-placeholder="( 5단계 )" style="min-width:170px;"></span></p>
+                    <div class="word-bank"><span class="word-bank-label">보기 ▸</span><span class="word-chip" draggable="true" data-value="STP 전략 수립">STP 전략 수립</span><span class="word-chip" draggable="true" data-value="마케팅 활동의 조정 및 통제">마케팅 활동의 조정 및 통제</span><span class="word-chip" draggable="true" data-value="체계적으로 관리">체계적으로 관리</span><span class="word-chip" draggable="true" data-value="마케팅 목표 설정">마케팅 목표 설정</span><span class="word-chip" draggable="true" data-value="시장 기회 분석">시장 기회 분석</span><span class="word-chip" draggable="true" data-value="마케팅 믹스 개발">마케팅 믹스 개발</span></div>
+                    <div class="dnd-card-footer"><button class="btn btn-item-reset" onclick="resetDndCard(this)">🔄 초기화</button></div>
+                </div>
+
+                <div class="subsection-title">📌 다양한 마케팅의 종류 (수요 상태별)</div>
+                <div class="dnd-card" data-group="g7">
+                    <p style="font-size:0.88rem;color:#666;margin-bottom:12px;">각 수요 상태에 해당하는 마케팅 유형을 보기에서 골라 빈칸에 넣으세요.</p>
+                    <div class="mkt-type-grid">
+                        <div class="mkt-type-item"><span class="mkt-type-demand">감퇴적 수요</span><div class="mkt-type-slot-row"><span class="arrow-icon">→</span><span class="drop-slot" data-answer="재마케팅" data-placeholder="마케팅 유형"></span></div><p class="mkt-type-desc">수요가 점차 하락하거나 침체되어 가는 상황에서 소비자 관심을 다시 불러일으키는 마케팅 기법</p></div>
+                        <div class="mkt-type-item"><span class="mkt-type-demand">불건전한 수요</span><div class="mkt-type-slot-row"><span class="arrow-icon">→</span><span class="drop-slot" data-answer="대항 마케팅" data-placeholder="마케팅 유형"></span></div><p class="mkt-type-desc">불건전한 수요를 두려움, 공포, 가격 인상 등을 활용하여 소멸 또는 파괴하도록 유도하는 마케팅 기법</p></div>
+                        <div class="mkt-type-item"><span class="mkt-type-demand">무수요</span><div class="mkt-type-slot-row"><span class="arrow-icon">→</span><span class="drop-slot" data-answer="자극 마케팅" data-placeholder="마케팅 유형"></span></div><p class="mkt-type-desc">무관심 상황에서 잠재 고객을 자극하여 수요가 활성화되도록 유도하는 마케팅 기법</p></div>
+                        <div class="mkt-type-item"><span class="mkt-type-demand">초과 수요</span><div class="mkt-type-slot-row"><span class="arrow-icon">→</span><span class="drop-slot" data-answer="억제 마케팅" data-placeholder="마케팅 유형"></span></div><p class="mkt-type-desc">기업이 고객의 수요를 의도적으로 억제하고 줄이는 마케팅 기법</p></div>
+                        <div class="mkt-type-item"><span class="mkt-type-demand">완전 수요</span><div class="mkt-type-slot-row"><span class="arrow-icon">→</span><span class="drop-slot" data-answer="유지 마케팅" data-placeholder="마케팅 유형"></span></div><p class="mkt-type-desc">이상적인 완전 수요 상황에서 현 수요 수준을 유지하기 위한 마케팅 기법</p></div>
+                        <div class="mkt-type-item"><span class="mkt-type-demand">잠재적 수요</span><div class="mkt-type-slot-row"><span class="arrow-icon">→</span><span class="drop-slot" data-answer="개발 마케팅" data-placeholder="마케팅 유형"></span></div><p class="mkt-type-desc">잠재된 수요를 실제 수요화할 수 있도록 하는 마케팅 기법</p></div>
+                        <div class="mkt-type-item"><span class="mkt-type-demand">불규칙적 수요</span><div class="mkt-type-slot-row"><span class="arrow-icon">→</span><span class="drop-slot" data-answer="동시화 마케팅" data-placeholder="마케팅 유형"></span></div><p class="mkt-type-desc">불규칙적으로 변동하는 수요에서 균형적 수요를 창출하기 위한 마케팅 기법</p></div>
+                        <div class="mkt-type-item"><span class="mkt-type-demand">부정적 수요</span><div class="mkt-type-slot-row"><span class="arrow-icon">→</span><span class="drop-slot" data-answer="전환 마케팅" data-placeholder="마케팅 유형"></span></div><p class="mkt-type-desc">부정적인 수요를 긍정적인 수요로 전환하기 위한 마케팅 기법</p></div>
+                    </div>
+                    <div class="word-bank"><span class="word-bank-label">보기 ▸</span><span class="word-chip" draggable="true" data-value="억제 마케팅">억제 마케팅</span><span class="word-chip" draggable="true" data-value="전환 마케팅">전환 마케팅</span><span class="word-chip" draggable="true" data-value="재마케팅">재마케팅</span><span class="word-chip" draggable="true" data-value="동시화 마케팅">동시화 마케팅</span><span class="word-chip" draggable="true" data-value="대항 마케팅">대항 마케팅</span><span class="word-chip" draggable="true" data-value="유지 마케팅">유지 마케팅</span><span class="word-chip" draggable="true" data-value="자극 마케팅">자극 마케팅</span><span class="word-chip" draggable="true" data-value="개발 마케팅">개발 마케팅</span></div>
+                    <div class="dnd-card-footer"><button class="btn btn-item-reset" onclick="resetDndCard(this)">🔄 초기화</button></div>
+                </div>
+
+                <div class="subsection-title">📌 특수 마케팅의 종류</div>
+                <div class="dnd-card" data-group="g8">
+                    <div class="special-grid">
+                        <div class="special-item"><div class="special-item-title">🛎️ 서비스 마케팅</div><p class="special-item-desc"><span class="drop-slot" data-answer="무형성" data-placeholder="(    )"></span>, 비분리성, 소멸성, 이질성이라는 서비스의 특징을 살려 조직의 목적을 만족시키는 교환을 창출하기 위한 마케팅 기법</p></div>
+                        <div class="special-item"><div class="special-item-title">📱 사회 관계망 서비스 마케팅</div><p class="special-item-desc"><span class="drop-slot" data-answer="소셜 미디어" data-placeholder="(    )"></span> 마케팅이라고도 하며, 소셜 미디어 플랫폼을 활용하여 제품 및 서비스를 홍보하고 비즈니스 거래를 유도하는 마케팅 기법</p></div>
+                        <div class="special-item"><div class="special-item-title">🌍 글로벌 마케팅</div><p class="special-item-desc"><span class="drop-slot" data-answer="국제" data-placeholder="(    )"></span> 마케팅이라고도 하며, 둘 이상의 국가를 대상으로 고객에게 가치 있는 것을 창출, 의사소통, 전달하는 교환 활동을 일컫는 마케팅 기법</p></div>
+                        <div class="special-item"><div class="special-item-title">💖 감성 마케팅</div><p class="special-item-desc">고객의 감성을 자극하는 <span class="drop-slot" data-answer="디자인" data-placeholder="(    )"></span>, 향기, 스토리를 통해 긍정적 이미지를 환기시켜 구매를 유도하는 마케팅 기법</p></div>
+                        <div class="special-item"><div class="special-item-title">🎪 게릴라 마케팅</div><p class="special-item-desc">장소와 시간에 구애받지 않고 표적 고객이 많이 모이는 장소에 <span class="drop-slot" data-answer="예고 없이" data-placeholder="(    )"></span> 나타나 자사의 상품이나 서비스를 알리는 마케팅 기법</p></div>
+                    </div>
+                    <div class="word-bank"><span class="word-bank-label">보기 ▸</span><span class="word-chip" draggable="true" data-value="소셜 미디어">소셜 미디어</span><span class="word-chip" draggable="true" data-value="무형성">무형성</span><span class="word-chip" draggable="true" data-value="예고 없이">예고 없이</span><span class="word-chip" draggable="true" data-value="디자인">디자인</span><span class="word-chip" draggable="true" data-value="국제">국제</span><span class="word-chip" draggable="true" data-value="가격">가격</span></div>
+                    <div class="dnd-card-footer"><button class="btn btn-item-reset" onclick="resetDndCard(this)">🔄 초기화</button></div>
+                </div>
+
+                <div class="btn-group"><button class="btn btn-check" onclick="checkAllReview()">✅ 정답 확인</button><button class="btn btn-section-reset" onclick="resetAllReview()">🔄 학습 정리 초기화</button></div>
+            </div>
+        </div>
+
+        <!-- 탭2: 대단원 평가 문제 -->
+        <div class="tab-content" id="tab-exam">
+            <div class="section-card">
+                <h2 class="section-title"><span class="icon">📝</span> 대단원 평가 문제</h2>
+                <p style="font-size:0.9rem;color:#666;margin-bottom:18px;">1주차 학습 내용을 종합적으로 평가합니다. 정답을 선택하세요!</p>
+                <div class="quiz-card" data-quiz="1"><p class="quiz-question"><span class="quiz-badge">Q1</span>다음 중 마케팅의 핵심 요소로 적절하지 않은 것은?</p><div class="quiz-options"><div class="quiz-option" data-value="1">① 시장(Market)</div><div class="quiz-option" data-value="2">② 욕구(Wants)</div><div class="quiz-option" data-value="3">③ 필요(Needs)</div><div class="quiz-option" data-value="4">④ 교환(Exchange)</div><div class="quiz-option" data-value="5" data-correct="true">⑤ 정보(Information)</div></div></div>
+                <div class="quiz-card" data-quiz="2"><p class="quiz-question"><span class="quiz-badge">Q2</span>다음 설명에 해당하는 마케팅의 종류는?</p><div class="quiz-desc-box">불건전한 수요를 두려움, 공포, 커뮤니케이션, 가격 인상, 구매장소 제한 등을 활용하여 소멸 또는 파괴하도록 유도하는 마케팅 기법</div><div class="quiz-options"><div class="quiz-option" data-value="1">① 재마케팅</div><div class="quiz-option" data-value="2" data-correct="true">② 대항 마케팅</div><div class="quiz-option" data-value="3">③ 자극 마케팅</div><div class="quiz-option" data-value="4">④ 억제 마케팅</div><div class="quiz-option" data-value="5">⑤ 동시화 마케팅</div></div></div>
+                <div class="quiz-card" data-quiz="3"><p class="quiz-question"><span class="quiz-badge">Q3</span>마케팅 환경 중 미시 환경에 해당하지 않는 것은?</p><div class="quiz-options"><div class="quiz-option" data-value="1">① 공중</div><div class="quiz-option" data-value="2" data-correct="true">② 정부</div><div class="quiz-option" data-value="3">③ 경쟁업자</div><div class="quiz-option" data-value="4">④ 고객 시장</div><div class="quiz-option" data-value="5">⑤ 마케팅 중간업자</div></div></div>
+                <div class="quiz-card" data-quiz="4"><p class="quiz-question"><span class="quiz-badge">Q4</span>다음에서 설명하는 마케팅 용어로 가장 적절한 것은?</p><div class="quiz-desc-box">조직의 목표를 달성하기 위해 마케팅 활동을 계획, 조직, 지휘, 조정, 통제해 나가는 일련의 관리 과정이다.</div><div class="quiz-options"><div class="quiz-option" data-value="1">① 마케팅 경영</div><div class="quiz-option" data-value="2" data-correct="true">② 마케팅 관리</div><div class="quiz-option" data-value="3">③ 마케팅 믹스</div><div class="quiz-option" data-value="4">④ 마케팅 통제</div><div class="quiz-option" data-value="5">⑤ 마케팅 트렌드</div></div></div>
+                <div class="quiz-card" data-quiz="5"><p class="quiz-question"><span class="quiz-badge">Q5</span>다음에서 설명하는 마케팅의 핵심 요소로 가장 적절한 것은?</p><div class="quiz-desc-box">근원적 욕구를 충족시킬 수 있는 구체적 수단으로 소비자 개인의 취향이나 그가 속한 사회 또는 문화에 따라 다르게 나타난다.<div class="quiz-example"><span>💡</span> 배고플 때 먹는 구체적 음식, 편안하게 잠잘 수 있는 침대 등</div></div><div class="quiz-options"><div class="quiz-option" data-value="1">① 교환</div><div class="quiz-option" data-value="2">② 필요</div><div class="quiz-option" data-value="3">③ 수요</div><div class="quiz-option" data-value="4">④ 시장</div><div class="quiz-option" data-value="5" data-correct="true">⑤ 욕구</div></div></div>
+                <div class="quiz-card" data-quiz="6"><p class="quiz-question"><span class="quiz-badge">Q6</span>다음에서 설명하는 마케팅 개념으로 가장 적절한 것은?</p><div class="quiz-desc-box">목표 시장의 욕구를 파악하고 소비자의 욕구를 충족시킴으로써 기업의 목표가 실현된다고 믿는 마케팅 개념이다. 따라서 고객 지향성, 서비스 지향성, 이윤 지향성을 추구하여 소비자들의 필요(needs)와 욕구(wants)에 초점을 맞춘 제품의 개발, 생산, 판매에 중점을 둔다.</div><div class="quiz-options"><div class="quiz-option" data-value="1">① 생산 중심적 개념</div><div class="quiz-option" data-value="2">② 제품 중심적 개념</div><div class="quiz-option" data-value="3">③ 판매 중심적 개념</div><div class="quiz-option" data-value="4">④ 사회 중심적 개념</div><div class="quiz-option" data-value="5" data-correct="true">⑤ 마케팅 중심적 개념</div></div></div>
+                <div class="quiz-card" data-quiz="7"><p class="quiz-question"><span class="quiz-badge">Q7</span>다음 대화에 나타난 특수 마케팅의 종류로 가장 적절한 것은?</p><div class="quiz-desc-box"><div style="display:flex;gap:10px;align-items:center;margin-bottom:8px;"><span style="font-size:1.2rem;">🧑</span><span>"요즘 트렌드에 적합한 마케팅 기법에는 무엇이 있을까요?"</span></div><div style="display:flex;gap:10px;align-items:center;"><span style="font-size:1.2rem;">👩‍💼</span><span>"소셜 미디어 플랫폼을 활용하여 기업 홍보는 물론 비즈니스 거래도 유도하는 기법이 있습니다."</span></div></div><div class="quiz-options"><div class="quiz-option" data-value="1">① 감성 마케팅</div><div class="quiz-option" data-value="2">② 글로벌 마케팅</div><div class="quiz-option" data-value="3">③ 게릴라 마케팅</div><div class="quiz-option" data-value="4">④ 서비스 마케팅</div><div class="quiz-option" data-value="5" data-correct="true">⑤ 사회 관계망 서비스 마케팅</div></div></div>
+                <div style="margin:25px 0 15px;padding:12px 18px;background:linear-gradient(135deg,#FFF8E1,#FFECB3);border-radius:12px;border-left:4px solid var(--lab-orange);font-size:0.9rem;">💡 <strong>서술형 문제</strong> — 아래 문제를 읽고 알맞은 답을 입력하세요.</div>
+                <div class="short-answer-card" data-quiz="10"><p class="quiz-question"><span class="quiz-badge">Q8</span>다음에서 설명하는 특수 마케팅의 종류를 적으시오.</p><div class="short-answer-box">장소와 시간에 구애받지 않고 표적 고객이 많이 모이는 장소에 예고 없이 나타나 자사의 상품이나 서비스를 알리는 마케팅 기법을 말한다. 기업들이 시장 경쟁력을 확보하기 위해 틈새 시장을 공략하거나 적은 비용으로 고객에게 밀착하여 마케팅을 펼치기 위한 방법이다.<br><br>비용 대비 효과가 크며, 짧은 시간 내 브랜드 인지도를 높일 수 있는 장점이 있지만 자극이 일시적이라는 단점이 있다.</div><input class="short-answer-input" data-answer="게릴라 마케팅" data-type="short" placeholder="정답을 입력하세요"></div>
+                <div class="short-answer-card" data-quiz="11"><p class="quiz-question"><span class="quiz-badge">Q9</span>다음에서 설명하는 용어를 적으시오.</p><div class="short-answer-box">기업의 재무적 요소 이상으로 비재무적 요소인 환경(environment), 사회(social), 지배 구조(governance)를 중시하는 기업 경영의 이념으로, 기업 경영 시 친환경, 사회적 책임, 건전한 지배 구조를 고려해야 지속 가능한 발전이 가능하다는 의미</div><input class="short-answer-input" data-answer="ESG" data-type="short" placeholder="정답을 입력하세요"></div>
+                <div class="quiz-card" data-quiz="12"><p class="quiz-question"><span class="quiz-badge">Q10</span>ESG 경영 전략 중 환경 요소로 적절하지 <u>않은</u> 것은?</p><div class="quiz-options"><div class="quiz-option" data-value="1">① 생태계 보호</div><div class="quiz-option" data-value="2">② 에너지 효율</div><div class="quiz-option" data-value="3" data-correct="true">③ 지역 사회 기여</div><div class="quiz-option" data-value="4">④ 환경 오염 방지</div><div class="quiz-option" data-value="5">⑤ 친환경적 제품 설계</div></div></div>
+                <div class="btn-group"><button class="btn btn-check" onclick="gradeExam()">📊 채점하기</button><button class="btn btn-section-reset" onclick="resetQuiz()">🔄 평가 문제 초기화</button></div>
+            </div>
+        </div>
+
+        <div class="btn-group"><button class="btn btn-save" onclick="saveProgress()">💾 저장하기</button><button class="btn btn-submit" onclick="submitWorksheet()">📤 제출하기</button><button class="btn btn-reset" onclick="resetAll()">🔄 초기화</button></div>
+        <div class="result-section" id="resultSection"><div class="result-icon">🏆</div><div class="result-grade" id="resultGrade">A+</div><p class="result-message" id="resultMessage">완벽해요!</p><div class="result-details" id="resultDetails"></div><div class="btn-group"><button class="btn btn-reset" onclick="resetAll()">🔄 다시 연구하기</button></div></div>
+        <footer class="footer"><p>🔬 은또링쌤의 마케팅Lab | 한국디지털미디어고등학교</p><p>Made with 💙 for DIMIGO Students</p></footer>
+    </div>
+    <div class="toast" id="toast">저장되었습니다!</div>
+    <div class="confirm-modal" id="confirmModal"><div class="confirm-box"><p>🔄 모든 연구 기록을 초기화하시겠습니까?</p><div class="confirm-btns"><button class="confirm-btn confirm-yes" onclick="doReset()">초기화</button><button class="confirm-btn confirm-no" onclick="closeConfirm()">취소</button></div></div></div>
+
+    <script>
+    (function(){const mols=['🔬','🧪','⚗️','💡','📊','🧬','💊','🔍'];for(let i=0;i<12;i++){const m=document.createElement('div');m.className='molecule';m.textContent=mols[Math.floor(Math.random()*mols.length)];m.style.left=Math.random()*100+'%';m.style.top=Math.random()*100+'%';m.style.animationDelay=Math.random()*5+'s';m.style.animationDuration=(6+Math.random()*4)+'s';document.body.appendChild(m);}})();
+    document.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));btn.classList.add('active');document.getElementById('tab-'+btn.dataset.tab).classList.add('active');});});
+
+    // DnD System
+    let selectedChip=null;let chipIdC=0;
+    document.querySelectorAll('.word-chip').forEach(c=>{c.dataset.chipUid='c_'+(chipIdC++);});
+    function getChipById(id){return document.querySelector('.word-chip[data-chip-uid="'+id+'"]');}
+
+    document.querySelectorAll('.word-chip').forEach(chip=>{
+        chip.addEventListener('dragstart',function(e){e.dataTransfer.setData('text/plain',this.dataset.value);e.dataTransfer.setData('chip-id',this.dataset.chipUid);this.style.opacity='0.5';});
+        chip.addEventListener('dragend',function(){this.style.opacity='';});
+        chip.addEventListener('click',function(e){e.stopPropagation();if(this.classList.contains('used'))return;const card=this.closest('.dnd-card');card.querySelectorAll('.word-chip').forEach(c=>c.classList.remove('selected'));this.classList.add('selected');selectedChip=this;});
+    });
+
+    document.querySelectorAll('.drop-slot').forEach(slot=>{
+        slot.addEventListener('dragover',function(e){e.preventDefault();if(!this.classList.contains('filled'))this.classList.add('drag-over');});
+        slot.addEventListener('dragleave',function(){this.classList.remove('drag-over');});
+        slot.addEventListener('drop',function(e){e.preventDefault();this.classList.remove('drag-over');if(this.classList.contains('filled'))return;const val=e.dataTransfer.getData('text/plain');const cid=e.dataTransfer.getData('chip-id');const chip=getChipById(cid);if(chip&&this.closest('.dnd-card')===chip.closest('.dnd-card')){placeInSlot(this,val,chip);}});
+        slot.addEventListener('click',function(e){e.stopPropagation();if(this.classList.contains('correct')||this.classList.contains('wrong'))return;if(this.classList.contains('filled')){removeFromSlot(this);return;}if(selectedChip&&this.closest('.dnd-card')===selectedChip.closest('.dnd-card')){placeInSlot(this,selectedChip.dataset.value,selectedChip);selectedChip=null;}});
+    });
+
+    document.addEventListener('click',function(){if(selectedChip){selectedChip.classList.remove('selected');selectedChip=null;}});
+
+    function placeInSlot(slot,value,chip){
+        slot.textContent=value;slot.dataset.placedValue=value;slot.classList.add('filled');
+        const rb=document.createElement('button');rb.className='slot-remove';rb.textContent='✕';
+        rb.addEventListener('click',function(e){e.stopPropagation();removeFromSlot(slot);});
+        slot.appendChild(rb);
+        if(chip){chip.classList.add('used');chip.classList.remove('selected');slot.dataset.chipId=chip.dataset.chipUid;}
+        updateProgress();
+    }
+    function removeFromSlot(slot){
+        const cid=slot.dataset.chipId;if(cid){const c=getChipById(cid);if(c)c.classList.remove('used');}
+        slot.textContent='';slot.classList.remove('filled','correct','wrong');delete slot.dataset.placedValue;delete slot.dataset.chipId;updateProgress();
+    }
+    function resetDndCard(btn){
+        const card=btn.closest('.dnd-card');
+        card.querySelectorAll('.drop-slot').forEach(s=>{s.textContent='';s.classList.remove('filled','correct','wrong');delete s.dataset.placedValue;delete s.dataset.chipId;});
+        card.querySelectorAll('.word-chip').forEach(c=>{c.classList.remove('used','selected');});
+        selectedChip=null;updateProgress();showToast('🔄 해당 문제가 초기화되었습니다!');
+    }
+    function checkAllReview(){
+        document.querySelectorAll('#tab-review .drop-slot').forEach(s=>{s.classList.remove('correct','wrong');if(s.classList.contains('filled')){s.classList.add(s.dataset.placedValue===s.dataset.answer?'correct':'wrong');}});
+        updateProgress();showToast('✅ 정답이 확인되었습니다!');
+    }
+    function resetAllReview(){
+        document.querySelectorAll('#tab-review .dnd-card').forEach(card=>{card.querySelectorAll('.drop-slot').forEach(s=>{s.textContent='';s.classList.remove('filled','correct','wrong');delete s.dataset.placedValue;delete s.dataset.chipId;});card.querySelectorAll('.word-chip').forEach(c=>{c.classList.remove('used','selected');});});
+        selectedChip=null;updateProgress();showToast('🔄 학습 정리가 초기화되었습니다!');
+    }
+
+    // Quiz
+    const quizCards=document.querySelectorAll('.quiz-card');
+    quizCards.forEach(card=>{card.querySelectorAll('.quiz-option').forEach(opt=>{opt.addEventListener('click',function(){if(card.classList.contains('graded'))return;card.querySelectorAll('.quiz-option').forEach(o=>o.classList.remove('selected'));this.classList.add('selected');updateProgress();});});});
+
+    const shortInputs=document.querySelectorAll('.short-answer-input[data-type="short"]');
+    function checkShort(input){input.classList.remove('correct','wrong');const v=input.value.trim();if(v){const n=s=>s.replace(/\s+/g,'').toLowerCase();input.classList.add(n(v)===n(input.dataset.answer)?'correct':'wrong');}}
+
+    function gradeExam(){
+        // 객관식 채점
+        quizCards.forEach(card=>{
+            card.classList.add('graded');
+            const sel=card.querySelector('.quiz-option.selected');
+            if(sel){
+                sel.classList.add(sel.dataset.correct==='true'?'correct':'wrong');
+                if(sel.dataset.correct!=='true'){card.querySelector('.quiz-option[data-correct="true"]').classList.add('correct');}
+            } else {
+                // 미응답인 경우 정답 표시
+                card.querySelector('.quiz-option[data-correct="true"]').classList.add('correct');
+            }
+        });
+        // 서술형 채점
+        shortInputs.forEach(i=>checkShort(i));
+        updateProgress();
+        showToast('📊 채점이 완료되었습니다!');
+    }
+
+    function resetQuiz(){quizCards.forEach(card=>{card.classList.remove('graded');card.querySelectorAll('.quiz-option').forEach(o=>o.classList.remove('selected','correct','wrong'));});shortInputs.forEach(i=>{i.value='';i.classList.remove('correct','wrong');});updateProgress();showToast('🔄 평가 문제가 초기화되었습니다!');}
+
+    function updateProgress(){
+        let total=0,correct=0;
+        document.querySelectorAll('#tab-review .drop-slot').forEach(s=>{total++;if(s.classList.contains('correct'))correct++;else if(s.classList.contains('filled')&&!s.classList.contains('wrong')&&s.dataset.placedValue===s.dataset.answer)correct++;});
+        quizCards.forEach(card=>{total++;const sel=card.querySelector('.quiz-option.selected');if(sel&&sel.dataset.correct==='true')correct++;});
+        shortInputs.forEach(i=>{total++;if(i.classList.contains('correct'))correct++;});
+        const answered=document.querySelectorAll('#tab-review .drop-slot.filled').length+document.querySelectorAll('.quiz-card .quiz-option.selected').length+document.querySelectorAll('.short-answer-input.correct,.short-answer-input.wrong').length;
+        const pct=total>0?Math.round((correct/total)*100):0;
+        document.getElementById('progressBar').style.width=pct+'%';document.getElementById('progressBar').textContent=pct+'%';
+        document.getElementById('correctCount').textContent=correct;document.getElementById('answeredCount').textContent=answered;document.getElementById('totalCount').textContent=total;
+    }
+
+    function saveProgress(){localStorage.setItem('marketinglab_week1_review',JSON.stringify({name:document.getElementById('studentName').value,id:document.getElementById('studentId').value,timestamp:new Date().toISOString()}));showToast('💾 진행 상황이 저장되었습니다!');}
+    function submitWorksheet(){
+        const name=document.getElementById('studentName').value.trim();const id=document.getElementById('studentId').value.trim();
+        if(!name||!id){showToast('⚠️ 이름과 연구원 번호를 입력해주세요!');return;}
+        checkAllReview();gradeExam();
+        let total=0,correct=0;
+        document.querySelectorAll('#tab-review .drop-slot').forEach(s=>{total++;if(s.classList.contains('correct'))correct++;});
+        quizCards.forEach(card=>{total++;const sel=card.querySelector('.quiz-option.selected');if(sel&&sel.dataset.correct==='true')correct++;});
+        shortInputs.forEach(i=>{total++;if(i.classList.contains('correct'))correct++;});
+        const pct=Math.round((correct/total)*100);let grade,message;
+        if(pct>=90){grade='A+';message='완벽한 연구 결과입니다! 🏆';}else if(pct>=80){grade='A';message='훌륭한 연구원이에요! 👏';}else if(pct>=70){grade='B+';message='잘했어요! 조금만 더! 💪';}else if(pct>=60){grade='B';message='좋아요! 복습하면 완벽! 📚';}else{grade='C';message='힘내요! 다시 연구해봐요! 🔬';}
+        const form=document.createElement('form');form.method='POST';form.action='https://script.google.com/macros/s/AKfycbw74Pv4jRMA_3aX-tOShm-Wca50XsW7VHQcQALyT8p26Z5TurhkBDWT0r2Mu-eLG30/exec';form.target='hidden_iframe';
+        const fields={name,studentId:id,week:1,session:4,sessionTitle:'1주차 최종 정리',correct,total,percentage:pct,grade,timestamp:new Date().toISOString()};
+        for(let k in fields){const inp=document.createElement('input');inp.type='hidden';inp.name=k;inp.value=fields[k];form.appendChild(inp);}
+        let iframe=document.getElementById('hidden_iframe');if(!iframe){iframe=document.createElement('iframe');iframe.name='hidden_iframe';iframe.id='hidden_iframe';iframe.style.display='none';document.body.appendChild(iframe);}
+        document.body.appendChild(form);form.submit();document.body.removeChild(form);
+        showToast('📤 연구 보고서가 제출되었습니다!');
+        document.getElementById('resultGrade').textContent=grade;document.getElementById('resultMessage').textContent=message;
+        document.getElementById('resultDetails').innerHTML='<h4>📊 '+name+' 연구원 ('+id+') 연구 결과</h4><ul><li><span>정답률</span><span>'+pct+'% ('+correct+'/'+total+')</span></li><li><span>연구 등급</span><span>'+grade+'</span></li><li><span>제출 시간</span><span>'+new Date().toLocaleString('ko-KR')+'</span></li></ul>';
+        document.getElementById('resultSection').classList.add('show');document.getElementById('resultSection').scrollIntoView({behavior:'smooth'});
+    }
+    function resetAll(){document.getElementById('confirmModal').classList.add('show');}
+    function closeConfirm(){document.getElementById('confirmModal').classList.remove('show');}
+    function doReset(){closeConfirm();localStorage.removeItem('marketinglab_week1_review');resetAllReview();resetQuiz();document.getElementById('resultSection').classList.remove('show');document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));document.querySelector('.tab-btn').classList.add('active');document.getElementById('tab-review').classList.add('active');showToast('🔄 전체 초기화되었습니다!');window.scrollTo({top:0,behavior:'smooth'});}
+    function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+    document.addEventListener('DOMContentLoaded',updateProgress);
+    </script>
+</body>
+</html>
