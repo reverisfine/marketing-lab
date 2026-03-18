@@ -1,0 +1,2633 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔬 은또링쌤의 마케팅Lab | 2주차 1차시</title>
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Black+Han+Sans&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --lab-mint: #00D4AA;
+            --lab-blue: #4A90D9;
+            --lab-purple: #7B68EE;
+            --lab-green: #32CD32;
+            --lab-orange: #FF8C42;
+            --lab-pink: #FF6B9D;
+            --lab-dark: #1E2A3A;
+            --lab-gray: #F0F4F8;
+            --lab-white: #FFFFFF;
+            --correct: #00C853;
+            --wrong: #FF5252;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Gowun Dodum', sans-serif;
+            background: linear-gradient(135deg, #E8F5E9 0%, #E3F2FD 50%, #F3E5F5 100%);
+            min-height: 100vh;
+            padding: 15px;
+            position: relative;
+        }
+
+        .molecule {
+            position: fixed;
+            font-size: 1.5rem;
+            opacity: 0.12;
+            animation: float 8s ease-in-out infinite;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(15deg); }
+        }
+
+        .container { max-width: 900px; margin: 0 auto; position: relative; z-index: 10; }
+
+        .header {
+            background: var(--lab-white);
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            margin-bottom: 15px;
+            box-shadow: 0 8px 32px rgba(0, 212, 170, 0.15);
+            border: 3px solid var(--lab-mint);
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--lab-mint), var(--lab-blue), var(--lab-purple), var(--lab-pink));
+        }
+
+        .header-icons { position: absolute; top: 15px; left: 20px; font-size: 1.5rem; display: flex; gap: 8px; }
+        .header-icons span { animation: bubble 2s ease-in-out infinite; }
+        .header-icons span:nth-child(2) { animation-delay: 0.3s; }
+        .header-icons span:nth-child(3) { animation-delay: 0.6s; }
+
+        @keyframes bubble { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-5px) scale(1.1); } }
+
+        .header-badge {
+            position: absolute; top: 15px; right: 20px;
+            background: linear-gradient(135deg, var(--lab-mint), var(--lab-blue));
+            color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold;
+        }
+
+        .header h1 {
+            font-family: 'Gowun Dodum', sans-serif;
+            font-size: 2rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--lab-mint), var(--lab-blue));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 8px; margin-top: 10px;
+        }
+
+        .header .subtitle { font-size: 1.15rem; color: var(--lab-dark); font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .header .week-info { display: inline-block; background: linear-gradient(135deg, var(--lab-purple), var(--lab-pink)); color: white; padding: 6px 16px; border-radius: 20px; font-size: 0.85rem; margin-top: 12px; font-weight: bold; }
+
+        .student-info {
+            background: var(--lab-white); border-radius: 15px; padding: 15px 20px; margin-bottom: 15px;
+            display: flex; gap: 15px; flex-wrap: wrap; align-items: center; justify-content: center;
+            border: 2px solid #E0E7EE; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .student-info label { font-weight: bold; color: var(--lab-dark); display: flex; align-items: center; gap: 5px; }
+        .student-info input { padding: 10px 15px; border: 2px solid #E0E7EE; border-radius: 10px; font-family: 'Gowun Dodum', sans-serif; font-size: 0.95rem; width: 130px; transition: all 0.3s ease; }
+        .student-info input:focus { outline: none; border-color: var(--lab-mint); box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.1); }
+
+        .tab-nav {
+            display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; justify-content: center;
+            background: var(--lab-white); padding: 10px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .tab-btn {
+            padding: 12px 18px; border: 2px solid #E0E7EE; border-radius: 12px;
+            font-family: 'Gowun Dodum', sans-serif; font-size: 0.85rem; font-weight: bold;
+            cursor: pointer; transition: all 0.3s ease; background: var(--lab-white); color: var(--lab-dark);
+        }
+        .tab-btn.active { background: linear-gradient(135deg, var(--lab-mint), var(--lab-blue)); color: white; border-color: transparent; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0, 212, 170, 0.3); }
+        .tab-btn:hover:not(.active) { border-color: var(--lab-mint); background: rgba(0, 212, 170, 0.05); }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .progress-section { background: var(--lab-white); border-radius: 15px; padding: 18px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 2px solid #E0E7EE; }
+        .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .progress-title { font-weight: bold; color: var(--lab-dark); display: flex; align-items: center; gap: 8px; }
+        .progress-bar-container { background: #E8F5E9; border-radius: 10px; height: 20px; overflow: hidden; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--lab-mint), var(--lab-blue)); border-radius: 10px; transition: width 0.5s ease; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.75rem; }
+        .progress-stats { display: flex; justify-content: space-between; margin-top: 10px; font-size: 0.85rem; color: var(--lab-dark); }
+        .progress-stats span { display: flex; align-items: center; gap: 5px; }
+
+        .section-card { background: var(--lab-white); border-radius: 20px; padding: 25px; margin-bottom: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 2px solid #E0E7EE; }
+        .section-title {
+            font-family: 'Gowun Dodum', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--lab-dark);
+            margin-bottom: 18px; display: flex; align-items: center; gap: 10px; padding-bottom: 12px; border-bottom: 2px dashed #E0E7EE;
+        }
+        .section-title .icon { font-size: 1.4rem; }
+
+        .objective-item { display: flex; align-items: flex-start; gap: 12px; padding: 15px; background: linear-gradient(135deg, #F8FFF8, #F0F8FF); border-radius: 12px; margin-bottom: 10px; transition: all 0.3s ease; cursor: pointer; border: 2px solid transparent; }
+        .objective-item:hover { transform: translateX(5px); border-color: var(--lab-mint); }
+        .objective-item.checked { background: linear-gradient(135deg, #E8F5E9, #C8E6C9); border-color: var(--correct); }
+        .objective-checkbox { width: 26px; height: 26px; border: 3px solid #CBD5E0; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; transition: all 0.3s ease; background: white; }
+        .objective-item.checked .objective-checkbox { background: var(--correct); border-color: var(--correct); color: white; }
+        .objective-text { font-size: 0.95rem; color: var(--lab-dark); line-height: 1.6; }
+
+        .concept-card { background: linear-gradient(135deg, #FAFFFE, #F5FAFF); border-radius: 15px; padding: 18px; margin-bottom: 12px; border-left: 5px solid var(--lab-mint); transition: all 0.3s ease; position: relative; }
+        .concept-card:nth-child(3n+1) { border-left-color: var(--lab-mint); }
+        .concept-card:nth-child(3n+2) { border-left-color: var(--lab-blue); }
+        .concept-card:nth-child(3n) { border-left-color: var(--lab-purple); }
+        .concept-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .concept-number { display: inline-flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--lab-mint), var(--lab-blue)); color: white; width: 28px; height: 28px; border-radius: 8px; font-weight: bold; font-size: 0.85rem; }
+        .concept-label { font-weight: bold; color: var(--lab-dark); }
+        .concept-text { font-size: 0.95rem; color: var(--lab-dark); line-height: 1.9; }
+        .blank-select { display: inline-block; min-width: 100px; padding: 6px 10px; border: 2px dashed var(--lab-blue); border-radius: 8px; background: white; font-family: 'Gowun Dodum', sans-serif; font-size: 0.9rem; cursor: pointer; transition: all 0.3s ease; appearance: none; text-align: center; }
+        .blank-select:focus { outline: none; border-color: var(--lab-mint); box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.15); }
+        .blank-select.correct { background: var(--correct); color: white; border-color: var(--correct); border-style: solid; }
+        .blank-select.wrong { background: var(--wrong); color: white; border-color: var(--wrong); border-style: solid; }
+
+        .quiz-card { background: linear-gradient(135deg, #FAFFFE, #F5FAFF); border-radius: 15px; padding: 18px; margin-bottom: 15px; border: 2px solid #E0E7EE; }
+        .quiz-question { font-weight: bold; color: var(--lab-dark); margin-bottom: 15px; font-size: 0.95rem; display: flex; align-items: flex-start; gap: 10px; }
+        .quiz-badge { background: linear-gradient(135deg, var(--lab-purple), var(--lab-pink)); color: white; padding: 3px 10px; border-radius: 15px; font-size: 0.75rem; flex-shrink: 0; }
+        .quiz-options { display: flex; flex-direction: column; gap: 10px; }
+        .quiz-option { padding: 14px 18px; background: white; border: 2px solid #E0E7EE; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; font-size: 0.9rem; }
+        .quiz-option:hover { border-color: var(--lab-mint); background: rgba(0, 212, 170, 0.05); transform: translateX(5px); }
+        .quiz-option.selected { border-color: var(--lab-blue); background: #E3F2FD; }
+        .quiz-option.correct { border-color: var(--correct); background: #E8F5E9; }
+        .quiz-option.wrong { border-color: var(--wrong); background: #FFEBEE; }
+
+        .activity-section { margin-bottom: 25px; }
+        .activity-title { font-weight: bold; color: var(--lab-dark); margin-bottom: 12px; font-size: 1rem; display: flex; align-items: center; gap: 8px; }
+        .activity-instruction { font-size: 0.85rem; color: #666; margin-bottom: 15px; background: linear-gradient(135deg, #FFF8E1, #FFECB3); padding: 12px 15px; border-radius: 10px; border-left: 4px solid var(--lab-orange); }
+        .drag-container { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; min-height: 50px; padding: 12px; background: #F8FAFC; border-radius: 12px; border: 2px dashed #CBD5E0; }
+        .drag-item { padding: 10px 18px; background: linear-gradient(135deg, var(--lab-blue), var(--lab-purple)); color: white; border-radius: 25px; cursor: grab; font-size: 0.9rem; font-weight: bold; transition: all 0.3s ease; user-select: none; box-shadow: 0 3px 10px rgba(74, 144, 217, 0.3); }
+        .drag-item:active { cursor: grabbing; transform: scale(1.05); }
+        .drag-item.selected { box-shadow: 0 0 0 3px var(--lab-orange), 0 3px 15px rgba(255, 140, 66, 0.4); }
+        .drag-item.placed { opacity: 0.4; pointer-events: none; }
+        .drop-zones { display: flex; gap: 12px; flex-wrap: wrap; }
+        .drop-zone-group { flex: 1; min-width: 140px; background: white; border-radius: 15px; padding: 12px; border: 2px solid #E0E7EE; }
+        .drop-zone-title { font-family: 'Gowun Dodum', sans-serif; font-weight: 600; font-size: 0.85rem; text-align: center; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 2px dashed #E0E7EE; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .drop-zone { min-height: 70px; border: 2px dashed #CBD5E0; border-radius: 12px; padding: 8px; display: flex; flex-wrap: wrap; gap: 6px; align-content: flex-start; transition: all 0.3s ease; background: #FAFAFA; }
+        .drop-zone.drag-over { border-color: var(--lab-mint); background: rgba(0, 212, 170, 0.05); }
+        .dropped-item { padding: 6px 12px; background: linear-gradient(135deg, var(--lab-mint), #00C49A); color: white; border-radius: 20px; font-size: 0.8rem; font-weight: bold; display: flex; align-items: center; gap: 6px; }
+        .dropped-item .remove-btn { background: rgba(255,255,255,0.25); border: none; border-radius: 50%; width: 18px; height: 18px; cursor: pointer; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; color: white; transition: all 0.2s; }
+        .dropped-item .remove-btn:hover { background: rgba(255,255,255,0.4); }
+        .dropped-item.correct { background: linear-gradient(135deg, var(--correct), #00B548); }
+        .dropped-item.wrong { background: linear-gradient(135deg, var(--wrong), #E04545); }
+
+        .matching-container { display: flex; gap: 15px; flex-wrap: wrap; align-items: stretch; }
+        .matching-column { flex: 1; min-width: 140px; display: flex; flex-direction: column; gap: 10px; }
+        .matching-item { padding: 12px; background: white; border: 2px solid #E0E7EE; border-radius: 12px; text-align: center; cursor: pointer; transition: all 0.3s ease; font-size: 0.85rem; }
+        .matching-item:hover { border-color: var(--lab-mint); transform: scale(1.02); }
+        .matching-item.selected { border-color: var(--lab-orange); background: #FFF8E1; box-shadow: 0 0 0 3px rgba(255, 140, 66, 0.2); }
+        .matching-item.matched { border-color: var(--correct); background: #E8F5E9; pointer-events: none; }
+        .matching-item.wrong-match { border-color: var(--wrong); background: #FFEBEE; animation: shake 0.3s ease; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        .matching-lines { flex: 0 0 40px; display: flex; flex-direction: column; justify-content: space-around; align-items: center; }
+        .match-indicator { width: 25px; height: 3px; background: #E0E7EE; border-radius: 2px; transition: all 0.3s; }
+        .match-indicator.connected { background: var(--correct); width: 35px; }
+
+        /* 마인드맵 스타일 */
+        .mindmap-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            height: 400px;
+            margin: 20px auto;
+        }
+        .mindmap-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        .mind-line {
+            fill: none;
+            stroke: #CBD5E0;
+            stroke-width: 3;
+            stroke-linecap: round;
+            transition: all 0.3s ease;
+        }
+        .mind-line.line-1 { stroke: #9C27B0; }
+        .mind-line.line-2 { stroke: #4ECDC4; }
+        .mind-line.line-3 { stroke: #FF6B6B; }
+        .mind-line.line-4 { stroke: #45B7D1; }
+        .mind-line.line-5 { stroke: #FFB74D; }
+        
+        .mindmap-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #FFF0F5, #FFE4EC);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 30px rgba(255, 107, 157, 0.4);
+            z-index: 10;
+            border: 4px solid white;
+            animation: pulse 2s ease-in-out infinite;
+            padding: 10px;
+        }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 8px 30px rgba(255, 107, 157, 0.4); }
+            50% { box-shadow: 0 8px 40px rgba(255, 107, 157, 0.6), 0 0 20px rgba(255, 107, 157, 0.3); }
+        }
+        .center-icon {
+            width: 70px;
+            height: 70px;
+        }
+        .mindmap-center-text {
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: var(--lab-dark);
+            text-align: center;
+            margin-top: -5px;
+        }
+        
+        .mindmap-node {
+            position: absolute;
+            background: white;
+            border-radius: 15px;
+            padding: 12px 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 5;
+            text-align: center;
+            border: 3px solid;
+        }
+        .mindmap-node:hover {
+            transform: scale(1.08);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+        .mindmap-node.active {
+            transform: scale(1.1);
+            box-shadow: 0 0 0 4px white, 0 8px 30px rgba(0,0,0,0.2);
+        }
+        
+        .node-1 { top: 20px; left: 60px; border-color: #9C27B0; }
+        .node-2 { top: 20px; right: 60px; border-color: #4ECDC4; }
+        .node-3 { top: 50%; left: 0; transform: translateY(-50%); border-color: #FF6B6B; }
+        .node-4 { top: 50%; right: 0; transform: translateY(-50%); border-color: #45B7D1; }
+        .node-5 { bottom: 10px; left: 50%; transform: translateX(-50%); border-color: #FFB74D; }
+        
+        .node-1.active { border-color: #9C27B0; background: linear-gradient(135deg, #F3E5F5, #E1BEE7); }
+        .node-2.active { border-color: #4ECDC4; background: linear-gradient(135deg, #E0F7FA, #B2EBF2); }
+        .node-3.active { border-color: #FF6B6B; background: linear-gradient(135deg, #FFEBEE, #FFCDD2); }
+        .node-4.active { border-color: #45B7D1; background: linear-gradient(135deg, #E1F5FE, #B3E5FC); }
+        .node-5.active { border-color: #FFB74D; background: linear-gradient(135deg, #FFF8E1, #FFECB3); }
+        
+        .node-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .cute-icon {
+            width: 100%;
+            height: 100%;
+            transition: transform 0.3s ease;
+        }
+        .mindmap-node:hover .cute-icon {
+            transform: scale(1.1) rotate(-5deg);
+            animation: wiggle 0.5s ease;
+        }
+        @keyframes wiggle {
+            0%, 100% { transform: scale(1.1) rotate(-5deg); }
+            25% { transform: scale(1.1) rotate(5deg); }
+            50% { transform: scale(1.1) rotate(-5deg); }
+            75% { transform: scale(1.1) rotate(5deg); }
+        }
+        .node-title {
+            font-weight: bold;
+            font-size: 0.85rem;
+            color: var(--lab-dark);
+            margin-bottom: 4px;
+        }
+        .node-sub {
+            font-size: 0.7rem;
+            color: #888;
+            line-height: 1.3;
+        }
+
+        @media (max-width: 600px) {
+            .mindmap-container {
+                height: 500px;
+            }
+            .mindmap-center {
+                width: 100px;
+                height: 100px;
+            }
+            .center-icon {
+                width: 55px;
+                height: 55px;
+            }
+            .mindmap-center-text {
+                font-size: 0.6rem;
+            }
+            .mindmap-node {
+                padding: 10px 12px;
+            }
+            .node-icon { font-size: 1.2rem; }
+            .node-title { font-size: 0.75rem; }
+            .node-sub { font-size: 0.6rem; }
+            .node-1 { top: 10px; left: 10px; }
+            .node-2 { top: 10px; right: 10px; }
+            .node-3 { top: 38%; left: 5px; }
+            .node-4 { top: 38%; right: 5px; }
+            .node-5 { bottom: 10px; }
+            .mindmap-lines { display: none; }
+        }
+        .factor-detail {
+            background: linear-gradient(135deg, #FAFFFE, #F5FAFF);
+            border-radius: 15px;
+            padding: 18px;
+            margin-top: 15px;
+            border-left: 5px solid var(--lab-mint);
+            display: none;
+            position: relative;
+        }
+        .factor-detail.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        .factor-detail .btn-item-reset {
+            position: static;
+            display: block;
+            margin: 15px auto 0;
+            padding: 6px 15px;
+            font-size: 0.8rem;
+        }
+        .factor-detail-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .factor-detail-emoji { font-size: 1.8rem; }
+        .factor-detail-title { font-weight: bold; color: var(--lab-dark); font-size: 1rem; }
+        .factor-sub-list {
+            list-style: none;
+            padding: 0;
+        }
+        .factor-sub-list li {
+            padding: 8px 12px;
+            margin: 5px 0;
+            background: white;
+            border-radius: 8px;
+            border-left: 3px solid var(--lab-blue);
+            font-size: 0.9rem;
+        }
+
+        /* 기차 여정 스타일 */
+        .train-journey-container {
+            position: relative;
+            padding: 40px 10px 30px;
+            margin: 20px 0;
+            background: linear-gradient(180deg, #E3F2FD 0%, #BBDEFB 50%, #90CAF9 100%);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        
+        /* 하늘 배경 장식 */
+        .train-journey-container::before {
+            content: '☁️';
+            position: absolute;
+            top: 10px;
+            left: 15%;
+            font-size: 1.5rem;
+            animation: cloudFloat 6s ease-in-out infinite;
+        }
+        .train-journey-container::after {
+            content: '☁️';
+            position: absolute;
+            top: 15px;
+            right: 20%;
+            font-size: 1.2rem;
+            animation: cloudFloat 8s ease-in-out infinite reverse;
+        }
+        @keyframes cloudFloat {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(20px); }
+        }
+        
+        /* 기차 트랙 */
+        .train-track {
+            position: absolute;
+            bottom: 60px;
+            left: 5%;
+            right: 5%;
+            height: 20px;
+        }
+        .track-line {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, #795548, #8D6E63, #795548);
+            border-radius: 4px;
+        }
+        .track-line-dashed {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: repeating-linear-gradient(
+                90deg,
+                #5D4037,
+                #5D4037 20px,
+                transparent 20px,
+                transparent 30px
+            );
+        }
+        
+        /* 움직이는 기차 */
+        .train-icon {
+            position: absolute;
+            bottom: 65px;
+            left: 2%;
+            width: 70px;
+            height: 45px;
+            z-index: 10;
+            transition: left 0.5s ease;
+        }
+        .train-svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.2));
+        }
+        .smoke {
+            animation: smokeRise 1s ease-out infinite;
+        }
+        .smoke1 { animation-delay: 0s; }
+        .smoke2 { animation-delay: 0.3s; }
+        .smoke3 { animation-delay: 0.6s; }
+        @keyframes smokeRise {
+            0% { opacity: 0.8; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-10px) scale(1.5); }
+        }
+        
+        /* 정거장 컨테이너 */
+        .stations-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            padding: 0 5%;
+            margin-bottom: 40px;
+        }
+        
+        /* 각 정거장 */
+        .station {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .station:hover {
+            transform: translateY(-8px);
+        }
+        .station:hover .station-platform {
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+        .station.active .station-platform {
+            transform: scale(1.1);
+            box-shadow: 0 0 0 4px #FFD54F, 0 8px 25px rgba(0,0,0,0.2);
+        }
+        .station.active .station-marker {
+            background: #FFD54F;
+            transform: scale(1.2);
+        }
+        
+        /* 정거장 마커 (선로 위 동그라미) */
+        .station-marker {
+            width: 30px;
+            height: 30px;
+            background: white;
+            border: 4px solid #FF6B6B;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 10px;
+            z-index: 5;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        .station:nth-child(1) .station-marker { border-color: #FF6B6B; }
+        .station:nth-child(2) .station-marker { border-color: #4ECDC4; }
+        .station:nth-child(3) .station-marker { border-color: #45B7D1; }
+        .station:nth-child(4) .station-marker { border-color: #96CEB4; }
+        .station:nth-child(5) .station-marker { border-color: #DDA0DD; }
+        
+        .station-number {
+            font-weight: bold;
+            font-size: 0.8rem;
+            color: var(--lab-dark);
+        }
+        
+        /* 정거장 플랫폼 (건물) */
+        .station-platform {
+            background: white;
+            border-radius: 15px;
+            padding: 12px 10px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            min-width: 70px;
+        }
+        .station:nth-child(1) .station-platform { border-top: 4px solid #FF6B6B; }
+        .station:nth-child(2) .station-platform { border-top: 4px solid #4ECDC4; }
+        .station:nth-child(3) .station-platform { border-top: 4px solid #45B7D1; }
+        .station:nth-child(4) .station-platform { border-top: 4px solid #96CEB4; }
+        .station:nth-child(5) .station-platform { border-top: 4px solid #DDA0DD; }
+        
+        .station-icon {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+        .station-name {
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: var(--lab-dark);
+            line-height: 1.3;
+        }
+        
+        /* 깃발 */
+        .station-flag {
+            position: absolute;
+            top: -15px;
+            right: -5px;
+            font-size: 1rem;
+            animation: flagWave 1s ease-in-out infinite;
+        }
+        @keyframes flagWave {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+        
+        /* 출발/도착 라벨 */
+        .journey-labels {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 3%;
+            margin-top: 10px;
+        }
+        .journey-start, .journey-end {
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: var(--lab-dark);
+            background: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        /* 특징 상세 내용 */
+        .feature-detail {
+            background: linear-gradient(135deg, #FAFFFE, #F5FAFF);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 12px;
+            border-left: 4px solid var(--lab-mint);
+            display: none;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            position: relative;
+        }
+        .feature-detail.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        .feature-detail .btn-item-reset {
+            position: static;
+            display: block;
+            margin: 12px auto 0;
+            padding: 6px 15px;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 600px) {
+            .train-journey-container {
+                padding: 30px 5px 25px;
+            }
+            .stations-container {
+                flex-wrap: wrap;
+                gap: 15px;
+                justify-content: center;
+            }
+            .station {
+                flex: 0 0 calc(33% - 10px);
+            }
+            .station-platform {
+                min-width: 60px;
+                padding: 10px 8px;
+            }
+            .station-icon { font-size: 1.2rem; }
+            .station-name { font-size: 0.7rem; }
+            .train-icon { display: none; }
+            .train-track { display: none; }
+            .journey-labels { display: none; }
+        }
+
+        .subsection-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--lab-dark);
+            margin: 25px 0 15px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px dashed #E0E7EE;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* 사례 연구 박스 */
+        .case-study-box {
+            background: linear-gradient(135deg, #FFF8E1, #FFECB3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 2px solid #FFD54F;
+        }
+        .case-study-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .case-study-icon {
+            font-size: 2.5rem;
+            background: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .case-study-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .case-study-label {
+            font-size: 0.85rem;
+            color: #666;
+            font-weight: bold;
+        }
+        .case-study-product {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--lab-dark);
+        }
+
+        /* 보고서 테이블 */
+        .report-table {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border: 2px solid #E0E7EE;
+        }
+        .report-row {
+            display: flex;
+            border-bottom: 1px solid #E0E7EE;
+        }
+        .report-row:last-child {
+            border-bottom: none;
+        }
+        .report-header-row {
+            background: linear-gradient(135deg, var(--lab-mint), var(--lab-blue));
+        }
+        .report-cell {
+            padding: 15px;
+        }
+        .header-cell {
+            color: white;
+            font-weight: bold;
+            text-align: center;
+        }
+        .header-cell:first-child {
+            flex: 0 0 120px;
+        }
+        .header-cell:last-child {
+            flex: 1;
+        }
+        .label-cell {
+            flex: 0 0 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #F8FAFC;
+            border-right: 1px solid #E0E7EE;
+        }
+        .content-cell {
+            flex: 1;
+            font-size: 0.9rem;
+            line-height: 1.8;
+            color: var(--lab-dark);
+        }
+        .feature-badge {
+            padding: 8px 12px;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-align: center;
+            white-space: nowrap;
+        }
+        .activity-blank {
+            min-width: 90px;
+        }
+
+        /* 자가 진단 테이블 스타일 */
+        .diagnosis-product-box {
+            background: linear-gradient(135deg, #FFF8E1, #FFECB3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 2px solid #FFD54F;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .diagnosis-product-label {
+            font-weight: bold;
+            color: var(--lab-dark);
+            font-size: 1rem;
+            white-space: nowrap;
+        }
+        .diagnosis-product-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 15px;
+            border: 2px solid #FFD54F;
+            border-radius: 10px;
+            font-family: 'Gowun Dodum', sans-serif;
+            font-size: 1rem;
+            background: white;
+            transition: all 0.3s;
+        }
+        .diagnosis-product-input:focus {
+            outline: none;
+            border-color: var(--lab-orange);
+            box-shadow: 0 0 0 3px rgba(255, 140, 66, 0.2);
+        }
+        .diagnosis-product-suffix {
+            font-weight: bold;
+            color: var(--lab-dark);
+            font-size: 1rem;
+        }
+
+        .diagnosis-table {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 2px solid #E0E7EE;
+        }
+        .diagnosis-header {
+            display: flex;
+            background: linear-gradient(135deg, var(--lab-mint), var(--lab-blue));
+        }
+        .diagnosis-header .diagnosis-cell {
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            padding: 12px 10px;
+        }
+        .header-factor { flex: 0 0 90px; }
+        .header-sub { flex: 0 0 100px; }
+        .header-content { flex: 1; }
+
+        .diagnosis-row {
+            display: flex;
+            border-bottom: 1px solid #E0E7EE;
+        }
+        .diagnosis-row:last-child {
+            border-bottom: none;
+        }
+        .diagnosis-cell {
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .factor-cell {
+            flex: 0 0 90px;
+            flex-direction: column;
+            gap: 5px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.8rem;
+            color: var(--lab-dark);
+            border-right: 1px solid #E0E7EE;
+        }
+        .factor-icon-small {
+            font-size: 1.3rem;
+        }
+        .diagnosis-sub-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .diagnosis-sub-row {
+            display: flex;
+            border-bottom: 1px solid #E0E7EE;
+        }
+        .diagnosis-sub-row:last-child {
+            border-bottom: none;
+        }
+        .sub-cell {
+            flex: 0 0 100px;
+            background: #F8FAFC;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--lab-dark);
+            border-right: 1px solid #E0E7EE;
+            text-align: center;
+        }
+        .content-cell {
+            flex: 1;
+            padding: 8px;
+        }
+        .diagnosis-textarea {
+            width: 100%;
+            min-height: 50px;
+            padding: 10px;
+            border: 2px solid #E0E7EE;
+            border-radius: 8px;
+            font-family: 'Gowun Dodum', sans-serif;
+            font-size: 0.85rem;
+            resize: vertical;
+            transition: all 0.3s;
+        }
+        .diagnosis-textarea:focus {
+            outline: none;
+            border-color: var(--lab-mint);
+            box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.15);
+        }
+        .diagnosis-textarea::placeholder {
+            color: #AAA;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 600px) {
+            .diagnosis-row {
+                flex-direction: column;
+            }
+            .factor-cell {
+                flex: none;
+                flex-direction: row;
+                justify-content: flex-start;
+                gap: 10px;
+                padding: 12px;
+                border-right: none;
+                border-bottom: 1px solid #E0E7EE;
+            }
+            .factor-cell span:last-child {
+                display: inline;
+            }
+            .factor-cell br {
+                display: none;
+            }
+            .diagnosis-sub-row {
+                flex-direction: column;
+            }
+            .sub-cell {
+                flex: none;
+                border-right: none;
+                border-bottom: 1px solid #E0E7EE;
+                padding: 10px;
+            }
+            .header-factor, .header-sub { display: none; }
+            .header-content { flex: 1; text-align: center; }
+            .diagnosis-product-box {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .report-row {
+                flex-direction: column;
+            }
+            .label-cell {
+                flex: none;
+                border-right: none;
+                border-bottom: 1px solid #E0E7EE;
+                padding: 10px;
+            }
+            .header-cell:first-child,
+            .header-cell:last-child {
+                flex: 1;
+            }
+            .case-study-header {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        /* 버튼 스타일 */
+        .btn { padding: 12px 24px; border: none; border-radius: 12px; font-family: 'Gowun Dodum', sans-serif; font-size: 0.95rem; font-weight: bold; cursor: pointer; transition: all 0.3s ease; }
+        .btn-save { background: linear-gradient(135deg, #4A90D9, #5BA0E9); color: white; box-shadow: 0 4px 15px rgba(74, 144, 217, 0.3); }
+        .btn-save:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(74, 144, 217, 0.4); }
+        .btn-submit { background: linear-gradient(135deg, var(--lab-mint), var(--lab-blue)); color: white; box-shadow: 0 4px 15px rgba(0, 212, 170, 0.3); }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 212, 170, 0.4); }
+        .btn-reset { background: linear-gradient(135deg, var(--lab-purple), var(--lab-pink)); color: white; }
+        .btn-reset:hover { transform: translateY(-2px); }
+        .btn-section-reset { background: #F5F5F5; color: var(--lab-dark); border: 2px solid #E0E7EE; }
+        .btn-section-reset:hover { background: #EEEEEE; }
+        .btn-item-reset { position: absolute; top: 10px; right: 10px; background: #F5F5F5; color: #888; border: 1px solid #E0E7EE; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; transition: all 0.2s; }
+        .btn-item-reset:hover { background: #FFEBEE; color: var(--wrong); border-color: var(--wrong); }
+        .btn-group { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+
+        /* 결과 섹션 */
+        .result-section { display: none; margin-top: 20px; padding: 25px; background: linear-gradient(135deg, #E8F5E9, #C8E6C9); border-radius: 20px; text-align: center; border: 3px solid var(--correct); }
+        .result-section.show { display: block; animation: fadeIn 0.5s ease; }
+        .result-grade { font-size: 4rem; margin-bottom: 10px; }
+        .result-message { font-size: 1.2rem; font-weight: bold; color: var(--lab-dark); margin-bottom: 15px; }
+        .result-details { background: white; border-radius: 15px; padding: 20px; }
+        .result-details h4 { margin-bottom: 15px; color: var(--lab-dark); }
+        .result-details ul { list-style: none; }
+        .result-details li { padding: 10px 0; border-bottom: 1px dashed #E0E7EE; display: flex; justify-content: space-between; }
+        .result-details li:last-child { border-bottom: none; }
+
+        /* 토스트 메시지 */
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--lab-dark); color: white; padding: 15px 30px; border-radius: 30px; font-weight: bold; z-index: 1000; opacity: 0; transition: all 0.3s ease; pointer-events: none; }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(-10px); }
+
+        /* 확인 모달 */
+        .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; pointer-events: none; transition: all 0.3s ease; }
+        .modal.show { opacity: 1; pointer-events: auto; }
+        .modal-content { background: white; border-radius: 20px; padding: 30px; max-width: 400px; text-align: center; }
+        .modal-content h3 { margin-bottom: 15px; color: var(--lab-dark); }
+        .modal-content p { color: #666; margin-bottom: 20px; }
+        .modal-btns { display: flex; gap: 10px; justify-content: center; }
+
+        /* 푸터 */
+        .footer { text-align: center; padding: 20px; color: #888; font-size: 0.85rem; }
+
+        @media (max-width: 600px) {
+            .header h1 { font-size: 1.5rem; }
+            .tab-btn { padding: 10px 12px; font-size: 0.8rem; }
+            .section-card { padding: 18px; }
+            .drop-zones { flex-direction: column; }
+            .matching-container { flex-direction: column; }
+            .matching-lines { flex-direction: row; height: 30px; width: 100%; justify-content: space-around; }
+            .match-indicator { width: 3px; height: 20px; }
+            .match-indicator.connected { width: 3px; height: 30px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 떠다니는 분자 이모지 -->
+    <span class="molecule" style="top: 5%; left: 8%;">🧬</span>
+    <span class="molecule" style="top: 15%; right: 12%; animation-delay: 1s;">⚗️</span>
+    <span class="molecule" style="top: 35%; left: 5%; animation-delay: 2s;">🔬</span>
+    <span class="molecule" style="top: 55%; right: 8%; animation-delay: 3s;">💡</span>
+    <span class="molecule" style="top: 75%; left: 10%; animation-delay: 4s;">🧪</span>
+    <span class="molecule" style="top: 85%; right: 15%; animation-delay: 5s;">📊</span>
+    <span class="molecule" style="top: 25%; left: 85%; animation-delay: 1.5s;">🎯</span>
+    <span class="molecule" style="top: 65%; left: 3%; animation-delay: 2.5s;">🧠</span>
+
+    <div class="container">
+        <header class="header">
+            <div class="header-icons"><span>🔬</span><span>🧪</span><span>💡</span></div>
+            <div class="header-badge">DIMIGO</div>
+            <h1>🔬 은또링쌤의 마케팅Lab</h1>
+            <p class="subtitle">📋 1차시. 소비자 행동과 영향 변수</p>
+            <span class="week-info">🗓️ 2주차 | 소비자 행동</span>
+        </header>
+
+        <div class="student-info">
+            <label>🧑‍🔬 연구원</label>
+            <input type="text" id="studentName" placeholder="이름 입력">
+            <label>🔢 연구원 번호</label>
+            <input type="text" id="studentId" placeholder="예: 10101">
+        </div>
+
+        <div class="tab-nav">
+            <button class="tab-btn active" data-tab="objectives">🎯 학습목표</button>
+            <button class="tab-btn" data-tab="concepts">🧬 개념정리</button>
+            <button class="tab-btn" data-tab="quiz">🔍 형성평가</button>
+            <button class="tab-btn" data-tab="activity">⚗️ 실험실</button>
+        </div>
+
+        <div class="progress-section">
+            <div class="progress-header"><span class="progress-title">📈 연구 진행률</span></div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar" style="width: 0%">0%</div>
+            </div>
+            <div class="progress-stats">
+                <span>✅ 정답: <strong id="correctCount">0</strong>개</span>
+                <span>📋 진행: <strong id="answeredCount">0</strong> / <strong id="totalCount">0</strong></span>
+            </div>
+        </div>
+
+        <!-- 탭 1: 학습목표 -->
+        <div class="tab-content active" id="tab-objectives">
+            <div class="section-card">
+                <h2 class="section-title"><span class="icon">🎯</span> 오늘의 연구 목표</h2>
+                <p style="font-size: 0.9rem; color: #666; margin-bottom: 18px;">연구를 시작하기 전, 오늘의 학습 목표를 확인하고 이해한 목표를 클릭해주세요!</p>
+                
+                <div class="objective-item" data-objective="1">
+                    <div class="objective-checkbox"></div>
+                    <span class="objective-text">소비자 구매 행동의 의미를 설명할 수 있다</span>
+                </div>
+                <div class="objective-item" data-objective="2">
+                    <div class="objective-checkbox"></div>
+                    <span class="objective-text">소비자 행동의 특징 5가지를 구분하여 설명할 수 있다</span>
+                </div>
+                <div class="objective-item" data-objective="3">
+                    <div class="objective-checkbox"></div>
+                    <span class="objective-text">소비자 행동에 영향을 미치는 변수 5가지를 분류할 수 있다</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 탭 2: 핵심 개념 정리 -->
+        <div class="tab-content" id="tab-concepts">
+            <div class="section-card">
+                <h2 class="section-title"><span class="icon">🧬</span> 핵심 개념 연구노트</h2>
+                <p style="font-size: 0.9rem; color: #666; margin-bottom: 18px;">빈칸에 알맞은 답을 선택하여 연구노트를 완성해보세요!</p>
+
+                <!-- 소비자 행동의 의미 -->
+                <div class="subsection-title">🛒 소비자 행동의 의미</div>
+                
+                <div class="concept-card">
+                    <div class="concept-header">
+                        <span class="concept-number">📌</span>
+                        <span class="concept-label">소비자 이해를 위한 4가지 정보</span>
+                    </div>
+                    <p class="concept-text">
+                        소비자를 이해하기 위해서는 4가지 정보가 필요하다:<br>
+                        ① <select class="blank-select" data-answer="무엇을" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="무엇을">무엇을</option>
+                            <option value="언제">언제</option>
+                            <option value="얼마나">얼마나</option>
+                        </select> 구매하는가? 
+                        ② <select class="blank-select" data-answer="왜" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="왜">왜</option>
+                            <option value="언제">언제</option>
+                            <option value="얼마에">얼마에</option>
+                        </select> 구매하는가?<br>
+                        ③ <select class="blank-select" data-answer="누가" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="누가">누가</option>
+                            <option value="언제">언제</option>
+                            <option value="어디서">어디서</option>
+                        </select> 구매하는가?
+                        ④ <select class="blank-select" data-answer="어떻게" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="어떻게">어떻게</option>
+                            <option value="언제">언제</option>
+                            <option value="얼마에">얼마에</option>
+                        </select> 구매하는가?
+                    </p>
+                    <button class="btn btn-item-reset" onclick="resetConceptItem(this)">🔄 초기화</button>
+                </div>
+
+                <div class="concept-card">
+                    <div class="concept-header">
+                        <span class="concept-number">📌</span>
+                        <span class="concept-label">소비자 행동의 정의</span>
+                    </div>
+                    <p class="concept-text">
+                        소비자 행동이란 소비자가 
+                        <select class="blank-select" data-answer="제품" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="제품">제품</option>
+                            <option value="기업">기업</option>
+                            <option value="광고">광고</option>
+                        </select>이나 
+                        <select class="blank-select" data-answer="서비스" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="서비스">서비스</option>
+                            <option value="정보">정보</option>
+                            <option value="브랜드">브랜드</option>
+                        </select>의 구매와 관련된 모든 활동을 의미한다.
+                    </p>
+                    <button class="btn btn-item-reset" onclick="resetConceptItem(this)">🔄 초기화</button>
+                </div>
+
+                <!-- 소비자 행동의 특징 5가지 -->
+                <div class="subsection-title">📋 소비자 행동의 특징 5가지</div>
+                <p style="font-size: 0.85rem; color: #666; margin-bottom: 10px; text-align: center;">각 정거장을 클릭하여 소비자 행동의 특징을 알아보세요! 🚂</p>
+                
+                <div class="train-journey-container">
+                    <!-- 기차 트랙 -->
+                    <div class="train-track">
+                        <div class="track-line"></div>
+                        <div class="track-line-dashed"></div>
+                    </div>
+                    
+                    <!-- 움직이는 기차 -->
+                    <div class="train-icon" id="trainIcon">
+                        <svg viewBox="0 0 80 50" class="train-svg">
+                            <!-- 기차 몸체 -->
+                            <rect x="10" y="15" width="55" height="25" rx="8" fill="#FF6B6B"/>
+                            <rect x="10" y="15" width="55" height="10" rx="5" fill="#FF8E8E"/>
+                            <!-- 창문 -->
+                            <rect x="18" y="20" width="10" height="8" rx="2" fill="#87CEEB"/>
+                            <rect x="32" y="20" width="10" height="8" rx="2" fill="#87CEEB"/>
+                            <rect x="46" y="20" width="10" height="8" rx="2" fill="#87CEEB"/>
+                            <!-- 굴뚝 -->
+                            <rect x="52" y="8" width="8" height="10" rx="2" fill="#555"/>
+                            <!-- 연기 -->
+                            <circle cx="56" cy="5" r="4" fill="#DDD" class="smoke smoke1"/>
+                            <circle cx="62" cy="3" r="3" fill="#EEE" class="smoke smoke2"/>
+                            <circle cx="67" cy="6" r="2" fill="#F5F5F5" class="smoke smoke3"/>
+                            <!-- 바퀴 -->
+                            <circle cx="22" cy="40" r="6" fill="#333"/>
+                            <circle cx="22" cy="40" r="3" fill="#666"/>
+                            <circle cx="40" cy="40" r="6" fill="#333"/>
+                            <circle cx="40" cy="40" r="3" fill="#666"/>
+                            <circle cx="55" cy="40" r="6" fill="#333"/>
+                            <circle cx="55" cy="40" r="3" fill="#666"/>
+                            <!-- 앞부분 -->
+                            <polygon points="65,20 75,25 75,35 65,40" fill="#FF5252"/>
+                            <circle cx="72" cy="30" r="3" fill="#FFD54F"/>
+                        </svg>
+                    </div>
+                    
+                    <!-- 정거장들 -->
+                    <div class="stations-container">
+                        <div class="station" data-feature="1" onclick="showFeatureDetail(1)">
+                            <div class="station-marker">
+                                <div class="station-number">1</div>
+                            </div>
+                            <div class="station-platform">
+                                <div class="station-icon">🎯</div>
+                                <div class="station-name">목표<br>지향성</div>
+                            </div>
+                            <div class="station-flag">🚩</div>
+                        </div>
+                        
+                        <div class="station" data-feature="2" onclick="showFeatureDetail(2)">
+                            <div class="station-marker">
+                                <div class="station-number">2</div>
+                            </div>
+                            <div class="station-platform">
+                                <div class="station-icon">🌈</div>
+                                <div class="station-name">다양성</div>
+                            </div>
+                            <div class="station-flag">🚩</div>
+                        </div>
+                        
+                        <div class="station" data-feature="3" onclick="showFeatureDetail(3)">
+                            <div class="station-marker">
+                                <div class="station-number">3</div>
+                            </div>
+                            <div class="station-platform">
+                                <div class="station-icon">📶</div>
+                                <div class="station-name">단계성</div>
+                            </div>
+                            <div class="station-flag">🚩</div>
+                        </div>
+                        
+                        <div class="station" data-feature="4" onclick="showFeatureDetail(4)">
+                            <div class="station-marker">
+                                <div class="station-number">4</div>
+                            </div>
+                            <div class="station-platform">
+                                <div class="station-icon">🌍</div>
+                                <div class="station-name">외부<br>요인</div>
+                            </div>
+                            <div class="station-flag">🚩</div>
+                        </div>
+                        
+                        <div class="station" data-feature="5" onclick="showFeatureDetail(5)">
+                            <div class="station-marker">
+                                <div class="station-number">5</div>
+                            </div>
+                            <div class="station-platform">
+                                <div class="station-icon">👤</div>
+                                <div class="station-name">개인성</div>
+                            </div>
+                            <div class="station-flag">🏁</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 출발/도착 표시 -->
+                    <div class="journey-labels">
+                        <span class="journey-start">🚉 출발</span>
+                        <span class="journey-end">🏠 도착</span>
+                    </div>
+                </div>
+
+                <div class="feature-detail" id="featureDetail1">
+                    <strong>① 목표 지향성</strong>: 소비자 행동은 특정 
+                    <select class="blank-select" data-answer="목표" data-type="concept">
+                        <option value="">선택</option>
+                        <option value="목표">목표</option>
+                        <option value="습관">습관</option>
+                        <option value="충동">충동</option>
+                    </select>를 달성하기 위해 이루어진다. 예) 갈증 해소를 위해 음료 구매
+                    <button class="btn btn-item-reset" onclick="resetConceptItem(this)">🔄 초기화</button>
+                </div>
+                <div class="feature-detail" id="featureDetail2">
+                    <strong>② 다양성</strong>: 같은 목표라도 소비자마다 
+                    <select class="blank-select" data-answer="다양한" data-type="concept">
+                        <option value="">선택</option>
+                        <option value="다양한">다양한</option>
+                        <option value="동일한">동일한</option>
+                        <option value="제한된">제한된</option>
+                    </select> 방법으로 행동한다. 예) 같은 갈증이라도 물, 커피, 주스 등 선택이 다름
+                    <button class="btn btn-item-reset" onclick="resetConceptItem(this)">🔄 초기화</button>
+                </div>
+                <div class="feature-detail" id="featureDetail3">
+                    <strong>③ 단계성</strong>: 소비자 행동은 
+                    <select class="blank-select" data-answer="구매 전" data-type="concept">
+                        <option value="">선택</option>
+                        <option value="구매 전">구매 전</option>
+                        <option value="탐색">탐색</option>
+                        <option value="평가">평가</option>
+                    </select> 활동, 
+                    <select class="blank-select" data-answer="구매 시" data-type="concept">
+                        <option value="">선택</option>
+                        <option value="구매 시">구매 시</option>
+                        <option value="결정">결정</option>
+                        <option value="비교">비교</option>
+                    </select> 활동, 
+                    <select class="blank-select" data-answer="구매 후" data-type="concept">
+                        <option value="">선택</option>
+                        <option value="구매 후">구매 후</option>
+                        <option value="재구매">재구매</option>
+                        <option value="폐기">폐기</option>
+                    </select> 활동으로 이루어진다.
+                    <button class="btn btn-item-reset" onclick="resetConceptItem(this)">🔄 초기화</button>
+                </div>
+                <div class="feature-detail" id="featureDetail4">
+                    <strong>④ 외부 요인</strong>: 소비자 행동은 
+                    <select class="blank-select" data-answer="환경" data-type="concept">
+                        <option value="">선택</option>
+                        <option value="환경">환경</option>
+                        <option value="본능">본능</option>
+                        <option value="유전">유전</option>
+                    </select>적 요인의 영향을 받는다. 예) 광고, 친구 추천, 사회적 분위기 등
+                    <button class="btn btn-item-reset" onclick="resetConceptItem(this)">🔄 초기화</button>
+                </div>
+                <div class="feature-detail" id="featureDetail5">
+                    <strong>⑤ 개인성</strong>: 소비자 행동은 
+                    <select class="blank-select" data-answer="개인" data-type="concept">
+                        <option value="">선택</option>
+                        <option value="개인">개인</option>
+                        <option value="집단">집단</option>
+                        <option value="사회">사회</option>
+                    </select>마다 다르게 나타난다. 예) 같은 광고에도 반응이 다름
+                    <button class="btn btn-item-reset" onclick="resetConceptItem(this)">🔄 초기화</button>
+                </div>
+
+                <!-- 소비자 행동 영향 변수 5가지 -->
+                <div class="subsection-title">🧠 소비자 행동 영향 변수 5가지</div>
+                <p style="font-size: 0.85rem; color: #666; margin-bottom: 10px; text-align: center;">각 요인을 클릭하여 상세 내용을 확인하세요!</p>
+                
+                <div class="mindmap-container">
+                    <!-- 중앙 노드 -->
+                    <div class="mindmap-center">
+                        <svg viewBox="0 0 80 80" class="center-icon">
+                            <!-- 쇼핑백 -->
+                            <path d="M20 35 L20 65 Q20 70 25 70 L55 70 Q60 70 60 65 L60 35 Z" fill="#FF6B9D"/>
+                            <path d="M20 35 L20 65 Q20 70 25 70 L55 70 Q60 70 60 65 L60 35 Z" fill="url(#bagGradient)" opacity="0.3"/>
+                            <rect x="22" y="35" width="36" height="8" fill="#FF8FB3"/>
+                            <!-- 쇼핑백 손잡이 -->
+                            <path d="M28 35 Q28 22 40 22 Q52 22 52 35" fill="none" stroke="#E91E63" stroke-width="4" stroke-linecap="round"/>
+                            <!-- 귀여운 얼굴 -->
+                            <circle cx="32" cy="52" r="4" fill="white"/>
+                            <circle cx="48" cy="52" r="4" fill="white"/>
+                            <circle cx="33" cy="53" r="2.5" fill="#333"/>
+                            <circle cx="49" cy="53" r="2.5" fill="#333"/>
+                            <circle cx="33.8" cy="52" r="0.8" fill="white"/>
+                            <circle cx="49.8" cy="52" r="0.8" fill="white"/>
+                            <!-- 볼터치 -->
+                            <ellipse cx="26" cy="56" rx="3" ry="2" fill="#FFCDD2" opacity="0.8"/>
+                            <ellipse cx="54" cy="56" rx="3" ry="2" fill="#FFCDD2" opacity="0.8"/>
+                            <!-- 미소 -->
+                            <path d="M35 60 Q40 65 45 60" fill="none" stroke="#333" stroke-width="2.5" stroke-linecap="round"/>
+                            <!-- 하트 장식 -->
+                            <path d="M65 25 L62 21 Q59 16 63 16 Q65 16 65 19 Q65 16 67 16 Q71 16 68 21 Z" fill="#FF6B9D"/>
+                            <path d="M18 28 L16 25 Q14 22 16.5 22 Q18 22 18 24 Q18 22 19.5 22 Q22 22 20 25 Z" fill="#4ECDC4"/>
+                            <!-- 별 반짝이 -->
+                            <polygon points="12,45 13,47 15,47 13.5,49 14,51 12,49.5 10,51 10.5,49 9,47 11,47" fill="#FFD54F"/>
+                            <polygon points="68,40 69,42 71,42 69.5,44 70,46 68,44.5 66,46 66.5,44 65,42 67,42" fill="#FFD54F"/>
+                            <defs>
+                                <linearGradient id="bagGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:white;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:transparent;stop-opacity:0" />
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                        <span class="mindmap-center-text">소비자 행동</span>
+                    </div>
+                    
+                    <!-- 연결선 SVG -->
+                    <svg class="mindmap-lines" viewBox="0 0 600 400">
+                        <!-- 심리적 요인 연결선 -->
+                        <path class="mind-line line-1" d="M300,200 Q220,120 140,80" />
+                        <!-- 사회적 요인 연결선 -->
+                        <path class="mind-line line-2" d="M300,200 Q380,120 460,80" />
+                        <!-- 문화적 요인 연결선 -->
+                        <path class="mind-line line-3" d="M300,200 Q200,200 80,200" />
+                        <!-- 개인적 요인 연결선 -->
+                        <path class="mind-line line-4" d="M300,200 Q400,200 520,200" />
+                        <!-- 경제적 요인 연결선 -->
+                        <path class="mind-line line-5" d="M300,200 Q300,280 300,340" />
+                    </svg>
+                    
+                    <!-- 요인 노드들 -->
+                    <div class="mindmap-node node-1" data-factor="1" onclick="showFactorDetail(1)">
+                        <div class="node-icon">
+                            <svg viewBox="0 0 60 60" class="cute-icon">
+                                <!-- 심리적 요인 - 귀여운 뇌 캐릭터 -->
+                                <ellipse cx="30" cy="32" rx="22" ry="18" fill="#E1BEE7"/>
+                                <ellipse cx="30" cy="32" rx="18" ry="14" fill="#CE93D8"/>
+                                <path d="M18 28 Q22 22 30 24 Q38 22 42 28" fill="none" stroke="#9C27B0" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M20 34 Q25 30 30 32 Q35 30 40 34" fill="none" stroke="#9C27B0" stroke-width="2" stroke-linecap="round"/>
+                                <!-- 귀여운 눈 -->
+                                <circle cx="24" cy="35" r="3" fill="#333"/>
+                                <circle cx="36" cy="35" r="3" fill="#333"/>
+                                <circle cx="25" cy="34" r="1" fill="white"/>
+                                <circle cx="37" cy="34" r="1" fill="white"/>
+                                <!-- 볼터치 -->
+                                <ellipse cx="18" cy="38" rx="3" ry="2" fill="#F8BBD9" opacity="0.7"/>
+                                <ellipse cx="42" cy="38" rx="3" ry="2" fill="#F8BBD9" opacity="0.7"/>
+                                <!-- 미소 -->
+                                <path d="M26 42 Q30 46 34 42" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+                                <!-- 전구 아이디어 -->
+                                <circle cx="45" cy="18" r="8" fill="#FFF59D"/>
+                                <circle cx="45" cy="18" r="5" fill="#FFEE58"/>
+                                <rect x="43" y="26" width="4" height="3" rx="1" fill="#BDBDBD"/>
+                                <path d="M42 15 L48 15 M42 18 L48 18 M42 21 L48 21" stroke="#FFC107" stroke-width="1"/>
+                            </svg>
+                        </div>
+                        <div class="node-title">심리적 요인</div>
+                        <div class="node-sub">동기 · 지각 · 학습 · 태도</div>
+                    </div>
+                    
+                    <div class="mindmap-node node-2" data-factor="2" onclick="showFactorDetail(2)">
+                        <div class="node-icon">
+                            <svg viewBox="0 0 60 60" class="cute-icon">
+                                <!-- 사회적 요인 - 귀여운 친구들 -->
+                                <!-- 왼쪽 캐릭터 -->
+                                <circle cx="18" cy="28" r="10" fill="#B2EBF2"/>
+                                <circle cx="18" cy="25" r="7" fill="#FFE0B2"/>
+                                <circle cx="15" cy="24" r="2" fill="#333"/>
+                                <circle cx="21" cy="24" r="2" fill="#333"/>
+                                <circle cx="15.5" cy="23.5" r="0.7" fill="white"/>
+                                <circle cx="21.5" cy="23.5" r="0.7" fill="white"/>
+                                <path d="M15 28 Q18 31 21 28" fill="none" stroke="#333" stroke-width="1.5" stroke-linecap="round"/>
+                                <ellipse cx="12" cy="26" rx="2" ry="1.5" fill="#FFCDD2" opacity="0.6"/>
+                                <ellipse cx="24" cy="26" rx="2" ry="1.5" fill="#FFCDD2" opacity="0.6"/>
+                                <!-- 오른쪽 캐릭터 -->
+                                <circle cx="42" cy="28" r="10" fill="#C8E6C9"/>
+                                <circle cx="42" cy="25" r="7" fill="#FFE0B2"/>
+                                <circle cx="39" cy="24" r="2" fill="#333"/>
+                                <circle cx="45" cy="24" r="2" fill="#333"/>
+                                <circle cx="39.5" cy="23.5" r="0.7" fill="white"/>
+                                <circle cx="45.5" cy="23.5" r="0.7" fill="white"/>
+                                <path d="M39 28 Q42 31 45 28" fill="none" stroke="#333" stroke-width="1.5" stroke-linecap="round"/>
+                                <ellipse cx="36" cy="26" rx="2" ry="1.5" fill="#FFCDD2" opacity="0.6"/>
+                                <ellipse cx="48" cy="26" rx="2" ry="1.5" fill="#FFCDD2" opacity="0.6"/>
+                                <!-- 가운데 하트 -->
+                                <path d="M30 38 L26 34 Q24 30 28 30 Q30 30 30 33 Q30 30 32 30 Q36 30 34 34 Z" fill="#FF6B9D"/>
+                                <!-- 연결선 -->
+                                <path d="M25 30 Q30 28 35 30" fill="none" stroke="#4ECDC4" stroke-width="2" stroke-dasharray="2,2"/>
+                            </svg>
+                        </div>
+                        <div class="node-title">사회적 요인</div>
+                        <div class="node-sub">준거 집단 · 가족</div>
+                    </div>
+                    
+                    <div class="mindmap-node node-3" data-factor="3" onclick="showFactorDetail(3)">
+                        <div class="node-icon">
+                            <svg viewBox="0 0 60 60" class="cute-icon">
+                                <!-- 문화적 요인 - 귀여운 지구 캐릭터 -->
+                                <circle cx="30" cy="30" r="20" fill="#81D4FA"/>
+                                <ellipse cx="25" cy="28" rx="8" ry="10" fill="#A5D6A7"/>
+                                <ellipse cx="38" cy="32" rx="6" ry="8" fill="#A5D6A7"/>
+                                <ellipse cx="30" cy="42" rx="4" ry="3" fill="#A5D6A7"/>
+                                <!-- 귀여운 눈 -->
+                                <circle cx="24" cy="28" r="4" fill="white"/>
+                                <circle cx="36" cy="28" r="4" fill="white"/>
+                                <circle cx="25" cy="29" r="2.5" fill="#333"/>
+                                <circle cx="37" cy="29" r="2.5" fill="#333"/>
+                                <circle cx="25.8" cy="28" r="0.8" fill="white"/>
+                                <circle cx="37.8" cy="28" r="0.8" fill="white"/>
+                                <!-- 볼터치 -->
+                                <ellipse cx="18" cy="33" rx="3" ry="2" fill="#FFCDD2" opacity="0.6"/>
+                                <ellipse cx="42" cy="33" rx="3" ry="2" fill="#FFCDD2" opacity="0.6"/>
+                                <!-- 미소 -->
+                                <path d="M25 36 Q30 41 35 36" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+                                <!-- 깃발들 -->
+                                <rect x="12" y="8" width="1.5" height="12" fill="#795548"/>
+                                <polygon points="13.5,8 22,12 13.5,16" fill="#FF6B6B"/>
+                                <rect x="46" y="10" width="1.5" height="10" fill="#795548"/>
+                                <polygon points="47.5,10 54,13 47.5,16" fill="#4ECDC4"/>
+                            </svg>
+                        </div>
+                        <div class="node-title">문화적 요인</div>
+                        <div class="node-sub">문화 · 하위문화 · 사회 계층</div>
+                    </div>
+                    
+                    <div class="mindmap-node node-4" data-factor="4" onclick="showFactorDetail(4)">
+                        <div class="node-icon">
+                            <svg viewBox="0 0 60 60" class="cute-icon">
+                                <!-- 개인적 요인 - 귀여운 사람 캐릭터 -->
+                                <!-- 몸통 -->
+                                <ellipse cx="30" cy="48" rx="14" ry="10" fill="#81D4FA"/>
+                                <!-- 얼굴 -->
+                                <circle cx="30" cy="26" r="14" fill="#FFE0B2"/>
+                                <!-- 머리카락 -->
+                                <ellipse cx="30" cy="16" rx="12" ry="6" fill="#5D4037"/>
+                                <ellipse cx="22" cy="18" rx="4" ry="5" fill="#5D4037"/>
+                                <ellipse cx="38" cy="18" rx="4" ry="5" fill="#5D4037"/>
+                                <!-- 눈 -->
+                                <ellipse cx="24" cy="26" rx="3" ry="3.5" fill="white"/>
+                                <ellipse cx="36" cy="26" rx="3" ry="3.5" fill="white"/>
+                                <circle cx="24" cy="27" r="2" fill="#333"/>
+                                <circle cx="36" cy="27" r="2" fill="#333"/>
+                                <circle cx="24.7" cy="26" r="0.7" fill="white"/>
+                                <circle cx="36.7" cy="26" r="0.7" fill="white"/>
+                                <!-- 볼터치 -->
+                                <ellipse cx="18" cy="30" rx="3" ry="2" fill="#FFCDD2" opacity="0.6"/>
+                                <ellipse cx="42" cy="30" rx="3" ry="2" fill="#FFCDD2" opacity="0.6"/>
+                                <!-- 미소 -->
+                                <path d="M25 33 Q30 37 35 33" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+                                <!-- 별 장식 -->
+                                <polygon points="50,15 51.5,19 56,19 52.5,22 54,26 50,23.5 46,26 47.5,22 44,19 48.5,19" fill="#FFD54F"/>
+                            </svg>
+                        </div>
+                        <div class="node-title">개인적 요인</div>
+                        <div class="node-sub">나이 · 라이프스타일 · 개성</div>
+                    </div>
+                    
+                    <div class="mindmap-node node-5" data-factor="5" onclick="showFactorDetail(5)">
+                        <div class="node-icon">
+                            <svg viewBox="0 0 60 60" class="cute-icon">
+                                <!-- 경제적 요인 - 귀여운 돼지 저금통 -->
+                                <!-- 몸통 -->
+                                <ellipse cx="30" cy="34" rx="20" ry="15" fill="#FFCCBC"/>
+                                <ellipse cx="30" cy="34" rx="17" ry="12" fill="#FFAB91"/>
+                                <!-- 귀 -->
+                                <ellipse cx="16" cy="22" rx="5" ry="7" fill="#FFCCBC"/>
+                                <ellipse cx="16" cy="22" rx="3" ry="5" fill="#FF8A65"/>
+                                <ellipse cx="44" cy="22" rx="5" ry="7" fill="#FFCCBC"/>
+                                <ellipse cx="44" cy="22" rx="3" ry="5" fill="#FF8A65"/>
+                                <!-- 코 -->
+                                <ellipse cx="30" cy="36" rx="6" ry="4" fill="#FF8A65"/>
+                                <circle cx="27" cy="36" r="1.5" fill="#E64A19"/>
+                                <circle cx="33" cy="36" r="1.5" fill="#E64A19"/>
+                                <!-- 눈 -->
+                                <circle cx="22" cy="30" r="3" fill="#333"/>
+                                <circle cx="38" cy="30" r="3" fill="#333"/>
+                                <circle cx="23" cy="29" r="1" fill="white"/>
+                                <circle cx="39" cy="29" r="1" fill="white"/>
+                                <!-- 볼터치 -->
+                                <ellipse cx="15" cy="34" rx="3" ry="2" fill="#FFCDD2" opacity="0.7"/>
+                                <ellipse cx="45" cy="34" rx="3" ry="2" fill="#FFCDD2" opacity="0.7"/>
+                                <!-- 동전 투입구 -->
+                                <rect x="26" y="20" width="8" height="3" rx="1.5" fill="#795548"/>
+                                <!-- 반짝이는 동전 -->
+                                <circle cx="48" cy="12" r="6" fill="#FFD54F"/>
+                                <circle cx="48" cy="12" r="4" fill="#FFEB3B"/>
+                                <text x="48" y="14" font-size="6" fill="#FF8F00" text-anchor="middle" font-weight="bold">$</text>
+                                <!-- 다리 -->
+                                <ellipse cx="20" cy="47" rx="4" ry="3" fill="#FFAB91"/>
+                                <ellipse cx="40" cy="47" rx="4" ry="3" fill="#FFAB91"/>
+                            </svg>
+                        </div>
+                        <div class="node-title">경제적 요인</div>
+                        <div class="node-sub">직업 · 자산 · 저축</div>
+                    </div>
+                </div>
+
+                <!-- 각 요인별 상세 설명 -->
+                <div class="factor-detail" id="factorDetail1">
+                    <div class="factor-detail-header">
+                        <span class="factor-detail-emoji">🧠</span>
+                        <span class="factor-detail-title">심리적 요인</span>
+                    </div>
+                    <p class="concept-text">소비자의 내면에서 작용하는 심리적 과정이 구매 행동에 영향을 미친다.</p>
+                    <ul class="factor-sub-list">
+                        <li>🔹 <strong>동기</strong>: 행동을 유발하는 
+                            <select class="blank-select" data-answer="욕구" data-type="concept">
+                                <option value="">선택</option>
+                                <option value="욕구">욕구</option>
+                                <option value="습관">습관</option>
+                                <option value="반복">반복</option>
+                            </select>
+                        </li>
+                        <li>🔹 <strong>지각</strong>: 정보를 선택, 조직, 해석하는 과정</li>
+                        <li>🔹 <strong>학습</strong>: 경험을 통한 행동 변화</li>
+                        <li>🔹 <strong>태도</strong>: 대상에 대한 지속적인 평가</li>
+                    </ul>
+                    <button class="btn btn-item-reset" onclick="resetConceptItem(this)">🔄 초기화</button>
+                </div>
+
+                <div class="factor-detail" id="factorDetail2">
+                    <div class="factor-detail-header">
+                        <span class="factor-detail-emoji">👥</span>
+                        <span class="factor-detail-title">사회적 요인</span>
+                    </div>
+                    <p class="concept-text">소비자가 속한 사회적 환경과 관계가 구매 행동에 영향을 미친다.</p>
+                    <ul class="factor-sub-list">
+                        <li>🔹 <strong>준거 집단</strong>: 개인의 태도나 행동에 영향을 주는 
+                            <select class="blank-select" data-answer="집단" data-type="concept">
+                                <option value="">선택</option>
+                                <option value="집단">집단</option>
+                                <option value="개인">개인</option>
+                                <option value="기업">기업</option>
+                            </select> (친구, 연예인, 인플루언서 등)
+                        </li>
+                        <li>🔹 <strong>가족</strong>: 구매 의사결정에 가장 큰 영향을 미치는 1차 집단</li>
+                    </ul>
+                    <button class="btn btn-item-reset" onclick="resetConceptItem(this)">🔄 초기화</button>
+                </div>
+
+                <div class="factor-detail" id="factorDetail3">
+                    <div class="factor-detail-header">
+                        <span class="factor-detail-emoji">🌍</span>
+                        <span class="factor-detail-title">문화적 요인</span>
+                    </div>
+                    <p class="concept-text">사회 구성원들이 공유하는 가치관, 규범, 관습 등이 소비 행동에 영향을 미친다.</p>
+                    <ul class="factor-sub-list">
+                        <li>🔹 <strong>문화</strong>: 한 사회의 
+                            <select class="blank-select" data-answer="가치관" data-type="concept">
+                                <option value="">선택</option>
+                                <option value="가치관">가치관</option>
+                                <option value="제도">제도</option>
+                                <option value="법률">법률</option>
+                            </select>, 인식, 선호, 행동양식
+                        </li>
+                        <li>🔹 <strong>하위문화</strong>: 민족, 종교, 지역 등에 따른 세부 문화집단</li>
+                        <li>🔹 <strong>사회 계층</strong>: 비슷한 가치관과 행동 양식을 공유하는 집단</li>
+                    </ul>
+                    <button class="btn btn-item-reset" onclick="resetConceptItem(this)">🔄 초기화</button>
+                </div>
+
+                <div class="factor-detail" id="factorDetail4">
+                    <div class="factor-detail-header">
+                        <span class="factor-detail-emoji">👤</span>
+                        <span class="factor-detail-title">개인적 요인</span>
+                    </div>
+                    <p class="concept-text">소비자 개인의 특성이 구매 행동에 영향을 미친다.</p>
+                    <ul class="factor-sub-list">
+                        <li>🔹 <strong>나이</strong>: 연령대별로 다른 소비 패턴</li>
+                        <li>🔹 <strong>라이프스타일</strong>: 개인의 활동, 관심, 
+                            <select class="blank-select" data-answer="의견" data-type="concept">
+                                <option value="">선택</option>
+                                <option value="의견">의견</option>
+                                <option value="수입">수입</option>
+                                <option value="학력">학력</option>
+                            </select>을 반영한 생활양식
+                        </li>
+                        <li>🔹 <strong>개성</strong>: 개인의 고유한 심리적 특성</li>
+                    </ul>
+                    <button class="btn btn-item-reset" onclick="resetConceptItem(this)">🔄 초기화</button>
+                </div>
+
+                <div class="factor-detail" id="factorDetail5">
+                    <div class="factor-detail-header">
+                        <span class="factor-detail-emoji">💰</span>
+                        <span class="factor-detail-title">경제적 요인</span>
+                    </div>
+                    <p class="concept-text">소비자의 경제적 상황이 구매 능력과 행동에 영향을 미친다.</p>
+                    <ul class="factor-sub-list">
+                        <li>🔹 <strong>직업</strong>: 직업에 따른 제품 
+                            <select class="blank-select" data-answer="선호도" data-type="concept">
+                                <option value="">선택</option>
+                                <option value="선호도">선호도</option>
+                                <option value="크기">크기</option>
+                                <option value="색상">색상</option>
+                            </select> 차이
+                        </li>
+                        <li>🔹 <strong>자산</strong>: 보유 재산에 따른 구매력</li>
+                        <li>🔹 <strong>저축</strong>: 저축 성향에 따른 소비 패턴</li>
+                    </ul>
+                    <button class="btn btn-item-reset" onclick="resetConceptItem(this)">🔄 초기화</button>
+                </div>
+
+                <div class="btn-group" style="margin-top: 20px;">
+                    <button class="btn btn-section-reset" onclick="resetConcepts()">🔄 개념정리 초기화</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 탭 3: 형성평가 (10문항) -->
+        <div class="tab-content" id="tab-quiz">
+            <div class="section-card">
+                <h2 class="section-title"><span class="icon">🔍</span> 연구 결과 확인</h2>
+                <p style="font-size: 0.9rem; color: #666; margin-bottom: 18px;">배운 내용을 확인해봅시다! 정답을 선택해주세요.</p>
+
+                <div class="quiz-card" data-quiz="1">
+                    <p class="quiz-question"><span class="quiz-badge">Q1</span>소비자를 이해하기 위한 4가지 정보로 올바르지 않은 것은?</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-value="1">① 무엇을 구매하는가</div>
+                        <div class="quiz-option" data-value="2">② 왜 구매하는가</div>
+                        <div class="quiz-option" data-value="3" data-correct="true">③ 언제 구매하는가</div>
+                        <div class="quiz-option" data-value="4">④ 어떻게 구매하는가</div>
+                    </div>
+                </div>
+
+                <div class="quiz-card" data-quiz="2">
+                    <p class="quiz-question"><span class="quiz-badge">Q2</span>소비자 행동의 특징 5가지가 아닌 것은?</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-value="1">① 목표 지향성</div>
+                        <div class="quiz-option" data-value="2">② 다양성</div>
+                        <div class="quiz-option" data-value="3" data-correct="true">③ 획일성</div>
+                        <div class="quiz-option" data-value="4">④ 단계성</div>
+                    </div>
+                </div>
+
+                <div class="quiz-card" data-quiz="3">
+                    <p class="quiz-question"><span class="quiz-badge">Q3</span>소비자 행동에 영향을 미치는 변수 5가지에 해당하지 않는 것은?</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-value="1">① 심리적 요인</div>
+                        <div class="quiz-option" data-value="2">② 경제적 요인</div>
+                        <div class="quiz-option" data-value="3" data-correct="true">③ 기후적 요인</div>
+                        <div class="quiz-option" data-value="4">④ 문화적 요인</div>
+                    </div>
+                </div>
+
+                <div class="quiz-card" data-quiz="4">
+                    <p class="quiz-question"><span class="quiz-badge">Q4</span>심리적 요인의 하위 요소에 해당하지 않는 것은?</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-value="1">① 동기</div>
+                        <div class="quiz-option" data-value="2">② 지각</div>
+                        <div class="quiz-option" data-value="3">③ 학습</div>
+                        <div class="quiz-option" data-value="4" data-correct="true">④ 가족</div>
+                    </div>
+                </div>
+
+                <div class="quiz-card" data-quiz="5">
+                    <p class="quiz-question"><span class="quiz-badge">Q5</span>개인의 태도나 행동에 영향을 주는 집단을 무엇이라 하는가?</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-value="1" data-correct="true">① 준거 집단</div>
+                        <div class="quiz-option" data-value="2">② 하위문화</div>
+                        <div class="quiz-option" data-value="3">③ 사회 계층</div>
+                        <div class="quiz-option" data-value="4">④ 라이프스타일</div>
+                    </div>
+                </div>
+
+                <div class="quiz-card" data-quiz="6">
+                    <p class="quiz-question"><span class="quiz-badge">Q6</span>'라이프스타일'은 어떤 요인에 해당하는가?</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-value="1">① 심리적 요인</div>
+                        <div class="quiz-option" data-value="2">② 사회적 요인</div>
+                        <div class="quiz-option" data-value="3" data-correct="true">③ 개인적 요인</div>
+                        <div class="quiz-option" data-value="4">④ 경제적 요인</div>
+                    </div>
+                </div>
+
+                <div class="quiz-card" data-quiz="7">
+                    <p class="quiz-question"><span class="quiz-badge">Q7</span>구매 의사결정에 가장 큰 영향을 미치는 1차 집단은?</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-value="1">① 직장 동료</div>
+                        <div class="quiz-option" data-value="2" data-correct="true">② 가족</div>
+                        <div class="quiz-option" data-value="3">③ 인플루언서</div>
+                        <div class="quiz-option" data-value="4">④ 종교 단체</div>
+                    </div>
+                </div>
+
+                <div class="quiz-card" data-quiz="8">
+                    <p class="quiz-question"><span class="quiz-badge">Q8</span>'직업, 자산, 저축'은 어떤 요인에 해당하는가?</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-value="1">① 개인적 요인</div>
+                        <div class="quiz-option" data-value="2">② 사회적 요인</div>
+                        <div class="quiz-option" data-value="3">③ 심리적 요인</div>
+                        <div class="quiz-option" data-value="4" data-correct="true">④ 경제적 요인</div>
+                    </div>
+                </div>
+
+                <div class="quiz-card" data-quiz="9">
+                    <p class="quiz-question"><span class="quiz-badge">Q9</span>소비자 행동이 '단계성'을 가진다는 것의 의미는?</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-value="1">① 소비자마다 다르게 행동한다</div>
+                        <div class="quiz-option" data-value="2" data-correct="true">② 구매 전, 구매 시, 구매 후 활동으로 이루어진다</div>
+                        <div class="quiz-option" data-value="3">③ 목표를 달성하기 위해 행동한다</div>
+                        <div class="quiz-option" data-value="4">④ 외부 환경의 영향을 받는다</div>
+                    </div>
+                </div>
+
+                <div class="quiz-card" data-quiz="10">
+                    <p class="quiz-question"><span class="quiz-badge">Q10</span>민족, 종교, 지역 등에 따른 세부 문화집단을 무엇이라 하는가?</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-value="1">① 문화</div>
+                        <div class="quiz-option" data-value="2" data-correct="true">② 하위문화</div>
+                        <div class="quiz-option" data-value="3">③ 사회 계층</div>
+                        <div class="quiz-option" data-value="4">④ 준거 집단</div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-section-reset" onclick="resetQuiz()">🔄 형성평가 초기화</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 탭 4: 활동지 (실험실) -->
+        <div class="tab-content" id="tab-activity">
+            <div class="section-card">
+                <h2 class="section-title"><span class="icon">⚗️</span> 마케팅 실험실</h2>
+
+                <!-- 실험 1: 소비자 행동 특징 분석 보고서 -->
+                <div class="activity-section">
+                    <h3 class="activity-title">🧪 실험 1: 소비자 행동 특징 분석 보고서</h3>
+                    <div class="activity-instruction">
+                        💡 아래 사례를 읽고, 소비자 행동의 특징 5가지에 해당하는 빈칸을 채워 보고서를 완성하세요!
+                    </div>
+
+                    <div class="case-study-box">
+                        <div class="case-study-header">
+                            <span class="case-study-icon">📱</span>
+                            <div class="case-study-info">
+                                <span class="case-study-label">구매하고 싶은 물품</span>
+                                <span class="case-study-product">핸드폰 케이스 구입</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="report-table">
+                        <div class="report-row report-header-row">
+                            <div class="report-cell header-cell">특징</div>
+                            <div class="report-cell header-cell">분석 내용</div>
+                        </div>
+                        
+                        <div class="report-row">
+                            <div class="report-cell label-cell">
+                                <span class="feature-badge" style="background: linear-gradient(135deg, #FF6B6B, #FF8E8E);">목표 지향성</span>
+                            </div>
+                            <div class="report-cell content-cell">
+                                새롭게 핸드폰을 구입하고 
+                                <select class="blank-select activity-blank" data-answer="파손" data-activity="1">
+                                    <option value="">선택</option>
+                                    <option value="파손">파손</option>
+                                    <option value="분실">분실</option>
+                                    <option value="교환">교환</option>
+                                </select>을 방지하기 위해 핸드폰 케이스를 구매하기로 생각하고 검색하였다.
+                            </div>
+                        </div>
+
+                        <div class="report-row">
+                            <div class="report-cell label-cell">
+                                <span class="feature-badge" style="background: linear-gradient(135deg, #4ECDC4, #6EE7DE);">다양성</span>
+                            </div>
+                            <div class="report-cell content-cell">
+                                친구들이 쓰고 있는 핸드폰 케이스의 장단점을 물어보고 
+                                <select class="blank-select activity-blank" data-answer="인터넷" data-activity="1">
+                                    <option value="">선택</option>
+                                    <option value="인터넷">인터넷</option>
+                                    <option value="매장">매장</option>
+                                    <option value="전화">전화</option>
+                                </select>을 활용하여 구매 후기, 상품 설명을 참고하였다.
+                            </div>
+                        </div>
+
+                        <div class="report-row">
+                            <div class="report-cell label-cell">
+                                <span class="feature-badge" style="background: linear-gradient(135deg, #45B7D1, #65D7F1);">단계성</span>
+                            </div>
+                            <div class="report-cell content-cell">
+                                구매가 필요한 상황에서 정보 탐색, 
+                                <select class="blank-select activity-blank" data-answer="비교 평가" data-activity="1">
+                                    <option value="">선택</option>
+                                    <option value="비교 평가">비교 평가</option>
+                                    <option value="충동 구매">충동 구매</option>
+                                    <option value="즉시 결제">즉시 결제</option>
+                                </select>, 구매, 리뷰 쓰기의 활동을 하였다.
+                            </div>
+                        </div>
+
+                        <div class="report-row">
+                            <div class="report-cell label-cell">
+                                <span class="feature-badge" style="background: linear-gradient(135deg, #96CEB4, #B6EED4);">외부 요인</span>
+                            </div>
+                            <div class="report-cell content-cell">
+                                고등학생에게 활용적인 휴대 전화 케이스로 구매하였으며 
+                                <select class="blank-select activity-blank" data-answer="친구들" data-activity="1">
+                                    <option value="">선택</option>
+                                    <option value="친구들">친구들</option>
+                                    <option value="선생님">선생님</option>
+                                    <option value="판매자">판매자</option>
+                                </select>이 사용하는 휴대 전화의 장단점을 참고하였다.
+                            </div>
+                        </div>
+
+                        <div class="report-row">
+                            <div class="report-cell label-cell">
+                                <span class="feature-badge" style="background: linear-gradient(135deg, #DDA0DD, #EDBDED);">개인성</span>
+                            </div>
+                            <div class="report-cell content-cell">
+                                친구들이 추천한 제품은 싸고 튼튼한 것 같았지만 별다른 
+                                <select class="blank-select activity-blank" data-answer="디자인" data-activity="1">
+                                    <option value="">선택</option>
+                                    <option value="디자인">디자인</option>
+                                    <option value="기능">기능</option>
+                                    <option value="가격">가격</option>
+                                </select>이 없기에 다음에는 구매하지 않을 것 같다.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 실험 2: 영향 변수 5가지 분류하기 -->
+                <div class="activity-section" style="margin-top: 30px;">
+                    <h3 class="activity-title">🎯 실험 2: 영향 변수 5가지 분류하기</h3>
+                    <div class="activity-instruction">
+                        💡 PC: 아래 요소들을 드래그하여 해당하는 요인에 놓으세요<br>
+                        📱 모바일: 요소를 터치하여 선택 후, 영역을 터치하여 배치하세요
+                    </div>
+
+                    <div class="drag-container" id="dragContainer1">
+                        <div class="drag-item" data-category="psychological" draggable="true">동기</div>
+                        <div class="drag-item" data-category="social" draggable="true">준거 집단</div>
+                        <div class="drag-item" data-category="cultural" draggable="true">하위문화</div>
+                        <div class="drag-item" data-category="personal" draggable="true">라이프스타일</div>
+                        <div class="drag-item" data-category="economic" draggable="true">직업</div>
+                        <div class="drag-item" data-category="psychological" draggable="true">태도</div>
+                        <div class="drag-item" data-category="social" draggable="true">가족</div>
+                        <div class="drag-item" data-category="cultural" draggable="true">사회 계층</div>
+                        <div class="drag-item" data-category="economic" draggable="true">저축</div>
+                        <div class="drag-item" data-category="personal" draggable="true">개성</div>
+                    </div>
+
+                    <div class="drop-zones">
+                        <div class="drop-zone-group">
+                            <div class="drop-zone-title" style="color: #9C27B0;">🧠 심리적</div>
+                            <div class="drop-zone" data-accept="psychological"></div>
+                        </div>
+                        <div class="drop-zone-group">
+                            <div class="drop-zone-title" style="color: #4ECDC4;">👥 사회적</div>
+                            <div class="drop-zone" data-accept="social"></div>
+                        </div>
+                        <div class="drop-zone-group">
+                            <div class="drop-zone-title" style="color: #FF6B6B;">🌍 문화적</div>
+                            <div class="drop-zone" data-accept="cultural"></div>
+                        </div>
+                        <div class="drop-zone-group">
+                            <div class="drop-zone-title" style="color: #45B7D1;">👤 개인적</div>
+                            <div class="drop-zone" data-accept="personal"></div>
+                        </div>
+                        <div class="drop-zone-group">
+                            <div class="drop-zone-title" style="color: #FFB74D;">💰 경제적</div>
+                            <div class="drop-zone" data-accept="economic"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 실험 3: 나의 구매 의사 결정 자가 진단 -->
+                <div class="activity-section" style="margin-top: 30px;">
+                    <h3 class="activity-title">🔗 실험 3: 나의 구매 의사 결정 자가 진단</h3>
+                    <div class="activity-instruction">
+                        💡 '나는 구매 의사 결정에 어떠한 요인의 영향을 받고 있는가?'에 대해 자가 진단을 해 보자!<br><br>
+                        <strong>활동 방법</strong><br>
+                        ① 스마트폰, 화장품, 옷 등 자신이 구매하고 싶은 물품을 구체적으로 정한다.<br>
+                        ② 위 상품에 대해 구매 의사 결정을 한다고 가정했을 때 구매 의사 결정에 어떠한 요인들이 영향을 미치는지 분석한다.
+                    </div>
+
+                    <!-- 구매하고 싶은 물품 입력 -->
+                    <div class="diagnosis-product-box">
+                        <div class="diagnosis-product-label">🛍️ 구매하고 싶은 물품</div>
+                        <input type="text" class="diagnosis-product-input" id="diagnosisProduct" placeholder="예: 한정판 운동화, 무선 이어폰, 신상 후드티 등">
+                        <span class="diagnosis-product-suffix">구입</span>
+                    </div>
+
+                    <!-- 자가 진단 테이블 -->
+                    <div class="diagnosis-table">
+                        <div class="diagnosis-header">
+                            <div class="diagnosis-cell header-factor">요인</div>
+                            <div class="diagnosis-cell header-sub">세부 요소</div>
+                            <div class="diagnosis-cell header-content">내용</div>
+                        </div>
+
+                        <!-- 심리적 요인 -->
+                        <div class="diagnosis-row">
+                            <div class="diagnosis-cell factor-cell" style="background: linear-gradient(135deg, #F3E5F5, #E1BEE7);">
+                                <span class="factor-icon-small">🧠</span>
+                                <span>심리적<br>요인</span>
+                            </div>
+                            <div class="diagnosis-sub-group">
+                                <div class="diagnosis-sub-row">
+                                    <div class="diagnosis-cell sub-cell">동기와 욕구</div>
+                                    <div class="diagnosis-cell content-cell">
+                                        <textarea class="diagnosis-textarea" placeholder="예: 지금 사용하는 것이 낡아서 새로 구입하고자 함."></textarea>
+                                    </div>
+                                </div>
+                                <div class="diagnosis-sub-row">
+                                    <div class="diagnosis-cell sub-cell">학습</div>
+                                    <div class="diagnosis-cell content-cell">
+                                        <textarea class="diagnosis-textarea" placeholder="예: 싼 가격의 제품은 금방 망가지는 경험을 함."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 사회적 요인 -->
+                        <div class="diagnosis-row">
+                            <div class="diagnosis-cell factor-cell" style="background: linear-gradient(135deg, #E0F7FA, #B2EBF2);">
+                                <span class="factor-icon-small">👥</span>
+                                <span>사회적<br>요인</span>
+                            </div>
+                            <div class="diagnosis-sub-group">
+                                <div class="diagnosis-sub-row">
+                                    <div class="diagnosis-cell sub-cell">준거 집단</div>
+                                    <div class="diagnosis-cell content-cell">
+                                        <textarea class="diagnosis-textarea" placeholder="예: 우리 반 친구들도 이 제품을 사용함."></textarea>
+                                    </div>
+                                </div>
+                                <div class="diagnosis-sub-row">
+                                    <div class="diagnosis-cell sub-cell">가족</div>
+                                    <div class="diagnosis-cell content-cell">
+                                        <textarea class="diagnosis-textarea" placeholder="예: 가족 구성원과 함께 사용할 수 있음."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 문화적 요인 -->
+                        <div class="diagnosis-row">
+                            <div class="diagnosis-cell factor-cell" style="background: linear-gradient(135deg, #FFEBEE, #FFCDD2);">
+                                <span class="factor-icon-small">🌍</span>
+                                <span>문화적<br>요인</span>
+                            </div>
+                            <div class="diagnosis-sub-group">
+                                <div class="diagnosis-sub-row">
+                                    <div class="diagnosis-cell sub-cell">하위 문화</div>
+                                    <div class="diagnosis-cell content-cell">
+                                        <textarea class="diagnosis-textarea" placeholder="예: 최근 유행하는 트렌드를 반영한 제품을 선호함."></textarea>
+                                    </div>
+                                </div>
+                                <div class="diagnosis-sub-row">
+                                    <div class="diagnosis-cell sub-cell">사회 계층</div>
+                                    <div class="diagnosis-cell content-cell">
+                                        <textarea class="diagnosis-textarea" placeholder="예: 학생 신분에 맞는 제품을 구매하고자 함."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 개인적 요인 -->
+                        <div class="diagnosis-row">
+                            <div class="diagnosis-cell factor-cell" style="background: linear-gradient(135deg, #E1F5FE, #B3E5FC);">
+                                <span class="factor-icon-small">👤</span>
+                                <span>개인적<br>요인</span>
+                            </div>
+                            <div class="diagnosis-sub-group">
+                                <div class="diagnosis-sub-row">
+                                    <div class="diagnosis-cell sub-cell">나이</div>
+                                    <div class="diagnosis-cell content-cell">
+                                        <textarea class="diagnosis-textarea" placeholder="예: 10대가 선호하는 디자인을 고려함."></textarea>
+                                    </div>
+                                </div>
+                                <div class="diagnosis-sub-row">
+                                    <div class="diagnosis-cell sub-cell">라이프스타일</div>
+                                    <div class="diagnosis-cell content-cell">
+                                        <textarea class="diagnosis-textarea" placeholder="예: 나의 생활 방식에 맞는 제품을 선호함."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 경제적 요인 -->
+                        <div class="diagnosis-row">
+                            <div class="diagnosis-cell factor-cell" style="background: linear-gradient(135deg, #FFF8E1, #FFECB3);">
+                                <span class="factor-icon-small">💰</span>
+                                <span>경제적<br>요인</span>
+                            </div>
+                            <div class="diagnosis-sub-group">
+                                <div class="diagnosis-sub-row">
+                                    <div class="diagnosis-cell sub-cell">경제적 상황</div>
+                                    <div class="diagnosis-cell content-cell">
+                                        <textarea class="diagnosis-textarea" placeholder="예: 용돈이나 아르바이트비로 감당할 수 있는 수준의 제품을 희망함."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-group" style="margin-top: 25px;">
+                    <button class="btn btn-section-reset" onclick="resetActivity()">🔄 실험실 초기화</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 제출 및 결과 섹션 -->
+        <div class="section-card">
+            <div class="btn-group">
+                <button class="btn btn-save" onclick="saveToLocal()">💾 저장하기</button>
+                <button class="btn btn-submit" onclick="submitAll()">📮 제출하기</button>
+                <button class="btn btn-reset" onclick="resetAll()">🔄 초기화</button>
+            </div>
+
+            <div class="result-section" id="resultSection">
+                <div class="result-grade" id="resultGrade">🏆</div>
+                <div class="result-message" id="resultMessage"></div>
+                <div class="result-details" id="resultDetails"></div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>🔬 은또링쌤의 마케팅Lab | 한국디지털미디어고등학교</p>
+            <p>Made with 💜 for DIMIGO Students</p>
+        </footer>
+    </div>
+
+    <!-- 토스트 메시지 -->
+    <div class="toast" id="toast"></div>
+
+    <!-- 확인 모달 -->
+    <div class="modal" id="confirmModal">
+        <div class="modal-content">
+            <h3>🔄 전체 초기화</h3>
+            <p>모든 답변과 진행 상황이 초기화됩니다. 계속하시겠습니까?</p>
+            <div class="modal-btns">
+                <button class="btn btn-section-reset" onclick="closeConfirm()">취소</button>
+                <button class="btn btn-reset" onclick="doReset()">초기화</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 탭 전환
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+                saveState();
+            });
+        });
+
+        // 학습목표 체크
+        document.querySelectorAll('.objective-item').forEach(item => {
+            item.addEventListener('click', () => {
+                item.classList.toggle('checked');
+                item.querySelector('.objective-checkbox').textContent = item.classList.contains('checked') ? '✓' : '';
+                updateProgress();
+                saveState();
+            });
+        });
+
+        // 특징 상세 보기 (기차 이동 효과)
+        function showFeatureDetail(num) {
+            document.querySelectorAll('.station').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.feature-detail').forEach(d => d.classList.remove('active'));
+            document.querySelector(`.station[data-feature="${num}"]`).classList.add('active');
+            document.getElementById('featureDetail' + num).classList.add('active');
+            
+            // 기차 이동 애니메이션
+            const train = document.getElementById('trainIcon');
+            const positions = ['2%', '20%', '40%', '58%', '76%'];
+            if (train) {
+                train.style.left = positions[num - 1];
+            }
+        }
+
+        // 요인 상세 보기
+        function showFactorDetail(num) {
+            document.querySelectorAll('.mindmap-node').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.factor-detail').forEach(d => d.classList.remove('active'));
+            document.querySelector(`.mindmap-node[data-factor="${num}"]`).classList.add('active');
+            document.getElementById('factorDetail' + num).classList.add('active');
+        }
+
+        // 빈칸 선택 확인
+        document.querySelectorAll('.blank-select').forEach(select => {
+            select.addEventListener('change', function() {
+                const correct = this.dataset.answer;
+                this.classList.remove('correct', 'wrong');
+                if (this.value === correct) {
+                    this.classList.add('correct');
+                } else if (this.value !== '') {
+                    this.classList.add('wrong');
+                }
+                updateProgress();
+                saveState();
+            });
+        });
+
+        // 퀴즈 선택
+        document.querySelectorAll('.quiz-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const card = this.closest('.quiz-card');
+                if (card.classList.contains('answered')) return;
+
+                card.classList.add('answered');
+                const isCorrect = this.dataset.correct === 'true';
+
+                card.querySelectorAll('.quiz-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                    if (opt.dataset.correct === 'true') {
+                        opt.classList.add('correct');
+                    }
+                });
+
+                if (isCorrect) {
+                    this.classList.add('correct');
+                } else {
+                    this.classList.add('wrong');
+                }
+
+                updateProgress();
+                saveState();
+            });
+        });
+
+        // 드래그 앤 드롭 (PC)
+        let selectedDragItem = null;
+
+        document.querySelectorAll('.drag-item').forEach(item => {
+            item.addEventListener('dragstart', function(e) {
+                e.dataTransfer.setData('text/plain', this.textContent);
+                e.dataTransfer.setData('category', this.dataset.category);
+                this.classList.add('selected');
+            });
+
+            item.addEventListener('dragend', function() {
+                this.classList.remove('selected');
+            });
+
+            // 모바일 터치
+            item.addEventListener('click', function() {
+                if (this.classList.contains('placed')) return;
+                document.querySelectorAll('.drag-item').forEach(i => i.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedDragItem = this;
+            });
+        });
+
+        document.querySelectorAll('.drop-zone').forEach(zone => {
+            zone.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('drag-over');
+            });
+
+            zone.addEventListener('dragleave', function() {
+                this.classList.remove('drag-over');
+            });
+
+            zone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('drag-over');
+                const text = e.dataTransfer.getData('text/plain');
+                const category = e.dataTransfer.getData('category');
+                const accept = this.dataset.accept;
+
+                addDroppedItem(this, text, category, accept);
+            });
+
+            // 모바일 터치
+            zone.addEventListener('click', function() {
+                if (selectedDragItem && !selectedDragItem.classList.contains('placed')) {
+                    const text = selectedDragItem.textContent;
+                    const category = selectedDragItem.dataset.category;
+                    const accept = this.dataset.accept;
+
+                    addDroppedItem(this, text, category, accept);
+                    selectedDragItem.classList.remove('selected');
+                    selectedDragItem = null;
+                }
+            });
+        });
+
+        function addDroppedItem(zone, text, category, accept) {
+            const isCorrect = category === accept;
+
+            const dropped = document.createElement('div');
+            dropped.className = 'dropped-item ' + (isCorrect ? 'correct' : 'wrong');
+            dropped.innerHTML = `${text} <button class="remove-btn" onclick="removeDropped(this, '${text}')">✕</button>`;
+            zone.appendChild(dropped);
+
+            document.querySelectorAll('.drag-item').forEach(item => {
+                if (item.textContent === text) {
+                    item.classList.add('placed');
+                    item.classList.remove('selected');
+                }
+            });
+
+            updateProgress();
+            saveState();
+        }
+
+        function removeDropped(btn, text) {
+            btn.parentElement.remove();
+            document.querySelectorAll('.drag-item').forEach(item => {
+                if (item.textContent === text) {
+                    item.classList.remove('placed');
+                }
+            });
+            updateProgress();
+            saveState();
+        }
+
+        // 매칭 활동
+        let selectedMatching = null;
+
+        document.querySelectorAll('.matching-item').forEach(item => {
+            item.addEventListener('click', function() {
+                if (this.classList.contains('matched')) return;
+
+                const column = this.parentElement;
+                const isLeft = column.id.includes('Left');
+
+                if (!selectedMatching) {
+                    this.classList.add('selected');
+                    selectedMatching = { element: this, match: this.dataset.match, isLeft: isLeft };
+                } else {
+                    if (selectedMatching.isLeft === isLeft) {
+                        selectedMatching.element.classList.remove('selected');
+                        this.classList.add('selected');
+                        selectedMatching = { element: this, match: this.dataset.match, isLeft: isLeft };
+                    } else {
+                        // 매칭 확인
+                        if (selectedMatching.match === this.dataset.match) {
+                            selectedMatching.element.classList.remove('selected');
+                            selectedMatching.element.classList.add('matched');
+                            this.classList.add('matched');
+
+                            // 연결선 표시
+                            const containerId = column.id.replace('Left', '').replace('Right', '');
+                            const indicator = document.querySelector(`#matchingLines${containerId.slice(-1)} .match-indicator[data-for="${this.dataset.match}"]`);
+                            if (indicator) indicator.classList.add('connected');
+                        } else {
+                            this.classList.add('wrong-match');
+                            setTimeout(() => this.classList.remove('wrong-match'), 500);
+                        }
+                        selectedMatching.element.classList.remove('selected');
+                        selectedMatching = null;
+                    }
+                }
+                updateProgress();
+                saveState();
+            });
+        });
+
+        // 진행률 업데이트
+        function updateProgress() {
+            let total = 0, answered = 0, correct = 0;
+
+            // 개념정리 빈칸
+            document.querySelectorAll('.blank-select').forEach(select => {
+                total++;
+                if (select.value !== '') {
+                    answered++;
+                    if (select.classList.contains('correct')) correct++;
+                }
+            });
+
+            // 퀴즈
+            document.querySelectorAll('.quiz-card').forEach(card => {
+                total++;
+                if (card.classList.contains('answered')) {
+                    answered++;
+                    const wrongOpt = card.querySelector('.quiz-option.wrong');
+                    if (!wrongOpt) correct++;
+                }
+            });
+
+            // 드래그앤드롭
+            document.querySelectorAll('.dropped-item').forEach(item => {
+                total++;
+                answered++;
+                if (item.classList.contains('correct')) correct++;
+            });
+
+            // 매칭
+            const matchedItems = document.querySelectorAll('.matching-item.matched');
+            total += matchedItems.length / 2;
+            answered += matchedItems.length / 2;
+            correct += matchedItems.length / 2;
+
+            const pct = total > 0 ? Math.round((answered / total) * 100) : 0;
+            document.getElementById('progressBar').style.width = pct + '%';
+            document.getElementById('progressBar').textContent = pct + '%';
+            document.getElementById('correctCount').textContent = correct;
+            document.getElementById('answeredCount').textContent = answered;
+            document.getElementById('totalCount').textContent = total;
+        }
+
+        // 제출
+        function submitAll() {
+            const name = document.getElementById('studentName').value.trim();
+            const id = document.getElementById('studentId').value.trim();
+
+            if (!name || !id) {
+                showToast('⚠️ 이름과 연구원 번호를 입력해주세요!');
+                return;
+            }
+
+            let total = 0, correct = 0;
+
+            // 빈칸
+            document.querySelectorAll('.blank-select').forEach(select => {
+                total++;
+                if (select.classList.contains('correct')) correct++;
+            });
+
+            // 퀴즈
+            document.querySelectorAll('.quiz-card').forEach(card => {
+                total++;
+                const wrongOpt = card.querySelector('.quiz-option.wrong');
+                if (card.classList.contains('answered') && !wrongOpt) correct++;
+            });
+
+            // 드래그앤드롭
+            document.querySelectorAll('.dropped-item').forEach(item => {
+                total++;
+                if (item.classList.contains('correct')) correct++;
+            });
+
+            // 매칭
+            const matchedItems = document.querySelectorAll('.matching-item.matched');
+            total += matchedItems.length / 2;
+            correct += matchedItems.length / 2;
+
+            const pct = total > 0 ? Math.round((correct / total) * 100) : 0;
+
+            let grade, message;
+            if (pct >= 90) { grade = 'A+'; message = '완벽해요! 소비자 행동 전문가! 🎉'; }
+            else if (pct >= 80) { grade = 'A'; message = '훌륭해요! 거의 완벽해요! ⭐'; }
+            else if (pct >= 70) { grade = 'B+'; message = '잘했어요! 조금만 더! 💪'; }
+            else if (pct >= 60) { grade = 'B'; message = '좋아요! 복습하면 완벽! 📚'; }
+            else { grade = 'C'; message = '힘내요! 다시 연구해봐요! 🔬'; }
+
+            // 구글 스프레드시트로 전송
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = 'https://script.google.com/macros/s/AKfycbw74Pv4jRMA_3aX-tOShm-Wca50XsW7VHQcQALyT8p26Z5TurhkBDWT0r2Mu-eLG30/exec';
+            form.target = 'hidden_iframe';
+
+            const fields = {
+                name: name,
+                studentId: id,
+                week: 2,
+                session: 1,
+                sessionTitle: '소비자 행동과 영향 변수',
+                correct: correct,
+                total: total,
+                percentage: pct,
+                grade: grade,
+                timestamp: new Date().toISOString()
+            };
+
+            for (let key in fields) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = key;
+                input.value = fields[key];
+                form.appendChild(input);
+            }
+
+            let iframe = document.getElementById('hidden_iframe');
+            if (!iframe) {
+                iframe = document.createElement('iframe');
+                iframe.name = 'hidden_iframe';
+                iframe.id = 'hidden_iframe';
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
+            }
+
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+
+            showToast('📤 연구 보고서가 제출되었습니다!');
+
+            document.getElementById('resultGrade').textContent = grade;
+            document.getElementById('resultMessage').textContent = message;
+            document.getElementById('resultDetails').innerHTML = `<h4>📊 ${name} 연구원 (${id}) 연구 결과</h4><ul><li><span>정답률</span><span>${pct}% (${correct}/${total})</span></li><li><span>연구 등급</span><span>${grade}</span></li><li><span>제출 시간</span><span>${new Date().toLocaleString('ko-KR')}</span></li></ul>`;
+            document.getElementById('resultSection').classList.add('show');
+            document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function resetAll() {
+            document.getElementById('confirmModal').classList.add('show');
+        }
+
+        function saveToLocal() {
+            saveState();
+            showToast('💾 진행 상황이 저장되었습니다!');
+        }
+
+        function closeConfirm() {
+            document.getElementById('confirmModal').classList.remove('show');
+        }
+
+        function resetObjectives() {
+            document.querySelectorAll('.objective-item').forEach(item => {
+                item.classList.remove('checked');
+                item.querySelector('.objective-checkbox').textContent = '';
+            });
+            updateProgress();
+            showToast('🎯 학습목표가 초기화되었습니다!');
+        }
+
+        function resetConceptItem(btn) {
+            const card = btn.closest('.concept-card, .factor-detail, .feature-detail');
+            card.querySelectorAll('.blank-select').forEach(select => {
+                select.value = '';
+                select.classList.remove('correct', 'wrong');
+            });
+            updateProgress();
+            showToast('🔄 해당 문제가 초기화되었습니다!');
+        }
+
+        function resetConcepts() {
+            document.querySelectorAll('.blank-select').forEach(select => {
+                select.value = '';
+                select.classList.remove('correct', 'wrong');
+            });
+            document.querySelectorAll('.mindmap-node').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.factor-detail').forEach(d => d.classList.remove('active'));
+            document.querySelectorAll('.station').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.feature-detail').forEach(d => d.classList.remove('active'));
+            // 기차 초기 위치로
+            const train = document.getElementById('trainIcon');
+            if (train) train.style.left = '2%';
+            updateProgress();
+            showToast('🧬 개념정리가 초기화되었습니다!');
+        }
+
+        function resetQuiz() {
+            document.querySelectorAll('.quiz-card').forEach(card => {
+                card.classList.remove('answered');
+                card.querySelectorAll('.quiz-option').forEach(opt => {
+                    opt.classList.remove('selected', 'correct', 'wrong');
+                });
+            });
+            updateProgress();
+            showToast('🔍 형성평가가 초기화되었습니다!');
+        }
+
+        function resetActivity() {
+            // 드래그앤드롭 초기화
+            document.querySelectorAll('.dropped-item').forEach(item => item.remove());
+            document.querySelectorAll('.drag-item').forEach(item => {
+                item.classList.remove('placed', 'selected');
+            });
+
+            // 매칭 초기화
+            document.querySelectorAll('.matching-item').forEach(item => {
+                item.classList.remove('matched', 'selected', 'wrong-match');
+            });
+            document.querySelectorAll('.match-indicator').forEach(ind => {
+                ind.classList.remove('connected');
+            });
+
+            updateProgress();
+            showToast('⚗️ 실험실이 초기화되었습니다!');
+        }
+
+        function doReset() {
+            closeConfirm();
+            localStorage.removeItem('marketinglab_week2_class1');
+
+            resetObjectives();
+            resetConcepts();
+            resetQuiz();
+            resetActivity();
+
+            document.getElementById('resultSection').classList.remove('show');
+
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelector('.tab-btn').classList.add('active');
+            document.getElementById('tab-objectives').classList.add('active');
+
+            showToast('🔄 전체 초기화되었습니다!');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2500);
+        }
+
+        // localStorage 저장
+        function saveState() {
+            const state = {
+                studentName: document.getElementById('studentName').value,
+                studentId: document.getElementById('studentId').value,
+                objectives: [],
+                concepts: [],
+                quizzes: [],
+                activeTab: document.querySelector('.tab-btn.active')?.dataset.tab
+            };
+
+            document.querySelectorAll('.objective-item').forEach((item, i) => {
+                state.objectives[i] = item.classList.contains('checked');
+            });
+
+            document.querySelectorAll('.blank-select').forEach((select, i) => {
+                state.concepts[i] = { value: select.value, correct: select.classList.contains('correct'), wrong: select.classList.contains('wrong') };
+            });
+
+            document.querySelectorAll('.quiz-card').forEach((card, i) => {
+                const selected = card.querySelector('.quiz-option.selected, .quiz-option.wrong');
+                state.quizzes[i] = { answered: card.classList.contains('answered'), selectedValue: selected?.dataset.value };
+            });
+
+            localStorage.setItem('marketinglab_week2_class1', JSON.stringify(state));
+        }
+
+        // localStorage 불러오기
+        function loadState() {
+            const saved = localStorage.getItem('marketinglab_week2_class1');
+            if (!saved) return;
+
+            try {
+                const state = JSON.parse(saved);
+
+                if (state.studentName) document.getElementById('studentName').value = state.studentName;
+                if (state.studentId) document.getElementById('studentId').value = state.studentId;
+
+                state.objectives?.forEach((checked, i) => {
+                    const item = document.querySelectorAll('.objective-item')[i];
+                    if (item && checked) {
+                        item.classList.add('checked');
+                        item.querySelector('.objective-checkbox').textContent = '✓';
+                    }
+                });
+
+                state.concepts?.forEach((data, i) => {
+                    const select = document.querySelectorAll('.blank-select')[i];
+                    if (select && data.value) {
+                        select.value = data.value;
+                        if (data.correct) select.classList.add('correct');
+                        if (data.wrong) select.classList.add('wrong');
+                    }
+                });
+
+                state.quizzes?.forEach((data, i) => {
+                    const card = document.querySelectorAll('.quiz-card')[i];
+                    if (card && data.answered) {
+                        card.classList.add('answered');
+                        card.querySelectorAll('.quiz-option').forEach(opt => {
+                            if (opt.dataset.value === data.selectedValue) {
+                                if (opt.dataset.correct === 'true') {
+                                    opt.classList.add('correct');
+                                } else {
+                                    opt.classList.add('wrong');
+                                }
+                            }
+                            if (opt.dataset.correct === 'true') {
+                                opt.classList.add('correct');
+                            }
+                        });
+                    }
+                });
+
+                if (state.activeTab) {
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    document.querySelector(`.tab-btn[data-tab="${state.activeTab}"]`)?.classList.add('active');
+                    document.getElementById('tab-' + state.activeTab)?.classList.add('active');
+                }
+
+                updateProgress();
+            } catch (e) {
+                console.log('상태 불러오기 실패:', e);
+            }
+        }
+
+        // 학생 정보 저장
+        document.getElementById('studentName').addEventListener('input', saveState);
+        document.getElementById('studentId').addEventListener('input', saveState);
+
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', () => {
+            loadState();
+            updateProgress();
+        });
+    </script>
+</body>
+</html>
