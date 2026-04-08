@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔬 은또링쌤의 마케팅Lab | 3주차 1차시</title>
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Black+Han+Sans&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --lab-mint: #00D4AA;
+            --lab-blue: #4A90D9;
+            --lab-purple: #7B68EE;
+            --lab-green: #32CD32;
+            --lab-orange: #FF8C42;
+            --lab-pink: #FF6B9D;
+            --lab-dark: #1E2A3A;
+            --lab-gray: #F0F4F8;
+            --lab-white: #FFFFFF;
+            --correct: #00C853;
+            --wrong: #FF5252;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Gowun Dodum', sans-serif;
+            background: linear-gradient(135deg, #E8F5E9 0%, #E3F2FD 50%, #F3E5F5 100%);
+            min-height: 100vh;
+            padding: 15px;
+            position: relative;
+        }
+
+        .molecule {
+            position: fixed;
+            font-size: 1.5rem;
+            opacity: 0.12;
+            animation: float 8s ease-in-out infinite;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(15deg); }
+        }
+
+        .container { max-width: 900px; margin: 0 auto; position: relative; z-index: 10; }
+
+        .header {
+            background: var(--lab-white);
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            margin-bottom: 15px;
+            box-shadow: 0 8px 32px rgba(0, 212, 170, 0.15);
+            border: 3px solid var(--lab-mint);
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--lab-mint), var(--lab-blue), var(--lab-purple), var(--lab-pink));
+        }
+
+        .header-icons { position: absolute; top: 15px; left: 20px; font-size: 1.5rem; display: flex; gap: 8px; }
+        .header-icons span { animation: bubble 2s ease-in-out infinite; }
+        .header-icons span:nth-child(2) { animation-delay: 0.3s; }
+        .header-icons span:nth-child(3) { animation-delay: 0.6s; }
+
+        @keyframes bubble { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-5px) scale(1.1); } }
+
+        .header-badge {
+            position: absolute; top: 15px; right: 20px;
+            background: linear-gradient(135deg, var(--lab-mint), var(--lab-blue));
+            color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold;
+        }
+
+        .header h1 {
+            font-family: 'Gowun Dodum', sans-serif;
+            font-size: 2rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--lab-mint), var(--lab-blue));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 8px; margin-top: 10px;
+        }
+
+        .header .subtitle { font-size: 1.15rem; color: var(--lab-dark); font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .header .week-info { display: inline-block; background: linear-gradient(135deg, var(--lab-purple), var(--lab-pink)); color: white; padding: 6px 16px; border-radius: 20px; font-size: 0.85rem; margin-top: 12px; font-weight: bold; }
+
+        .student-info {
+            background: var(--lab-white); border-radius: 15px; padding: 15px 20px; margin-bottom: 15px;
+            display: flex; gap: 15px; flex-wrap: wrap; align-items: center; justify-content: center;
+            border: 2px solid #E0E7EE; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .student-info label { font-weight: bold; color: var(--lab-dark); display: flex; align-items: center; gap: 5px; }
+        .student-info input { padding: 10px 15px; border: 2px solid #E0E7EE; border-radius: 10px; font-family: 'Gowun Dodum', sans-serif; font-size: 0.95rem; width: 130px; transition: all 0.3s ease; }
+        .student-info input:focus { outline: none; border-color: var(--lab-mint); box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.1); }
+
+        .tab-nav {
+            display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; justify-content: center;
+            background: var(--lab-white); padding: 10px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .tab-btn {
+            padding: 12px 18px; border: 2px solid #E0E7EE; border-radius: 12px;
+            font-family: 'Gowun Dodum', sans-serif; font-size: 0.85rem; font-weight: bold;
+            cursor: pointer; transition: all 0.3s ease; background: var(--lab-white); color: var(--lab-dark);
+        }
+        .tab-btn.active { background: linear-gradient(135deg, var(--lab-mint), var(--lab-blue)); color: white; border-color: transparent; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0, 212, 170, 0.3); }
+        .tab-btn:hover:not(.active) { border-color: var(--lab-mint); background: rgba(0, 212, 170, 0.05); }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .progress-section { background: var(--lab-white); border-radius: 15px; padding: 18px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 2px solid #E0E7EE; }
+        .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .progress-title { font-weight: bold; color: var(--lab-dark); display: flex; align-items: center; gap: 8px; }
+        .progress-bar-container { background: #E8F5E9; border-radius: 10px; height: 20px; overflow: hidden; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--lab-mint), var(--lab-blue)); border-radius: 10px; transition: width 0.5s ease; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.75rem; }
+        .progress-stats { display: flex; justify-content: space-between; margin-top: 10px; font-size: 0.85rem; color: var(--lab-dark); }
+        .progress-stats span { display: flex; align-items: center; gap: 5px; }
+
+        .section-card { background: var(--lab-white); border-radius: 20px; padding: 25px; margin-bottom: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 2px solid #E0E7EE; }
+        .section-title {
+            font-family: 'Gowun Dodum', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--lab-dark);
+            margin-bottom: 18px; display: flex; align-items: center; gap: 10px; padding-bottom: 12px; border-bottom: 2px dashed #E0E7EE;
+        }
+        .section-title .icon { font-size: 1.4rem; }
+
+        .objective-item { display: flex; align-items: flex-start; gap: 12px; padding: 15px; background: linear-gradient(135deg, #F8FFF8, #F0F8FF); border-radius: 12px; margin-bottom: 10px; transition: all 0.3s ease; cursor: pointer; border: 2px solid transparent; }
+        .objective-item:hover { transform: translateX(5px); border-color: var(--lab-mint); }
+        .objective-item.checked { background: linear-gradient(135deg, #E8F5E9, #C8E6C9); border-color: var(--correct); }
+        .objective-checkbox { width: 26px; height: 26px; border: 3px solid #CBD5E0; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; transition: all 0.3s ease; background: white; }
+        .objective-item.checked .objective-checkbox { background: var(--correct); border-color: var(--correct); color: white; }
+        .objective-text { font-size: 0.95rem; color: var(--lab-dark); line-height: 1.6; }
+
+        .concept-card { background: linear-gradient(135deg, #FAFFFE, #F5FAFF); border-radius: 15px; padding: 18px; margin-bottom: 12px; border-left: 5px solid var(--lab-mint); transition: all 0.3s ease; position: relative; }
+        .concept-card:nth-child(3n+1) { border-left-color: var(--lab-mint); }
+        .concept-card:nth-child(3n+2) { border-left-color: var(--lab-blue); }
+        .concept-card:nth-child(3n) { border-left-color: var(--lab-purple); }
+        .concept-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .concept-number { display: inline-flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--lab-mint), var(--lab-blue)); color: white; width: 28px; height: 28px; border-radius: 8px; font-weight: bold; font-size: 0.85rem; }
+        .concept-label { font-weight: bold; color: var(--lab-dark); }
+        .concept-text { font-size: 0.95rem; color: var(--lab-dark); line-height: 1.9; }
+        .blank-select { display: inline-block; min-width: 100px; padding: 6px 10px; border: 2px dashed var(--lab-blue); border-radius: 8px; background: white; font-family: 'Gowun Dodum', sans-serif; font-size: 0.9rem; cursor: pointer; transition: all 0.3s ease; appearance: none; text-align: center; }
+        .blank-select:focus { outline: none; border-color: var(--lab-mint); box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.15); }
+        .blank-select.correct { background: var(--correct); color: white; border-color: var(--correct); border-style: solid; }
+        .blank-select.wrong { background: var(--wrong); color: white; border-color: var(--wrong); border-style: solid; }
+
+        .quiz-card { background: linear-gradient(135deg, #FAFFFE, #F5FAFF); border-radius: 15px; padding: 18px; margin-bottom: 15px; border: 2px solid #E0E7EE; }
+        .quiz-question { font-weight: bold; color: var(--lab-dark); margin-bottom: 15px; font-size: 0.95rem; display: flex; align-items: flex-start; gap: 10px; }
+        .quiz-badge { background: linear-gradient(135deg, var(--lab-purple), var(--lab-pink)); color: white; padding: 3px 10px; border-radius: 15px; font-size: 0.75rem; flex-shrink: 0; }
+        .quiz-options { display: flex; flex-direction: column; gap: 10px; }
+        .quiz-option { padding: 14px 18px; background: white; border: 2px solid #E0E7EE; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; font-size: 0.9rem; }
+        .quiz-option:hover { border-color: var(--lab-mint); background: rgba(0, 212, 170, 0.05); transform: translateX(5px); }
+        .quiz-option.selected { border-color: var(--lab-blue); background: #E3F2FD; }
+        .quiz-option.correct { border-color: var(--correct); background: #E8F5E9; }
+        .quiz-option.wrong { border-color: var(--wrong); background: #FFEBEE; }
+
+        /* SWOT 다이어그램 */
+        .swot-diagram {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 20px 0;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .swot-box {
+            border-radius: 15px;
+            padding: 18px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+        .swot-box:hover { transform: scale(1.03); }
+        .swot-s { background: linear-gradient(135deg, #E8F5E9, #C8E6C9); border: 2px solid #66BB6A; }
+        .swot-w { background: linear-gradient(135deg, #FFEBEE, #FFCDD2); border: 2px solid #EF5350; }
+        .swot-o { background: linear-gradient(135deg, #E3F2FD, #BBDEFB); border: 2px solid #42A5F5; }
+        .swot-t { background: linear-gradient(135deg, #FFF3E0, #FFE0B2); border: 2px solid #FFA726; }
+        .swot-letter { font-size: 2rem; font-weight: bold; margin-bottom: 5px; }
+        .swot-s .swot-letter { color: #2E7D32; }
+        .swot-w .swot-letter { color: #C62828; }
+        .swot-o .swot-letter { color: #1565C0; }
+        .swot-t .swot-letter { color: #E65100; }
+        .swot-label { font-size: 0.9rem; font-weight: bold; color: var(--lab-dark); margin-bottom: 3px; }
+        .swot-desc { font-size: 0.8rem; color: #666; }
+
+        /* 환경 구분 표시 */
+        .env-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 10px 0;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+        .env-badge {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: white;
+            font-weight: bold;
+        }
+        .env-internal { background: linear-gradient(135deg, #66BB6A, #EF5350); }
+        .env-external { background: linear-gradient(135deg, #42A5F5, #FFA726); }
+
+        /* 드래그앤드롭 */
+        .drag-container { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; justify-content: center; padding: 15px; background: #F8FAFC; border-radius: 12px; border: 2px dashed #CBD5E0; }
+        .drag-item { padding: 10px 16px; background: white; border: 2px solid #E0E7EE; border-radius: 10px; cursor: grab; transition: all 0.3s ease; font-size: 0.9rem; user-select: none; }
+        .drag-item:hover { border-color: var(--lab-mint); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .drag-item.selected { border-color: var(--lab-blue); background: #E3F2FD; box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.2); }
+        .drag-item.placed { opacity: 0.4; cursor: default; pointer-events: none; }
+
+        .drop-zones { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
+        .drop-zone { min-height: 100px; border: 2px dashed #CBD5E0; border-radius: 15px; padding: 15px; transition: all 0.3s ease; display: flex; flex-direction: column; gap: 6px; }
+        .drop-zone.drag-over { border-color: var(--lab-mint); background: rgba(0, 212, 170, 0.05); }
+        .drop-zone-title { font-weight: bold; color: var(--lab-dark); font-size: 0.9rem; text-align: center; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px dashed #E0E7EE; }
+        .drop-zone.zone-s { border-color: #66BB6A; background: rgba(102, 187, 106, 0.05); }
+        .drop-zone.zone-w { border-color: #EF5350; background: rgba(239, 83, 80, 0.05); }
+        .drop-zone.zone-o { border-color: #42A5F5; background: rgba(66, 165, 245, 0.05); }
+        .drop-zone.zone-t { border-color: #FFA726; background: rgba(255, 167, 38, 0.05); }
+
+        .dropped-item { padding: 8px 12px; border-radius: 8px; font-size: 0.85rem; display: flex; justify-content: space-between; align-items: center; }
+        .dropped-item.correct { background: #E8F5E9; border: 1px solid var(--correct); }
+        .dropped-item.wrong { background: #FFEBEE; border: 1px solid var(--wrong); }
+        .remove-btn { background: none; border: none; cursor: pointer; font-size: 0.8rem; color: #999; padding: 2px 5px; }
+        .remove-btn:hover { color: var(--wrong); }
+
+        /* 매칭 */
+        .matching-container { display: flex; gap: 15px; align-items: flex-start; justify-content: center; margin: 15px 0; flex-wrap: wrap; }
+        .matching-column { display: flex; flex-direction: column; gap: 10px; flex: 1; min-width: 150px; }
+        .matching-item { padding: 12px 15px; background: white; border: 2px solid #E0E7EE; border-radius: 10px; cursor: pointer; transition: all 0.3s ease; font-size: 0.85rem; text-align: center; }
+        .matching-item:hover { border-color: var(--lab-mint); }
+        .matching-item.selected { border-color: var(--lab-blue); background: #E3F2FD; box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.2); }
+        .matching-item.matched { border-color: var(--correct); background: #E8F5E9; cursor: default; }
+        .matching-item.wrong-match { border-color: var(--wrong); background: #FFEBEE; animation: shake 0.3s; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+
+        .matching-lines { display: flex; flex-direction: column; gap: 10px; align-items: center; justify-content: center; min-width: 30px; }
+        .match-indicator { width: 12px; height: 12px; border-radius: 50%; background: #E0E7EE; transition: all 0.3s ease; }
+        .match-indicator.connected { background: var(--correct); box-shadow: 0 0 8px rgba(0, 200, 83, 0.5); }
+
+        /* 활동 섹션 */
+        .activity-section { margin-bottom: 25px; }
+        .activity-title { font-size: 1.05rem; font-weight: bold; color: var(--lab-dark); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .activity-instruction { background: linear-gradient(135deg, #FFF8E1, #FFECB3); padding: 12px 15px; border-radius: 10px; font-size: 0.85rem; color: #795548; margin-bottom: 15px; line-height: 1.6; border-left: 4px solid #FFC107; }
+
+        /* 버튼 */
+        .btn { padding: 12px 25px; border: none; border-radius: 12px; font-family: 'Gowun Dodum', sans-serif; font-size: 0.9rem; font-weight: bold; cursor: pointer; transition: all 0.3s ease; }
+        .btn:hover { transform: translateY(-2px); }
+        .btn-submit { background: linear-gradient(135deg, var(--lab-mint), var(--lab-blue)); color: white; box-shadow: 0 4px 15px rgba(0, 212, 170, 0.3); }
+        .btn-save { background: linear-gradient(135deg, var(--lab-purple), var(--lab-pink)); color: white; box-shadow: 0 4px 15px rgba(123, 104, 238, 0.3); }
+        .btn-reset { background: linear-gradient(135deg, var(--wrong), #FF7043); color: white; box-shadow: 0 4px 15px rgba(255, 82, 82, 0.3); }
+        .btn-check { background: linear-gradient(135deg, var(--lab-mint), var(--lab-green)); color: white; box-shadow: 0 4px 15px rgba(0, 212, 170, 0.3); }
+        .btn-section-reset { background: #F5F5F5; color: var(--lab-dark); border: 2px solid #E0E7EE; }
+        .btn-item-reset { position: absolute; top: 10px; right: 10px; padding: 5px 12px; font-size: 0.75rem; background: #F5F5F5; color: #666; border: 1px solid #DDD; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+        .btn-item-reset:hover { background: #E0E0E0; }
+        .btn-group { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+
+        .result-section { margin-top: 25px; padding: 25px; background: linear-gradient(135deg, #E8F5E9, #C8E6C9); border-radius: 15px; text-align: center; display: none; }
+        .result-section.show { display: block; animation: fadeIn 0.5s ease; }
+        .result-icon { font-size: 3rem; margin-bottom: 10px; }
+        .result-grade { font-size: 2rem; font-weight: bold; color: var(--lab-dark); margin-bottom: 5px; }
+        .result-message { font-size: 1.2rem; font-weight: bold; color: var(--lab-dark); margin-bottom: 15px; }
+        .result-details { background: white; border-radius: 12px; padding: 15px; text-align: left; }
+        .result-details h4 { color: var(--lab-dark); margin-bottom: 10px; font-size: 1rem; }
+        .result-details ul { list-style: none; }
+        .result-details li { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #E0E7EE; font-size: 0.9rem; }
+        .result-details li:last-child { border-bottom: none; }
+
+        .footer { text-align: center; padding: 20px; color: #888; font-size: 0.85rem; }
+        .footer p:first-child { font-weight: bold; margin-bottom: 5px; }
+
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--lab-dark); color: white; padding: 15px 25px; border-radius: 12px; font-weight: bold; z-index: 1000; transition: all 0.3s ease; opacity: 0; }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+        .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .modal.show { display: flex; }
+        .modal-content { background: white; border-radius: 20px; padding: 30px; max-width: 400px; text-align: center; }
+        .modal-content h3 { color: var(--lab-dark); margin-bottom: 15px; }
+        .modal-content p { color: #666; margin-bottom: 20px; }
+        .modal-btns { display: flex; gap: 10px; justify-content: center; }
+
+        /* 전략 도구 카드 */
+        .tool-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin: 20px 0;
+        }
+        .tool-card {
+            background: white;
+            border-radius: 15px;
+            padding: 18px 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border-top: 4px solid var(--lab-mint);
+        }
+        .tool-card:nth-child(2) { border-top-color: var(--lab-blue); }
+        .tool-card:nth-child(3) { border-top-color: var(--lab-purple); }
+        .tool-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); }
+        .tool-card-icon { font-size: 2rem; margin-bottom: 8px; }
+        .tool-card-name { font-weight: bold; color: var(--lab-dark); font-size: 0.95rem; margin-bottom: 5px; }
+        .tool-card-desc { font-size: 0.75rem; color: #888; line-height: 1.4; }
+
+        /* 마케팅 전략 프로세스 플로우 */
+        .process-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #F0F8FF, #E8F5E9);
+            border-radius: 15px;
+        }
+        .process-box {
+            background: white;
+            border-radius: 12px;
+            padding: 12px 18px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            min-width: 90px;
+        }
+        .process-box:nth-child(1) { border: 2px solid var(--lab-mint); }
+        .process-box:nth-child(3) { border: 2px solid var(--lab-blue); }
+        .process-box:nth-child(5) { border: 2px solid var(--lab-purple); }
+        .process-box:nth-child(7) { border: 2px solid var(--lab-pink); }
+        .process-icon { font-size: 1.5rem; margin-bottom: 5px; }
+        .process-label { font-size: 0.8rem; font-weight: bold; color: var(--lab-dark); }
+        .process-arrow { font-size: 1.5rem; color: var(--lab-blue); }
+
+        @media (max-width: 600px) {
+            .header h1 { font-size: 1.5rem; }
+            .tab-btn { padding: 10px 14px; font-size: 0.8rem; }
+            .drop-zones { grid-template-columns: 1fr; }
+            .swot-diagram { grid-template-columns: 1fr; }
+            .tool-cards { grid-template-columns: 1fr; }
+            .matching-container { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="molecule" style="top: 5%; left: 8%;">🧬</div>
+    <div class="molecule" style="top: 15%; right: 12%; animation-delay: 1s;">⚗️</div>
+    <div class="molecule" style="top: 35%; left: 5%; animation-delay: 2s;">🔬</div>
+    <div class="molecule" style="top: 55%; right: 8%; animation-delay: 3s;">💡</div>
+    <div class="molecule" style="top: 75%; left: 10%; animation-delay: 4s;">🧪</div>
+    <div class="molecule" style="top: 85%; right: 15%; animation-delay: 5s;">📊</div>
+    <div class="molecule" style="top: 45%; left: 90%; animation-delay: 1.5s;">🎯</div>
+    <div class="molecule" style="top: 25%; left: 92%; animation-delay: 3.5s;">📈</div>
+
+    <div class="container">
+        <header class="header">
+            <div class="header-icons"><span>🔬</span><span>🧪</span><span>💡</span></div>
+            <div class="header-badge">DIMIGO</div>
+            <h1>🔬 은또링쌤의 마케팅Lab</h1>
+            <p class="subtitle">📋 전략적 마케팅 계획과 SWOT 분석</p>
+            <span class="week-info">🗓️ 3주차 1차시 | 마케팅 전략</span>
+        </header>
+
+        <div class="student-info">
+            <label>🧑‍🔬 연구원</label>
+            <input type="text" id="studentName" placeholder="이름 입력">
+            <label>🔢 연구원 번호</label>
+            <input type="text" id="studentId" placeholder="예: 10101">
+        </div>
+
+        <div class="tab-nav">
+            <button class="tab-btn active" data-tab="objectives">🎯 학습목표</button>
+            <button class="tab-btn" data-tab="concepts">🧬 개념정리</button>
+            <button class="tab-btn" data-tab="quiz">🔍 형성평가</button>
+            <button class="tab-btn" data-tab="activity">⚗️ 실험실</button>
+        </div>
+
+        <div class="progress-section">
+            <div class="progress-header"><span class="progress-title">📈 연구 진행률</span></div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar" style="width: 0%">0%</div>
+            </div>
+            <div class="progress-stats">
+                <span>✅ 정답: <strong id="correctCount">0</strong>개</span>
+                <span>📋 진행: <strong id="answeredCount">0</strong> / <strong id="totalCount">0</strong></span>
+            </div>
+        </div>
+
+        <!-- 탭 1: 학습목표 -->
+        <div class="tab-content active" id="tab-objectives">
+            <div class="section-card">
+                <h2 class="section-title"><span class="icon">🎯</span> 오늘의 연구 목표</h2>
+                <p style="font-size: 0.9rem; color: #666; margin-bottom: 18px;">연구를 시작하기 전, 오늘의 학습 목표를 확인하고 이해한 목표를 클릭해주세요!</p>
+
+                <div class="objective-item" data-objective="1">
+                    <div class="objective-checkbox"></div>
+                    <span class="objective-text">전략적 마케팅 계획의 필요성과 프로세스를 설명할 수 있다</span>
+                </div>
+                <div class="objective-item" data-objective="2">
+                    <div class="objective-checkbox"></div>
+                    <span class="objective-text">SWOT 분석의 개념과 4가지 요소(강점, 약점, 기회, 위협)를 설명할 수 있다</span>
+                </div>
+                <div class="objective-item" data-objective="3">
+                    <div class="objective-checkbox"></div>
+                    <span class="objective-text">SWOT 분석에서 내부 환경(S, W)과 외부 환경(O, T)을 구분할 수 있다</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 탭 2: 개념정리 -->
+        <div class="tab-content" id="tab-concepts">
+            <div class="section-card">
+                <h2 class="section-title"><span class="icon">🧬</span> 핵심 개념 연구노트</h2>
+                <p style="font-size: 0.9rem; color: #666; margin-bottom: 18px;">빈칸에 알맞은 답을 선택하여 연구노트를 완성해보세요!</p>
+
+                <!-- 개념 1 -->
+                <div class="concept-card">
+                    <div class="concept-header">
+                        <span class="concept-number">1</span>
+                        <span class="concept-label">전략적 마케팅 계획이란?</span>
+                    </div>
+                    <p class="concept-text">
+                        전략적 마케팅 계획이란 기업이 
+                        <select class="blank-select" data-answer="마케팅 목표" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="마케팅 목표">마케팅 목표</option>
+                            <option value="생산 목표">생산 목표</option>
+                            <option value="인사 목표">인사 목표</option>
+                        </select>
+                        를 달성하기 위해 환경을 분석하고, 전략을 수립하며, 이를 실행·통제하는 체계적인 과정이다.
+                    </p>
+                    <button class="btn btn-item-reset" onclick="resetConceptItem(this)">🔄 초기화</button>
+                </div>
+
+                <!-- 개념 2 -->
+                <div class="concept-card">
+                    <div class="concept-header">
+                        <span class="concept-number">2</span>
+                        <span class="concept-label">마케팅 전략 수립 프로세스</span>
+                    </div>
+                    <p class="concept-text">
+                        마케팅 전략 수립은 ① 
+                        <select class="blank-select" data-answer="환경 분석" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="환경 분석">환경 분석</option>
+                            <option value="제품 생산">제품 생산</option>
+                            <option value="광고 제작">광고 제작</option>
+                        </select>
+                        → ② 마케팅 목표 수립 → ③ STP 전략 수립 → ④ 마케팅 믹스 개발 순서로 이루어진다.
+                    </p>
+
+                    <div class="process-flow">
+                        <div class="process-box"><div class="process-icon">🔍</div><div class="process-label">환경 분석</div></div>
+                        <div class="process-arrow">→</div>
+                        <div class="process-box"><div class="process-icon">🎯</div><div class="process-label">목표 수립</div></div>
+                        <div class="process-arrow">→</div>
+                        <div class="process-box"><div class="process-icon">📊</div><div class="process-label">STP 전략</div></div>
+                        <div class="process-arrow">→</div>
+                        <div class="process-box"><div class="process-icon">🧩</div><div class="process-label">마케팅 믹스</div></div>
+                    </div>
+
+                    <button class="btn btn-item-reset" onclick="resetConceptItem(this)">🔄 초기화</button>
+                </div>
+
+                <!-- 개념 3 -->
+                <div class="concept-card">
+                    <div class="concept-header">
+                        <span class="concept-number">3</span>
+                        <span class="concept-label">마케팅 환경 분석 도구</span>
+                    </div>
+                    <p class="concept-text">
+                        마케팅 환경을 분석하기 위한 대표적인 전략 도구에는 
+                        <select class="blank-select" data-answer="SWOT 분석" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="SWOT 분석">SWOT 분석</option>
+                            <option value="PEST 분석">PEST 분석</option>
+                            <option value="ABC 분석">ABC 분석</option>
+                        </select>
+                        , BCG 매트릭스, GE 매트릭스 등이 있다.
+                    </p>
+
+                    <div class="tool-cards">
+                        <div class="tool-card">
+                            <div class="tool-card-icon">📋</div>
+                            <div class="tool-card-name">SWOT 분석</div>
+                            <div class="tool-card-desc">내부·외부 환경을 종합 분석</div>
+                        </div>
+                        <div class="tool-card">
+                            <div class="tool-card-icon">📊</div>
+                            <div class="tool-card-name">BCG 매트릭스</div>
+                            <div class="tool-card-desc">시장성장률 × 시장점유율</div>
+                        </div>
+                        <div class="tool-card">
+                            <div class="tool-card-icon">📈</div>
+                            <div class="tool-card-name">GE 매트릭스</div>
+                            <div class="tool-card-desc">산업매력도 × 사업강점</div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-item-reset" onclick="resetConceptItem(this)">🔄 초기화</button>
+                </div>
+
+                <!-- 개념 4 -->
+                <div class="concept-card">
+                    <div class="concept-header">
+                        <span class="concept-number">4</span>
+                        <span class="concept-label">SWOT 분석의 개념</span>
+                    </div>
+                    <p class="concept-text">
+                        SWOT 분석은 기업의 
+                        <select class="blank-select" data-answer="내부 환경" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="내부 환경">내부 환경</option>
+                            <option value="외부 환경">외부 환경</option>
+                            <option value="자연 환경">자연 환경</option>
+                        </select>
+                        에서 강점(Strength)과 약점(Weakness)을, 
+                        <select class="blank-select" data-answer="외부 환경" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="내부 환경">내부 환경</option>
+                            <option value="외부 환경">외부 환경</option>
+                            <option value="경제 환경">경제 환경</option>
+                        </select>
+                        에서 기회(Opportunity)와 위협(Threat)을 분석하는 전략 도구이다.
+                    </p>
+                    <button class="btn btn-item-reset" onclick="resetConceptItem(this)">🔄 초기화</button>
+                </div>
+
+                <!-- 개념 5 -->
+                <div class="concept-card">
+                    <div class="concept-header">
+                        <span class="concept-number">5</span>
+                        <span class="concept-label">S — Strength (강점)</span>
+                    </div>
+                    <p class="concept-text">
+                        강점(Strength)은 기업이 경쟁사보다 
+                        <select class="blank-select" data-answer="우수한" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="우수한">우수한</option>
+                            <option value="부족한">부족한</option>
+                            <option value="위험한">위험한</option>
+                        </select>
+                        내부 역량이나 자원을 의미한다. 예를 들어 뛰어난 기술력, 강력한 브랜드 인지도, 우수한 인적 자원 등이 해당한다.
+                    </p>
+                    <button class="btn btn-item-reset" onclick="resetConceptItem(this)">🔄 초기화</button>
+                </div>
+
+                <!-- 개념 6 -->
+                <div class="concept-card">
+                    <div class="concept-header">
+                        <span class="concept-number">6</span>
+                        <span class="concept-label">W — Weakness (약점)</span>
+                    </div>
+                    <p class="concept-text">
+                        약점(Weakness)은 경쟁사에 비해 
+                        <select class="blank-select" data-answer="부족하거나 불리한" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="부족하거나 불리한">부족하거나 불리한</option>
+                            <option value="유리하거나 우수한">유리하거나 우수한</option>
+                            <option value="변화가 없는">변화가 없는</option>
+                        </select>
+                        내부 요인이다. 높은 생산 원가, 낮은 브랜드 인지도, 한정된 유통망 등이 이에 해당한다.
+                    </p>
+                    <button class="btn btn-item-reset" onclick="resetConceptItem(this)">🔄 초기화</button>
+                </div>
+
+                <!-- 개념 7 -->
+                <div class="concept-card">
+                    <div class="concept-header">
+                        <span class="concept-number">7</span>
+                        <span class="concept-label">O — Opportunity (기회)</span>
+                    </div>
+                    <p class="concept-text">
+                        기회(Opportunity)는 기업에 
+                        <select class="blank-select" data-answer="유리하게 작용하는" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="유리하게 작용하는">유리하게 작용하는</option>
+                            <option value="불리하게 작용하는">불리하게 작용하는</option>
+                            <option value="영향이 없는">영향이 없는</option>
+                        </select>
+                        외부 환경 요인이다. 시장 성장, 규제 완화, 기술 발전, 소비 트렌드 변화 등이 해당한다.
+                    </p>
+                    <button class="btn btn-item-reset" onclick="resetConceptItem(this)">🔄 초기화</button>
+                </div>
+
+                <!-- 개념 8 -->
+                <div class="concept-card">
+                    <div class="concept-header">
+                        <span class="concept-number">8</span>
+                        <span class="concept-label">T — Threat (위협)</span>
+                    </div>
+                    <p class="concept-text">
+                        위협(Threat)은 기업의 성과에 
+                        <select class="blank-select" data-answer="부정적 영향" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="부정적 영향">부정적 영향</option>
+                            <option value="긍정적 영향">긍정적 영향</option>
+                            <option value="아무 영향 없음">아무 영향 없음</option>
+                        </select>
+                        을 미칠 수 있는 외부 환경 요인이다. 경쟁 심화, 경기 침체, 법적 규제 강화, 대체재 등장 등이 해당한다.
+                    </p>
+                    <button class="btn btn-item-reset" onclick="resetConceptItem(this)">🔄 초기화</button>
+                </div>
+
+                <!-- 개념 9: SWOT 다이어그램 -->
+                <div class="concept-card">
+                    <div class="concept-header">
+                        <span class="concept-number">9</span>
+                        <span class="concept-label">SWOT 분석 구조도</span>
+                    </div>
+
+                    <div class="env-label">
+                        <span class="env-badge env-internal">🏢 내부 환경</span>
+                        <span style="color: #999;">+</span>
+                        <span class="env-badge env-external">🌍 외부 환경</span>
+                    </div>
+
+                    <div class="swot-diagram">
+                        <div class="swot-box swot-s">
+                            <div class="swot-letter">S</div>
+                            <div class="swot-label">강점 (Strength)</div>
+                            <div class="swot-desc">내부 긍정 요인</div>
+                        </div>
+                        <div class="swot-box swot-w">
+                            <div class="swot-letter">W</div>
+                            <div class="swot-label">약점 (Weakness)</div>
+                            <div class="swot-desc">내부 부정 요인</div>
+                        </div>
+                        <div class="swot-box swot-o">
+                            <div class="swot-letter">O</div>
+                            <div class="swot-label">기회 (Opportunity)</div>
+                            <div class="swot-desc">외부 긍정 요인</div>
+                        </div>
+                        <div class="swot-box swot-t">
+                            <div class="swot-letter">T</div>
+                            <div class="swot-label">위협 (Threat)</div>
+                            <div class="swot-desc">외부 부정 요인</div>
+                        </div>
+                    </div>
+
+                    <p class="concept-text">
+                        SWOT에서 내부 환경 요인은 
+                        <select class="blank-select" data-answer="강점과 약점" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="강점과 약점">강점과 약점</option>
+                            <option value="기회와 위협">기회와 위협</option>
+                            <option value="강점과 기회">강점과 기회</option>
+                        </select>
+                        이고, 외부 환경 요인은 
+                        <select class="blank-select" data-answer="기회와 위협" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="강점과 약점">강점과 약점</option>
+                            <option value="기회와 위협">기회와 위협</option>
+                            <option value="약점과 위협">약점과 위협</option>
+                        </select>
+                        이다.
+                    </p>
+                    <button class="btn btn-item-reset" onclick="resetConceptItem(this)">🔄 초기화</button>
+                </div>
+
+                <!-- 개념 10 -->
+                <div class="concept-card">
+                    <div class="concept-header">
+                        <span class="concept-number">10</span>
+                        <span class="concept-label">SWOT 분석의 목적</span>
+                    </div>
+                    <p class="concept-text">
+                        SWOT 분석의 궁극적 목적은 강점을 최대한 활용하고, 약점을 보완하며, 기회를 포착하고, 위협을 
+                        <select class="blank-select" data-answer="회피하거나 최소화" data-type="concept">
+                            <option value="">선택</option>
+                            <option value="회피하거나 최소화">회피하거나 최소화</option>
+                            <option value="무시하거나 방치">무시하거나 방치</option>
+                            <option value="확대하거나 강화">확대하거나 강화</option>
+                        </select>
+                        하는 전략적 방향을 도출하는 것이다.
+                    </p>
+                    <button class="btn btn-item-reset" onclick="resetConceptItem(this)">🔄 초기화</button>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-section-reset" onclick="resetConcepts()">🔄 개념정리 초기화</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 탭 3: 형성평가 -->
+        <div class="tab-content" id="tab-quiz">
+            <div class="section-card">
+                <h2 class="section-title"><span class="icon">🔍</span> 연구 결과 확인</h2>
+                <p style="font-size: 0.9rem; color: #666; margin-bottom: 18px;">배운 내용을 확인해봅시다! 각 문항의 정답을 선택해주세요.</p>
+
+                <div class="quiz-card" data-quiz="1">
+                    <p class="quiz-question"><span class="quiz-badge">Q1</span>전략적 마케팅 계획의 첫 번째 단계는?</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-value="1">① 마케팅 믹스 개발</div>
+                        <div class="quiz-option" data-value="2">② STP 전략 수립</div>
+                        <div class="quiz-option" data-value="3" data-correct="true">③ 환경 분석</div>
+                        <div class="quiz-option" data-value="4">④ 마케팅 목표 수립</div>
+                    </div>
+                </div>
+
+                <div class="quiz-card" data-quiz="2">
+                    <p class="quiz-question"><span class="quiz-badge">Q2</span>SWOT 분석에서 S(Strength)가 의미하는 것은?</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-value="1">① 외부 환경의 유리한 요인</div>
+                        <div class="quiz-option" data-value="2" data-correct="true">② 기업 내부의 긍정적 역량</div>
+                        <div class="quiz-option" data-value="3">③ 경쟁사의 전략적 위치</div>
+                        <div class="quiz-option" data-value="4">④ 시장의 성장 가능성</div>
+                    </div>
+                </div>
+
+                <div class="quiz-card" data-quiz="3">
+                    <p class="quiz-question"><span class="quiz-badge">Q3</span>다음 중 SWOT 분석의 '외부 환경' 요인에 해당하는 것은?</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-value="1">① 뛰어난 기술력</div>
+                        <div class="quiz-option" data-value="2">② 높은 브랜드 인지도</div>
+                        <div class="quiz-option" data-value="3" data-correct="true">③ 경쟁사의 신제품 출시</div>
+                        <div class="quiz-option" data-value="4">④ 숙련된 직원</div>
+                    </div>
+                </div>
+
+                <div class="quiz-card" data-quiz="4">
+                    <p class="quiz-question"><span class="quiz-badge">Q4</span>SWOT 분석에서 '기회(Opportunity)'에 해당하는 예시로 가장 적절한 것은?</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-value="1">① 자사의 독보적인 특허 기술</div>
+                        <div class="quiz-option" data-value="2" data-correct="true">② 정부의 친환경 정책으로 인한 시장 확대</div>
+                        <div class="quiz-option" data-value="3">③ 원자재 가격 상승으로 인한 원가 부담</div>
+                        <div class="quiz-option" data-value="4">④ 낮은 시장 점유율</div>
+                    </div>
+                </div>
+
+                <div class="quiz-card" data-quiz="5">
+                    <p class="quiz-question"><span class="quiz-badge">Q5</span>다음 중 SWOT의 '약점(Weakness)'에 해당하는 것은?</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-value="1">① 시장 성장률 증가</div>
+                        <div class="quiz-option" data-value="2">② 강력한 브랜드 파워</div>
+                        <div class="quiz-option" data-value="3" data-correct="true">③ 한정된 유통 채널</div>
+                        <div class="quiz-option" data-value="4">④ 새로운 규제 도입</div>
+                    </div>
+                </div>
+
+                <div class="quiz-card" data-quiz="6">
+                    <p class="quiz-question"><span class="quiz-badge">Q6</span>SWOT 분석에서 내부 환경에 해당하는 요소의 조합은?</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-value="1" data-correct="true">① 강점(S)과 약점(W)</div>
+                        <div class="quiz-option" data-value="2">② 기회(O)와 위협(T)</div>
+                        <div class="quiz-option" data-value="3">③ 강점(S)과 기회(O)</div>
+                        <div class="quiz-option" data-value="4">④ 약점(W)과 위협(T)</div>
+                    </div>
+                </div>
+
+                <div class="quiz-card" data-quiz="7">
+                    <p class="quiz-question"><span class="quiz-badge">Q7</span>다음 중 마케팅 환경 분석 도구가 아닌 것은?</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-value="1">① SWOT 분석</div>
+                        <div class="quiz-option" data-value="2">② BCG 매트릭스</div>
+                        <div class="quiz-option" data-value="3">③ GE 매트릭스</div>
+                        <div class="quiz-option" data-value="4" data-correct="true">④ AIDA 모델</div>
+                    </div>
+                </div>
+
+                <div class="quiz-card" data-quiz="8">
+                    <p class="quiz-question"><span class="quiz-badge">Q8</span>'경기 침체로 인한 소비 위축'은 SWOT 분석의 어떤 요소에 해당하는가?</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-value="1">① 강점(S)</div>
+                        <div class="quiz-option" data-value="2">② 약점(W)</div>
+                        <div class="quiz-option" data-value="3">③ 기회(O)</div>
+                        <div class="quiz-option" data-value="4" data-correct="true">④ 위협(T)</div>
+                    </div>
+                </div>
+
+                <div class="quiz-card" data-quiz="9">
+                    <p class="quiz-question"><span class="quiz-badge">Q9</span>SWOT 분석의 궁극적인 목적으로 가장 적절한 것은?</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-value="1">① 경쟁사의 전략을 모방하기 위해</div>
+                        <div class="quiz-option" data-value="2" data-correct="true">② 강점 활용, 약점 보완, 기회 포착, 위협 최소화를 통한 전략 방향 도출</div>
+                        <div class="quiz-option" data-value="3">③ 시장의 규모를 정확히 측정하기 위해</div>
+                        <div class="quiz-option" data-value="4">④ 제품의 가격을 결정하기 위해</div>
+                    </div>
+                </div>
+
+                <div class="quiz-card" data-quiz="10">
+                    <p class="quiz-question"><span class="quiz-badge">Q10</span>삼성전자가 '반도체 기술에서 세계 최고 수준의 경쟁력'을 보유하고 있다면, 이는 SWOT의 어떤 요소인가?</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-value="1" data-correct="true">① 강점(S) — 내부의 우수한 역량</div>
+                        <div class="quiz-option" data-value="2">② 기회(O) — 외부의 유리한 환경</div>
+                        <div class="quiz-option" data-value="3">③ 약점(W) — 내부의 부족한 역량</div>
+                        <div class="quiz-option" data-value="4">④ 위협(T) — 외부의 불리한 환경</div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-section-reset" onclick="resetQuiz()">🔄 형성평가 초기화</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 탭 4: 실험실 -->
+        <div class="tab-content" id="tab-activity">
+            <div class="section-card">
+                <h2 class="section-title"><span class="icon">⚗️</span> 마케팅 실험실</h2>
+
+                <!-- 실험 1: SWOT 요소 분류하기 -->
+                <div class="activity-section">
+                    <h3 class="activity-title">🧪 실험 1: SWOT 요소 분류하기</h3>
+                    <div class="activity-instruction">
+                        💡 PC: 아래 항목을 드래그하여 해당하는 SWOT 영역에 놓으세요<br>
+                        📱 모바일: 항목을 터치하여 선택 후, 영역을 터치하여 배치하세요
+                    </div>
+
+                    <div class="drag-container" id="dragContainer1">
+                        <div class="drag-item" data-category="s" draggable="true">뛰어난 기술력</div>
+                        <div class="drag-item" data-category="o" draggable="true">시장 규모 확대</div>
+                        <div class="drag-item" data-category="w" draggable="true">높은 생산 원가</div>
+                        <div class="drag-item" data-category="t" draggable="true">경쟁사 증가</div>
+                        <div class="drag-item" data-category="s" draggable="true">강력한 브랜드</div>
+                        <div class="drag-item" data-category="t" draggable="true">원자재 가격 상승</div>
+                        <div class="drag-item" data-category="o" draggable="true">규제 완화</div>
+                        <div class="drag-item" data-category="w" draggable="true">낮은 인지도</div>
+                    </div>
+
+                    <div class="drop-zones">
+                        <div class="drop-zone zone-s" data-accept="s">
+                            <div class="drop-zone-title">💪 강점 (S)</div>
+                        </div>
+                        <div class="drop-zone zone-w" data-accept="w">
+                            <div class="drop-zone-title">📉 약점 (W)</div>
+                        </div>
+                        <div class="drop-zone zone-o" data-accept="o">
+                            <div class="drop-zone-title">🌟 기회 (O)</div>
+                        </div>
+                        <div class="drop-zone zone-t" data-accept="t">
+                            <div class="drop-zone-title">⚠️ 위협 (T)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 실험 2: 내부 환경 vs 외부 환경 매칭 -->
+                <div class="activity-section" style="margin-top: 30px;">
+                    <h3 class="activity-title">🔗 실험 2: SWOT 개념 매칭</h3>
+                    <div class="activity-instruction">
+                        💡 왼쪽의 SWOT 요소를 클릭한 후, 오른쪽의 알맞은 설명을 클릭하여 연결하세요
+                    </div>
+
+                    <div class="matching-container">
+                        <div class="matching-column" id="matchingLeft1">
+                            <div class="matching-item" data-match="strength">강점 (S)</div>
+                            <div class="matching-item" data-match="weakness">약점 (W)</div>
+                            <div class="matching-item" data-match="opportunity">기회 (O)</div>
+                            <div class="matching-item" data-match="threat">위협 (T)</div>
+                            <div class="matching-item" data-match="internal">내부 환경</div>
+                        </div>
+                        <div class="matching-lines" id="matchingLines1">
+                            <div class="match-indicator" data-for="strength"></div>
+                            <div class="match-indicator" data-for="weakness"></div>
+                            <div class="match-indicator" data-for="opportunity"></div>
+                            <div class="match-indicator" data-for="threat"></div>
+                            <div class="match-indicator" data-for="internal"></div>
+                        </div>
+                        <div class="matching-column" id="matchingRight1">
+                            <div class="matching-item" data-match="opportunity">기업에 유리한 외부 환경 변화</div>
+                            <div class="matching-item" data-match="internal">강점(S)과 약점(W)이 해당</div>
+                            <div class="matching-item" data-match="threat">기업 성과에 부정적인 외부 요인</div>
+                            <div class="matching-item" data-match="strength">경쟁사 대비 우수한 내부 역량</div>
+                            <div class="matching-item" data-match="weakness">경쟁사 대비 부족한 내부 요인</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 실험 3: 유통업계 SWOT 사례 분류 -->
+                <div class="activity-section" style="margin-top: 30px;">
+                    <h3 class="activity-title">🏪 실험 3: 유통업계 SWOT 사례 분류</h3>
+                    <div class="activity-instruction">
+                        💡 다음은 대형 마트의 실제 SWOT 요소입니다. 해당하는 영역에 분류해보세요!
+                    </div>
+
+                    <div class="drag-container" id="dragContainer2">
+                        <div class="drag-item" data-category="s2" draggable="true">신선 식품 관리 노하우</div>
+                        <div class="drag-item" data-category="w2" draggable="true">부족한 온라인 대응 능력</div>
+                        <div class="drag-item" data-category="o2" draggable="true">온라인 식품 시장 확대</div>
+                        <div class="drag-item" data-category="t2" draggable="true">대형 이커머스 업체의 오프라인 진출</div>
+                        <div class="drag-item" data-category="s2" draggable="true">다수 점포 보유, 부동산 수익</div>
+                        <div class="drag-item" data-category="w2" draggable="true">비식품 MD 부진</div>
+                        <div class="drag-item" data-category="o2" draggable="true">대형 점포 공간 재구성</div>
+                        <div class="drag-item" data-category="t2" draggable="true">온라인 경쟁 심화</div>
+                    </div>
+
+                    <div class="drop-zones">
+                        <div class="drop-zone zone-s" data-accept="s2">
+                            <div class="drop-zone-title">💪 강점 (S)</div>
+                        </div>
+                        <div class="drop-zone zone-w" data-accept="w2">
+                            <div class="drop-zone-title">📉 약점 (W)</div>
+                        </div>
+                        <div class="drop-zone zone-o" data-accept="o2">
+                            <div class="drop-zone-title">🌟 기회 (O)</div>
+                        </div>
+                        <div class="drop-zone zone-t" data-accept="t2">
+                            <div class="drop-zone-title">⚠️ 위협 (T)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-section-reset" onclick="resetActivity()">🔄 실험실 초기화</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn btn-save" onclick="saveToLocal()">💾 저장하기</button>
+            <button class="btn btn-submit" onclick="submitAll()">📤 제출하기</button>
+            <button class="btn btn-reset" onclick="resetAll()">🔄 초기화</button>
+        </div>
+
+        <div class="result-section" id="resultSection">
+            <div class="result-icon">🏆</div>
+            <div class="result-grade" id="resultGrade">A+</div>
+            <p class="result-message" id="resultMessage">완벽해요!</p>
+            <div class="result-details" id="resultDetails"></div>
+            <div class="btn-group">
+                <button class="btn btn-reset" onclick="resetAll()">🔄 다시 연구하기</button>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>🔬 은또링쌤의 마케팅Lab | 한국디지털미디어고등학교</p>
+            <p>Made with 💙 for DIMIGO Students</p>
+        </footer>
+    </div>
+
+    <div class="toast" id="toast">저장되었습니다!</div>
+
+    <!-- 확인 모달 -->
+    <div class="modal" id="confirmModal">
+        <div class="modal-content">
+            <h3>🔄 전체 초기화</h3>
+            <p>모든 연구 기록을 초기화하시겠습니까?</p>
+            <div class="modal-btns">
+                <button class="btn btn-submit" onclick="doReset()">확인</button>
+                <button class="btn btn-section-reset" onclick="closeConfirm()">취소</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 탭 전환
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                document.getElementById('tab-' + this.dataset.tab).classList.add('active');
+                saveState();
+            });
+        });
+
+        // 학습목표 체크
+        document.querySelectorAll('.objective-item').forEach(item => {
+            item.addEventListener('click', function() {
+                this.classList.toggle('checked');
+                const cb = this.querySelector('.objective-checkbox');
+                cb.textContent = this.classList.contains('checked') ? '✓' : '';
+                saveState();
+            });
+        });
+
+        // 빈칸 선택
+        document.querySelectorAll('.blank-select').forEach(select => {
+            select.addEventListener('change', function() {
+                const answer = this.dataset.answer;
+                this.classList.remove('correct', 'wrong');
+                if (this.value === answer) {
+                    this.classList.add('correct');
+                } else if (this.value !== '') {
+                    this.classList.add('wrong');
+                }
+                updateProgress();
+                saveState();
+            });
+        });
+
+        // 퀴즈 선택
+        document.querySelectorAll('.quiz-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const card = this.closest('.quiz-card');
+                if (card.classList.contains('answered')) return;
+
+                card.classList.add('answered');
+                card.querySelectorAll('.quiz-option').forEach(opt => {
+                    if (opt.dataset.correct === 'true') {
+                        opt.classList.add('correct');
+                    }
+                });
+
+                if (this.dataset.correct !== 'true') {
+                    this.classList.add('wrong');
+                }
+
+                updateProgress();
+                saveState();
+            });
+        });
+
+        // 드래그 앤 드롭
+        let selectedDragItem = null;
+
+        document.querySelectorAll('.drag-item').forEach(item => {
+            item.addEventListener('dragstart', function(e) {
+                e.dataTransfer.setData('text', this.textContent);
+                e.dataTransfer.setData('category', this.dataset.category);
+            });
+
+            item.addEventListener('click', function() {
+                if (this.classList.contains('placed')) return;
+                document.querySelectorAll('.drag-item').forEach(i => i.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedDragItem = this;
+            });
+        });
+
+        document.querySelectorAll('.drop-zone').forEach(zone => {
+            zone.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('drag-over');
+            });
+
+            zone.addEventListener('dragleave', function() {
+                this.classList.remove('drag-over');
+            });
+
+            zone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('drag-over');
+
+                const text = e.dataTransfer.getData('text');
+                const category = e.dataTransfer.getData('category');
+                const accept = this.dataset.accept;
+
+                addDroppedItem(this, text, category, accept);
+            });
+
+            zone.addEventListener('click', function() {
+                if (selectedDragItem && !selectedDragItem.classList.contains('placed')) {
+                    const text = selectedDragItem.textContent;
+                    const category = selectedDragItem.dataset.category;
+                    const accept = this.dataset.accept;
+
+                    addDroppedItem(this, text, category, accept);
+                    selectedDragItem.classList.remove('selected');
+                    selectedDragItem = null;
+                }
+            });
+        });
+
+        function addDroppedItem(zone, text, category, accept) {
+            const isCorrect = category === accept;
+
+            const dropped = document.createElement('div');
+            dropped.className = 'dropped-item ' + (isCorrect ? 'correct' : 'wrong');
+            dropped.innerHTML = `${text} <button class="remove-btn" onclick="removeDropped(this, '${text}')">✕</button>`;
+            zone.appendChild(dropped);
+
+            document.querySelectorAll('.drag-item').forEach(item => {
+                if (item.textContent === text) {
+                    item.classList.add('placed');
+                    item.classList.remove('selected');
+                }
+            });
+
+            updateProgress();
+            saveState();
+        }
+
+        function removeDropped(btn, text) {
+            btn.parentElement.remove();
+            document.querySelectorAll('.drag-item').forEach(item => {
+                if (item.textContent === text) {
+                    item.classList.remove('placed');
+                }
+            });
+            updateProgress();
+            saveState();
+        }
+
+        // 매칭 활동
+        let selectedMatching = null;
+
+        document.querySelectorAll('.matching-item').forEach(item => {
+            item.addEventListener('click', function() {
+                if (this.classList.contains('matched')) return;
+
+                const column = this.parentElement;
+                const isLeft = column.id.includes('Left');
+
+                if (!selectedMatching) {
+                    this.classList.add('selected');
+                    selectedMatching = { element: this, match: this.dataset.match, isLeft: isLeft };
+                } else {
+                    if (selectedMatching.isLeft === isLeft) {
+                        selectedMatching.element.classList.remove('selected');
+                        this.classList.add('selected');
+                        selectedMatching = { element: this, match: this.dataset.match, isLeft: isLeft };
+                    } else {
+                        if (selectedMatching.match === this.dataset.match) {
+                            selectedMatching.element.classList.remove('selected');
+                            selectedMatching.element.classList.add('matched');
+                            this.classList.add('matched');
+
+                            const indicator = document.querySelector(`#matchingLines1 .match-indicator[data-for="${this.dataset.match}"]`);
+                            if (indicator) indicator.classList.add('connected');
+                        } else {
+                            this.classList.add('wrong-match');
+                            setTimeout(() => this.classList.remove('wrong-match'), 500);
+                        }
+                        selectedMatching.element.classList.remove('selected');
+                        selectedMatching = null;
+                    }
+                }
+                updateProgress();
+                saveState();
+            });
+        });
+
+        // 진행률 업데이트
+        function updateProgress() {
+            let total = 0, answered = 0, correct = 0;
+
+            document.querySelectorAll('.blank-select').forEach(select => {
+                total++;
+                if (select.value !== '') {
+                    answered++;
+                    if (select.classList.contains('correct')) correct++;
+                }
+            });
+
+            document.querySelectorAll('.quiz-card').forEach(card => {
+                total++;
+                if (card.classList.contains('answered')) {
+                    answered++;
+                    const wrongOpt = card.querySelector('.quiz-option.wrong');
+                    if (!wrongOpt) correct++;
+                }
+            });
+
+            document.querySelectorAll('.dropped-item').forEach(item => {
+                total++;
+                answered++;
+                if (item.classList.contains('correct')) correct++;
+            });
+
+            const matchedItems = document.querySelectorAll('.matching-item.matched');
+            total += matchedItems.length / 2;
+            answered += matchedItems.length / 2;
+            correct += matchedItems.length / 2;
+
+            const pct = total > 0 ? Math.round((answered / total) * 100) : 0;
+            document.getElementById('progressBar').style.width = pct + '%';
+            document.getElementById('progressBar').textContent = pct + '%';
+            document.getElementById('correctCount').textContent = correct;
+            document.getElementById('answeredCount').textContent = answered;
+            document.getElementById('totalCount').textContent = total;
+        }
+
+        // 제출
+        function submitAll() {
+            const name = document.getElementById('studentName').value.trim();
+            const id = document.getElementById('studentId').value.trim();
+
+            if (!name || !id) {
+                showToast('⚠️ 이름과 연구원 번호를 입력해주세요!');
+                return;
+            }
+
+            let total = 0, correct = 0;
+
+            document.querySelectorAll('.blank-select').forEach(select => {
+                total++;
+                if (select.classList.contains('correct')) correct++;
+            });
+
+            document.querySelectorAll('.quiz-card').forEach(card => {
+                total++;
+                const wrongOpt = card.querySelector('.quiz-option.wrong');
+                if (card.classList.contains('answered') && !wrongOpt) correct++;
+            });
+
+            document.querySelectorAll('.dropped-item').forEach(item => {
+                total++;
+                if (item.classList.contains('correct')) correct++;
+            });
+
+            const matchedItems = document.querySelectorAll('.matching-item.matched');
+            total += matchedItems.length / 2;
+            correct += matchedItems.length / 2;
+
+            const pct = total > 0 ? Math.round((correct / total) * 100) : 0;
+
+            let grade, message;
+            if (pct >= 90) { grade = 'A+'; message = '완벽해요! SWOT 분석 전문가! 🎉'; }
+            else if (pct >= 80) { grade = 'A'; message = '훌륭해요! 거의 완벽해요! ⭐'; }
+            else if (pct >= 70) { grade = 'B+'; message = '잘했어요! 조금만 더! 💪'; }
+            else if (pct >= 60) { grade = 'B'; message = '좋아요! 복습하면 완벽! 📚'; }
+            else { grade = 'C'; message = '힘내요! 다시 연구해봐요! 🔬'; }
+
+            // 구글 스프레드시트로 전송
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = 'https://script.google.com/macros/s/AKfycbw74Pv4jRMA_3aX-tOShm-Wca50XsW7VHQcQALyT8p26Z5TurhkBDWT0r2Mu-eLG30/exec';
+            form.target = 'hidden_iframe';
+
+            const fields = {
+                name: name,
+                studentId: id,
+                week: 3,
+                session: 1,
+                sessionTitle: '전략적 마케팅 계획과 SWOT 분석',
+                correct: correct,
+                total: total,
+                percentage: pct,
+                grade: grade,
+                timestamp: new Date().toISOString()
+            };
+
+            for (let key in fields) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = key;
+                input.value = fields[key];
+                form.appendChild(input);
+            }
+
+            let iframe = document.getElementById('hidden_iframe');
+            if (!iframe) {
+                iframe = document.createElement('iframe');
+                iframe.name = 'hidden_iframe';
+                iframe.id = 'hidden_iframe';
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
+            }
+
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+
+            showToast('📤 연구 보고서가 제출되었습니다!');
+
+            document.getElementById('resultGrade').textContent = grade;
+            document.getElementById('resultMessage').textContent = message;
+            document.getElementById('resultDetails').innerHTML = `<h4>📊 ${name} 연구원 (${id}) 연구 결과</h4><ul><li><span>정답률</span><span>${pct}% (${correct}/${total})</span></li><li><span>연구 등급</span><span>${grade}</span></li><li><span>제출 시간</span><span>${new Date().toLocaleString('ko-KR')}</span></li></ul>`;
+            document.getElementById('resultSection').classList.add('show');
+            document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function resetAll() {
+            document.getElementById('confirmModal').classList.add('show');
+        }
+
+        function saveToLocal() {
+            saveState();
+            showToast('💾 진행 상황이 저장되었습니다!');
+        }
+
+        function closeConfirm() {
+            document.getElementById('confirmModal').classList.remove('show');
+        }
+
+        function resetConceptItem(btn) {
+            const card = btn.closest('.concept-card');
+            card.querySelectorAll('.blank-select').forEach(select => {
+                select.value = '';
+                select.classList.remove('correct', 'wrong');
+            });
+            updateProgress();
+            saveState();
+            showToast('🔄 해당 문제가 초기화되었습니다!');
+        }
+
+        function resetConcepts() {
+            document.querySelectorAll('.blank-select').forEach(select => {
+                select.value = '';
+                select.classList.remove('correct', 'wrong');
+            });
+            updateProgress();
+            saveState();
+            showToast('🧬 개념정리가 초기화되었습니다!');
+        }
+
+        function resetQuiz() {
+            document.querySelectorAll('.quiz-card').forEach(card => {
+                card.classList.remove('answered');
+                card.querySelectorAll('.quiz-option').forEach(opt => {
+                    opt.classList.remove('selected', 'correct', 'wrong');
+                });
+            });
+            updateProgress();
+            saveState();
+            showToast('🔍 형성평가가 초기화되었습니다!');
+        }
+
+        function resetActivity() {
+            document.querySelectorAll('.dropped-item').forEach(item => item.remove());
+            document.querySelectorAll('.drag-item').forEach(item => {
+                item.classList.remove('placed', 'selected');
+            });
+
+            document.querySelectorAll('.matching-item').forEach(item => {
+                item.classList.remove('matched', 'selected', 'wrong-match');
+            });
+            document.querySelectorAll('.match-indicator').forEach(ind => {
+                ind.classList.remove('connected');
+            });
+
+            updateProgress();
+            saveState();
+            showToast('⚗️ 실험실이 초기화되었습니다!');
+        }
+
+        function doReset() {
+            closeConfirm();
+            localStorage.removeItem('marketinglab_week3_class1');
+
+            document.querySelectorAll('.objective-item').forEach(item => {
+                item.classList.remove('checked');
+                item.querySelector('.objective-checkbox').textContent = '';
+            });
+            resetConcepts();
+            resetQuiz();
+            resetActivity();
+
+            document.getElementById('resultSection').classList.remove('show');
+
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelector('.tab-btn').classList.add('active');
+            document.getElementById('tab-objectives').classList.add('active');
+
+            showToast('🔄 전체 초기화되었습니다!');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            if (!t) return;
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2500);
+        }
+
+        // localStorage 저장
+        function saveState() {
+            const state = {
+                studentName: document.getElementById('studentName').value,
+                studentId: document.getElementById('studentId').value,
+                objectives: [],
+                concepts: [],
+                quizzes: [],
+                activeTab: document.querySelector('.tab-btn.active')?.dataset.tab
+            };
+
+            document.querySelectorAll('.objective-item').forEach((item, i) => {
+                state.objectives[i] = item.classList.contains('checked');
+            });
+
+            document.querySelectorAll('.blank-select').forEach((select, i) => {
+                state.concepts[i] = { value: select.value, correct: select.classList.contains('correct'), wrong: select.classList.contains('wrong') };
+            });
+
+            document.querySelectorAll('.quiz-card').forEach((card, i) => {
+                const selected = card.querySelector('.quiz-option.selected, .quiz-option.wrong');
+                state.quizzes[i] = { answered: card.classList.contains('answered'), selectedValue: selected?.dataset.value };
+            });
+
+            localStorage.setItem('marketinglab_week3_class1', JSON.stringify(state));
+        }
+
+        // localStorage 불러오기
+        function loadState() {
+            const saved = localStorage.getItem('marketinglab_week3_class1');
+            if (!saved) return;
+
+            try {
+                const state = JSON.parse(saved);
+
+                if (state.studentName) document.getElementById('studentName').value = state.studentName;
+                if (state.studentId) document.getElementById('studentId').value = state.studentId;
+
+                state.objectives?.forEach((checked, i) => {
+                    const item = document.querySelectorAll('.objective-item')[i];
+                    if (item && checked) {
+                        item.classList.add('checked');
+                        item.querySelector('.objective-checkbox').textContent = '✓';
+                    }
+                });
+
+                state.concepts?.forEach((data, i) => {
+                    const select = document.querySelectorAll('.blank-select')[i];
+                    if (select && data.value) {
+                        select.value = data.value;
+                        if (data.correct) select.classList.add('correct');
+                        if (data.wrong) select.classList.add('wrong');
+                    }
+                });
+
+                state.quizzes?.forEach((data, i) => {
+                    const card = document.querySelectorAll('.quiz-card')[i];
+                    if (card && data.answered) {
+                        card.classList.add('answered');
+                        card.querySelectorAll('.quiz-option').forEach(opt => {
+                            if (opt.dataset.value === data.selectedValue) {
+                                if (opt.dataset.correct === 'true') {
+                                    opt.classList.add('correct');
+                                } else {
+                                    opt.classList.add('wrong');
+                                }
+                            }
+                            if (opt.dataset.correct === 'true') {
+                                opt.classList.add('correct');
+                            }
+                        });
+                    }
+                });
+
+                if (state.activeTab) {
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    document.querySelector(`.tab-btn[data-tab="${state.activeTab}"]`)?.classList.add('active');
+                    document.getElementById('tab-' + state.activeTab)?.classList.add('active');
+                }
+
+                updateProgress();
+            } catch (e) {
+                console.log('상태 불러오기 실패:', e);
+            }
+        }
+
+        // 학생 정보 저장
+        document.getElementById('studentName').addEventListener('input', saveState);
+        document.getElementById('studentId').addEventListener('input', saveState);
+
+        // 초기화
+        loadState();
+        updateProgress();
+    </script>
+</body>
+</html>
