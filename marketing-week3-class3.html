@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔬 은또링쌤의 마케팅Lab | 3주차 3차시</title>
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Black+Han+Sans&display=swap" rel="stylesheet">
+    <style>
+
+        :root {
+            --lab-mint: #00D4AA;
+            --lab-blue: #4A90D9;
+            --lab-purple: #7B68EE;
+            --lab-green: #32CD32;
+            --lab-orange: #FF8C42;
+            --lab-pink: #FF6B9D;
+            --lab-dark: #1E2A3A;
+            --lab-gray: #F0F4F8;
+            --lab-white: #FFFFFF;
+            --correct: #00C853;
+            --wrong: #FF5252;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Gowun Dodum', sans-serif;
+            background: linear-gradient(135deg, #E8F5E9 0%, #E3F2FD 50%, #F3E5F5 100%);
+            min-height: 100vh;
+            padding: 15px;
+            position: relative;
+        }
+
+        .molecule {
+            position: fixed;
+            font-size: 1.5rem;
+            opacity: 0.12;
+            animation: float 8s ease-in-out infinite;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(15deg); }
+        }
+
+        .container { max-width: 900px; margin: 0 auto; position: relative; z-index: 10; }
+
+        .header {
+            background: var(--lab-white);
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            margin-bottom: 15px;
+            box-shadow: 0 8px 32px rgba(0, 212, 170, 0.15);
+            border: 3px solid var(--lab-mint);
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--lab-mint), var(--lab-blue), var(--lab-purple), var(--lab-pink));
+        }
+
+        .header-icons { position: absolute; top: 15px; left: 20px; font-size: 1.5rem; display: flex; gap: 8px; }
+        .header-icons span { animation: bubble 2s ease-in-out infinite; }
+        .header-icons span:nth-child(2) { animation-delay: 0.3s; }
+        .header-icons span:nth-child(3) { animation-delay: 0.6s; }
+
+        @keyframes bubble { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-5px) scale(1.1); } }
+
+        .header-badge {
+            position: absolute; top: 15px; right: 20px;
+            background: linear-gradient(135deg, var(--lab-mint), var(--lab-blue));
+            color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold;
+        }
+
+        .header h1 {
+            font-family: 'Gowun Dodum', sans-serif;
+            font-size: 2rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--lab-mint), var(--lab-blue));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 8px; margin-top: 10px;
+        }
+
+        .header .subtitle { font-size: 1.15rem; color: var(--lab-dark); font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .header .week-info { display: inline-block; background: linear-gradient(135deg, var(--lab-purple), var(--lab-pink)); color: white; padding: 6px 16px; border-radius: 20px; font-size: 0.85rem; margin-top: 12px; font-weight: bold; }
+
+        .student-info {
+            background: var(--lab-white); border-radius: 15px; padding: 15px 20px; margin-bottom: 15px;
+            display: flex; gap: 15px; flex-wrap: wrap; align-items: center; justify-content: center;
+            border: 2px solid #E0E7EE; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .student-info label { font-weight: bold; color: var(--lab-dark); display: flex; align-items: center; gap: 5px; }
+        .student-info input { padding: 10px 15px; border: 2px solid #E0E7EE; border-radius: 10px; font-family: 'Gowun Dodum', sans-serif; font-size: 0.95rem; width: 130px; transition: all 0.3s ease; }
+        .student-info input:focus { outline: none; border-color: var(--lab-mint); box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.1); }
+
+        .tab-nav {
+            display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; justify-content: center;
+            background: var(--lab-white); padding: 10px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .tab-btn {
+            padding: 12px 18px; border: 2px solid #E0E7EE; border-radius: 12px;
+            font-family: 'Gowun Dodum', sans-serif; font-size: 0.85rem; font-weight: bold;
+            cursor: pointer; transition: all 0.3s ease; background: var(--lab-white); color: var(--lab-dark);
+        }
+        .tab-btn.active { background: linear-gradient(135deg, var(--lab-mint), var(--lab-blue)); color: white; border-color: transparent; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0, 212, 170, 0.3); }
+        .tab-btn:hover:not(.active) { border-color: var(--lab-mint); background: rgba(0, 212, 170, 0.05); }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .progress-section { background: var(--lab-white); border-radius: 15px; padding: 18px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 2px solid #E0E7EE; }
+        .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .progress-title { font-weight: bold; color: var(--lab-dark); display: flex; align-items: center; gap: 8px; }
+        .progress-bar-container { background: #E8F5E9; border-radius: 10px; height: 20px; overflow: hidden; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--lab-mint), var(--lab-blue)); border-radius: 10px; transition: width 0.5s ease; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.75rem; }
+        .progress-stats { display: flex; justify-content: space-between; margin-top: 10px; font-size: 0.85rem; color: var(--lab-dark); }
+        .progress-stats span { display: flex; align-items: center; gap: 5px; }
+
+        .section-card { background: var(--lab-white); border-radius: 20px; padding: 25px; margin-bottom: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 2px solid #E0E7EE; }
+        .section-title {
+            font-family: 'Gowun Dodum', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--lab-dark);
+            margin-bottom: 18px; display: flex; align-items: center; gap: 10px; padding-bottom: 12px; border-bottom: 2px dashed #E0E7EE;
+        }
+        .section-title .icon { font-size: 1.4rem; }
+
+        .objective-item { display: flex; align-items: flex-start; gap: 12px; padding: 15px; background: linear-gradient(135deg, #F8FFF8, #F0F8FF); border-radius: 12px; margin-bottom: 10px; transition: all 0.3s ease; cursor: pointer; border: 2px solid transparent; }
+        .objective-item:hover { transform: translateX(5px); border-color: var(--lab-mint); }
+        .objective-item.checked { background: linear-gradient(135deg, #E8F5E9, #C8E6C9); border-color: var(--correct); }
+        .objective-checkbox { width: 26px; height: 26px; border: 3px solid #CBD5E0; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; transition: all 0.3s ease; background: white; }
+        .objective-item.checked .objective-checkbox { background: var(--correct); border-color: var(--correct); color: white; }
+        .objective-text { font-size: 0.95rem; color: var(--lab-dark); line-height: 1.6; }
+
+        .concept-card { background: linear-gradient(135deg, #FAFFFE, #F5FAFF); border-radius: 15px; padding: 18px; margin-bottom: 12px; border-left: 5px solid var(--lab-mint); transition: all 0.3s ease; position: relative; }
+        .concept-card:nth-child(3n+1) { border-left-color: var(--lab-mint); }
+        .concept-card:nth-child(3n+2) { border-left-color: var(--lab-blue); }
+        .concept-card:nth-child(3n) { border-left-color: var(--lab-purple); }
+        .concept-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .concept-number { display: inline-flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--lab-mint), var(--lab-blue)); color: white; width: 28px; height: 28px; border-radius: 8px; font-weight: bold; font-size: 0.85rem; }
+        .concept-label { font-weight: bold; color: var(--lab-dark); }
+        .concept-text { font-size: 0.95rem; color: var(--lab-dark); line-height: 1.9; }
+        .blank-select { display: inline-block; min-width: 100px; padding: 6px 10px; border: 2px dashed var(--lab-blue); border-radius: 8px; background: white; font-family: 'Gowun Dodum', sans-serif; font-size: 0.9rem; cursor: pointer; transition: all 0.3s ease; appearance: none; text-align: center; }
+        .blank-select:focus { outline: none; border-color: var(--lab-mint); box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.15); }
+        .blank-select.correct { background: var(--correct); color: white; border-color: var(--correct); border-style: solid; }
+        .blank-select.wrong { background: var(--wrong); color: white; border-color: var(--wrong); border-style: solid; }
+
+        .quiz-card { background: linear-gradient(135deg, #FAFFFE, #F5FAFF); border-radius: 15px; padding: 18px; margin-bottom: 15px; border: 2px solid #E0E7EE; }
+        .quiz-question { font-weight: bold; color: var(--lab-dark); margin-bottom: 15px; font-size: 0.95rem; display: flex; align-items: flex-start; gap: 10px; }
+        .quiz-badge { background: linear-gradient(135deg, var(--lab-purple), var(--lab-pink)); color: white; padding: 3px 10px; border-radius: 15px; font-size: 0.75rem; flex-shrink: 0; }
+        .quiz-options { display: flex; flex-direction: column; gap: 10px; }
+        .quiz-option { padding: 14px 18px; background: white; border: 2px solid #E0E7EE; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; font-size: 0.9rem; }
+        .quiz-option:hover { border-color: var(--lab-mint); background: rgba(0, 212, 170, 0.05); transform: translateX(5px); }
+        .quiz-option.selected { border-color: var(--lab-blue); background: #E3F2FD; }
+        .quiz-option.correct { border-color: var(--correct); background: #E8F5E9; }
+        .quiz-option.wrong { border-color: var(--wrong); background: #FFEBEE; }
+
+        /* SWOT 다이어그램 */
+        .swot-diagram {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 20px 0;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .swot-box {
+            border-radius: 15px;
+            padding: 18px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+        .swot-box:hover { transform: scale(1.03); }
+        .swot-s { background: linear-gradient(135deg, #E8F5E9, #C8E6C9); border: 2px solid #66BB6A; }
+        .swot-w { background: linear-gradient(135deg, #FFEBEE, #FFCDD2); border: 2px solid #EF5350; }
+        .swot-o { background: linear-gradient(135deg, #E3F2FD, #BBDEFB); border: 2px solid #42A5F5; }
+        .swot-t { background: linear-gradient(135deg, #FFF3E0, #FFE0B2); border: 2px solid #FFA726; }
+        .swot-letter { font-size: 2rem; font-weight: bold; margin-bottom: 5px; }
+        .swot-s .swot-letter { color: #2E7D32; }
+        .swot-w .swot-letter { color: #C62828; }
+        .swot-o .swot-letter { color: #1565C0; }
+        .swot-t .swot-letter { color: #E65100; }
+        .swot-label { font-size: 0.9rem; font-weight: bold; color: var(--lab-dark); margin-bottom: 3px; }
+        .swot-desc { font-size: 0.8rem; color: #666; }
+
+        /* 환경 구분 표시 */
+        .env-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 10px 0;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+        .env-badge {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: white;
+            font-weight: bold;
+        }
+        .env-internal { background: linear-gradient(135deg, #66BB6A, #EF5350); }
+        .env-external { background: linear-gradient(135deg, #42A5F5, #FFA726); }
+
+        /* 드래그앤드롭 */
+        .drag-container { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; justify-content: center; padding: 15px; background: #F8FAFC; border-radius: 12px; border: 2px dashed #CBD5E0; }
+        .drag-item { padding: 10px 16px; background: white; border: 2px solid #E0E7EE; border-radius: 10px; cursor: grab; transition: all 0.3s ease; font-size: 0.9rem; user-select: none; }
+        .drag-item:hover { border-color: var(--lab-mint); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .drag-item.selected { border-color: var(--lab-blue); background: #E3F2FD; box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.2); }
+        .drag-item.placed { opacity: 0.4; cursor: default; pointer-events: none; }
+
+        .drop-zones { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
+        .drop-zone { min-height: 100px; border: 2px dashed #CBD5E0; border-radius: 15px; padding: 15px; transition: all 0.3s ease; display: flex; flex-direction: column; gap: 6px; }
+        .drop-zone.drag-over { border-color: var(--lab-mint); background: rgba(0, 212, 170, 0.05); }
+        .drop-zone-title { font-weight: bold; color: var(--lab-dark); font-size: 0.9rem; text-align: center; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px dashed #E0E7EE; }
+        .drop-zone.zone-s { border-color: #66BB6A; background: rgba(102, 187, 106, 0.05); }
+        .drop-zone.zone-w { border-color: #EF5350; background: rgba(239, 83, 80, 0.05); }
+        .drop-zone.zone-o { border-color: #42A5F5; background: rgba(66, 165, 245, 0.05); }
+        .drop-zone.zone-t { border-color: #FFA726; background: rgba(255, 167, 38, 0.05); }
+
+        .dropped-item { padding: 8px 12px; border-radius: 8px; font-size: 0.85rem; display: flex; justify-content: space-between; align-items: center; }
+        .dropped-item.correct { background: #E8F5E9; border: 1px solid var(--correct); }
+        .dropped-item.wrong { background: #FFEBEE; border: 1px solid var(--wrong); }
+        .remove-btn { background: none; border: none; cursor: pointer; font-size: 0.8rem; color: #999; padding: 2px 5px; }
+        .remove-btn:hover { color: var(--wrong); }
+
+        /* 매칭 */
+        .matching-container { display: flex; gap: 15px; align-items: flex-start; justify-content: center; margin: 15px 0; flex-wrap: wrap; }
+        .matching-column { display: flex; flex-direction: column; gap: 10px; flex: 1; min-width: 150px; }
+        .matching-item { padding: 12px 15px; background: white; border: 2px solid #E0E7EE; border-radius: 10px; cursor: pointer; transition: all 0.3s ease; font-size: 0.85rem; text-align: center; }
+        .matching-item:hover { border-color: var(--lab-mint); }
+        .matching-item.selected { border-color: var(--lab-blue); background: #E3F2FD; box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.2); }
+        .matching-item.matched { border-color: var(--correct); background: #E8F5E9; cursor: default; }
+        .matching-item.wrong-match { border-color: var(--wrong); background: #FFEBEE; animation: shake 0.3s; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+
+        .matching-lines { display: flex; flex-direction: column; gap: 10px; align-items: center; justify-content: center; min-width: 30px; }
+        .match-indicator { width: 12px; height: 12px; border-radius: 50%; background: #E0E7EE; transition: all 0.3s ease; }
+        .match-indicator.connected { background: var(--correct); box-shadow: 0 0 8px rgba(0, 200, 83, 0.5); }
+
+        /* 활동 섹션 */
+        .activity-section { margin-bottom: 25px; }
+        .activity-title { font-size: 1.05rem; font-weight: bold; color: var(--lab-dark); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .activity-instruction { background: linear-gradient(135deg, #FFF8E1, #FFECB3); padding: 12px 15px; border-radius: 10px; font-size: 0.85rem; color: #795548; margin-bottom: 15px; line-height: 1.6; border-left: 4px solid #FFC107; }
+
+        /* 버튼 */
+        .btn { padding: 12px 25px; border: none; border-radius: 12px; font-family: 'Gowun Dodum', sans-serif; font-size: 0.9rem; font-weight: bold; cursor: pointer; transition: all 0.3s ease; }
+        .btn:hover { transform: translateY(-2px); }
+        .btn-submit { background: linear-gradient(135deg, var(--lab-mint), var(--lab-blue)); color: white; box-shadow: 0 4px 15px rgba(0, 212, 170, 0.3); }
+        .btn-save { background: linear-gradient(135deg, var(--lab-purple), var(--lab-pink)); color: white; box-shadow: 0 4px 15px rgba(123, 104, 238, 0.3); }
+        .btn-reset { background: linear-gradient(135deg, var(--wrong), #FF7043); color: white; box-shadow: 0 4px 15px rgba(255, 82, 82, 0.3); }
+        .btn-check { background: linear-gradient(135deg, var(--lab-mint), var(--lab-green)); color: white; box-shadow: 0 4px 15px rgba(0, 212, 170, 0.3); }
+        .btn-section-reset { background: #F5F5F5; color: var(--lab-dark); border: 2px solid #E0E7EE; }
+        .btn-item-reset { position: absolute; top: 10px; right: 10px; padding: 5px 12px; font-size: 0.75rem; background: #F5F5F5; color: #666; border: 1px solid #DDD; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+        .btn-item-reset:hover { background: #E0E0E0; }
+        .btn-group { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+
+        .result-section { margin-top: 25px; padding: 25px; background: linear-gradient(135deg, #E8F5E9, #C8E6C9); border-radius: 15px; text-align: center; display: none; }
+        .result-section.show { display: block; animation: fadeIn 0.5s ease; }
+        .result-icon { font-size: 3rem; margin-bottom: 10px; }
+        .result-grade { font-size: 2rem; font-weight: bold; color: var(--lab-dark); margin-bottom: 5px; }
+        .result-message { font-size: 1.2rem; font-weight: bold; color: var(--lab-dark); margin-bottom: 15px; }
+        .result-details { background: white; border-radius: 12px; padding: 15px; text-align: left; }
+        .result-details h4 { color: var(--lab-dark); margin-bottom: 10px; font-size: 1rem; }
+        .result-details ul { list-style: none; }
+        .result-details li { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #E0E7EE; font-size: 0.9rem; }
+        .result-details li:last-child { border-bottom: none; }
+
+        .footer { text-align: center; padding: 20px; color: #888; font-size: 0.85rem; }
+        .footer p:first-child { font-weight: bold; margin-bottom: 5px; }
+
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--lab-dark); color: white; padding: 15px 25px; border-radius: 12px; font-weight: bold; z-index: 1000; transition: all 0.3s ease; opacity: 0; }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+        .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .modal.show { display: flex; }
+        .modal-content { background: white; border-radius: 20px; padding: 30px; max-width: 400px; text-align: center; }
+        .modal-content h3 { color: var(--lab-dark); margin-bottom: 15px; }
+        .modal-content p { color: #666; margin-bottom: 20px; }
+        .modal-btns { display: flex; gap: 10px; justify-content: center; }
+
+        /* 전략 도구 카드 */
+        .tool-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin: 20px 0;
+        }
+        .tool-card {
+            background: white;
+            border-radius: 15px;
+            padding: 18px 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border-top: 4px solid var(--lab-mint);
+        }
+        .tool-card:nth-child(2) { border-top-color: var(--lab-blue); }
+        .tool-card:nth-child(3) { border-top-color: var(--lab-purple); }
+        .tool-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); }
+        .tool-card-icon { font-size: 2rem; margin-bottom: 8px; }
+        .tool-card-name { font-weight: bold; color: var(--lab-dark); font-size: 0.95rem; margin-bottom: 5px; }
+        .tool-card-desc { font-size: 0.75rem; color: #888; line-height: 1.4; }
+
+        /* 마케팅 전략 프로세스 플로우 */
+        .process-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #F0F8FF, #E8F5E9);
+            border-radius: 15px;
+        }
+        .process-box {
+            background: white;
+            border-radius: 12px;
+            padding: 12px 18px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            min-width: 90px;
+        }
+        .process-box:nth-child(1) { border: 2px solid var(--lab-mint); }
+        .process-box:nth-child(3) { border: 2px solid var(--lab-blue); }
+        .process-box:nth-child(5) { border: 2px solid var(--lab-purple); }
+        .process-box:nth-child(7) { border: 2px solid var(--lab-pink); }
+        .process-icon { font-size: 1.5rem; margin-bottom: 5px; }
+        .process-label { font-size: 0.8rem; font-weight: bold; color: var(--lab-dark); }
+        .process-arrow { font-size: 1.5rem; color: var(--lab-blue); }
+
+        @media (max-width: 600px) {
+            .header h1 { font-size: 1.5rem; }
+            .tab-btn { padding: 10px 14px; font-size: 0.8rem; }
+            .drop-zones { grid-template-columns: 1fr; }
+            .swot-diagram { grid-template-columns: 1fr; }
+            .tool-cards { grid-template-columns: 1fr; }
+            .matching-container { flex-direction: column; }
+        }
+    
+        /* ===== 포트폴리오 닥터 게임 ===== */
+        .doctor-header { text-align: center; margin-bottom: 20px; }
+        .doctor-header .doctor-icon { font-size: 3rem; margin-bottom: 8px; }
+        .doctor-header .doctor-title { font-size: 1.1rem; font-weight: bold; color: var(--lab-dark); margin-bottom: 4px; }
+        .doctor-header .doctor-desc { font-size: 0.85rem; color: #888; line-height: 1.5; }
+        .ref-toggle { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: linear-gradient(135deg, #F0F8FF, #E8F5E9); border: 2px solid #E0E7EE; border-radius: 10px; cursor: pointer; font-family: 'Gowun Dodum', sans-serif; font-size: 0.85rem; font-weight: bold; color: var(--lab-dark); transition: all 0.3s; margin-bottom: 15px; }
+        .ref-toggle:hover { border-color: var(--lab-mint); }
+        .ref-section { display: none; margin-bottom: 20px; padding: 15px; background: linear-gradient(135deg, #FAFFFE, #F5FAFF); border-radius: 15px; border: 2px solid #E0E7EE; }
+        .ref-section.open { display: block; animation: fadeIn 0.3s; }
+        .bcg-mini { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; max-width: 400px; margin: 10px auto; }
+        .bcg-mini-box { border-radius: 10px; padding: 10px; text-align: center; font-size: 0.8rem; font-weight: bold; }
+        .bcg-mini-box.star { background: #FFF8E1; border: 2px solid #FFB300; }
+        .bcg-mini-box.qmark { background: #F3E5F5; border: 2px solid #AB47BC; }
+        .bcg-mini-box.cow { background: #E8F5E9; border: 2px solid #66BB6A; }
+        .bcg-mini-box.dog { background: #FFEBEE; border: 2px solid #EF5350; }
+        .bcg-mini-icon { font-size: 1.3rem; }
+        .bcg-mini-label { font-size: 0.7rem; color: #666; font-weight: normal; margin-top: 2px; }
+        .patient-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; padding: 12px 15px; background: linear-gradient(135deg, #EDE7F6, #E8EAF6); border-radius: 12px; flex-wrap: wrap; gap: 8px; }
+        .patient-nav-label { font-weight: bold; color: var(--lab-dark); font-size: 0.9rem; }
+        .patient-dots { display: flex; gap: 6px; flex-wrap: wrap; }
+        .patient-dot { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #CBD5E0; background: white; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: bold; color: #999; transition: all 0.3s; cursor: pointer; }
+        .patient-dot.current { border-color: var(--lab-purple); background: linear-gradient(135deg, var(--lab-purple), var(--lab-pink)); color: white; transform: scale(1.15); }
+        .patient-dot.done { border-color: var(--correct); background: var(--correct); color: white; }
+        .patient-dot.done-wrong { border-color: var(--lab-orange); background: var(--lab-orange); color: white; }
+        .patient-card { display: none; animation: fadeIn 0.4s ease; }
+        .patient-card.active { display: block; }
+        .chart-card { background: linear-gradient(135deg, #FAFFFE, #F5FAFF); border-radius: 15px; padding: 20px; border: 2px solid #E0E7EE; margin-bottom: 18px; }
+        .chart-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; }
+        .chart-emoji { font-size: 2.5rem; flex-shrink: 0; background: white; width: 60px; height: 60px; border-radius: 15px; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(0,0,0,0.08); }
+        .chart-info h3 { font-size: 1.1rem; color: var(--lab-dark); margin-bottom: 3px; }
+        .chart-info p { font-size: 0.85rem; color: #888; line-height: 1.4; }
+        .chart-badge { display: inline-block; padding: 3px 10px; border-radius: 15px; font-size: 0.7rem; font-weight: bold; color: white; margin-top: 4px; }
+        .badge-hot { background: linear-gradient(135deg, #FF6B6B, #FF8E53); }
+        .badge-stable { background: linear-gradient(135deg, #4ECDC4, #44B09E); }
+        .badge-declining { background: linear-gradient(135deg, #A8A8A8, #888); }
+        .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .data-item { background: white; border-radius: 10px; padding: 12px; border: 1px solid #E8ECF0; }
+        .data-label { font-size: 0.75rem; color: #888; margin-bottom: 5px; }
+        .data-bar-bg { height: 8px; background: #E8ECF0; border-radius: 4px; overflow: hidden; margin-bottom: 4px; }
+        .data-bar { height: 100%; border-radius: 4px; transition: width 0.8s ease; }
+        .data-bar.high { background: linear-gradient(90deg, var(--lab-mint), var(--lab-green)); }
+        .data-bar.low { background: linear-gradient(90deg, var(--lab-orange), var(--wrong)); }
+        .data-value { font-size: 0.95rem; font-weight: bold; color: var(--lab-dark); }
+        .data-value .arrow-up { color: var(--correct); }
+        .data-value .arrow-down { color: var(--wrong); }
+        .extra-info { display: flex; gap: 10px; flex-wrap: wrap; }
+        .extra-chip { padding: 6px 12px; background: white; border: 1px solid #E8ECF0; border-radius: 20px; font-size: 0.8rem; color: var(--lab-dark); }
+        .step-section { margin-bottom: 18px; }
+        .step-label { font-weight: bold; color: var(--lab-dark); font-size: 0.95rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .step-badge { background: linear-gradient(135deg, var(--lab-purple), var(--lab-pink)); color: white; padding: 2px 10px; border-radius: 10px; font-size: 0.75rem; }
+        .choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .choice-btn { padding: 14px 12px; background: white; border: 2px solid #E0E7EE; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; font-family: 'Gowun Dodum', sans-serif; font-size: 0.85rem; font-weight: bold; color: var(--lab-dark); text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .choice-btn:hover:not(.disabled) { border-color: var(--lab-mint); background: rgba(0,212,170,0.05); transform: translateY(-2px); }
+        .choice-btn .choice-icon { font-size: 1.5rem; }
+        .choice-btn .choice-sub { font-size: 0.7rem; color: #999; font-weight: normal; }
+        .choice-btn.selected-correct { border-color: var(--correct); background: #E8F5E9; }
+        .choice-btn.selected-wrong { border-color: var(--wrong); background: #FFEBEE; }
+        .choice-btn.reveal-correct { border-color: var(--correct); background: #E8F5E9; opacity: 0.7; }
+        .choice-btn.disabled { cursor: default; opacity: 0.6; }
+        .feedback-box { padding: 12px 15px; border-radius: 10px; font-size: 0.85rem; margin-top: 10px; line-height: 1.6; display: none; }
+        .feedback-box.show { display: block; animation: fadeIn 0.3s; }
+        .feedback-correct { background: linear-gradient(135deg, #E8F5E9, #C8E6C9); border-left: 4px solid var(--correct); color: #2E7D32; }
+        .feedback-wrong { background: linear-gradient(135deg, #FFEBEE, #FFCDD2); border-left: 4px solid var(--wrong); color: #C62828; }
+        .nav-btns { display: flex; justify-content: space-between; margin-top: 15px; }
+        .nav-btn { padding: 10px 20px; border: none; border-radius: 10px; font-family: 'Gowun Dodum', sans-serif; font-size: 0.9rem; font-weight: bold; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 6px; }
+        .nav-btn:hover { transform: translateY(-2px); }
+        .nav-btn-prev { background: #F5F5F5; color: var(--lab-dark); border: 2px solid #E0E7EE; }
+        .nav-btn-next { background: linear-gradient(135deg, var(--lab-purple), var(--lab-pink)); color: white; box-shadow: 0 4px 15px rgba(123,104,238,0.3); }
+        .nav-btn:disabled { opacity: 0.4; cursor: default; transform: none; }
+        .ge-bonus { display: none; }
+        .ge-bonus.active { display: block; animation: fadeIn 0.4s; }
+        .ge-bonus-header { text-align: center; margin-bottom: 18px; padding: 15px; background: linear-gradient(135deg, #EDE7F6, #E8EAF6); border-radius: 12px; }
+        .ge-bonus-header h3 { color: var(--lab-dark); margin-bottom: 5px; }
+        .ge-bonus-header p { font-size: 0.85rem; color: #666; }
+        .ge-diagram-mini { display: grid; grid-template-columns: auto repeat(3, 1fr); grid-template-rows: auto repeat(3, 1fr) auto; gap: 3px; margin: 15px auto; max-width: 480px; }
+        .ge-ylabel-m { grid-column: 1; grid-row: 2/5; writing-mode: vertical-lr; transform: rotate(180deg); text-align: center; font-weight: bold; font-size: 0.8rem; color: var(--lab-dark); display: flex; align-items: center; justify-content: center; padding-right: 6px; }
+        .ge-xlabel-m { grid-column: 2/5; grid-row: 5; text-align: center; font-weight: bold; font-size: 0.8rem; color: var(--lab-dark); padding-top: 6px; }
+        .ge-header-m { grid-column: 2/5; grid-row: 1; display: flex; }
+        .ge-header-m span { flex: 1; text-align: center; font-size: 0.7rem; color: #888; font-weight: bold; }
+        .ge-box-m { border-radius: 8px; padding: 8px 5px; text-align: center; font-size: 0.7rem; font-weight: bold; color: var(--lab-dark); }
+        .ge-green-m { background: linear-gradient(135deg, #C8E6C9, #A5D6A7); border: 1px solid #66BB6A; }
+        .ge-yellow-m { background: linear-gradient(135deg, #FFF9C4, #FFF176); border: 1px solid #FFD54F; }
+        .ge-red-m { background: linear-gradient(135deg, #FFCDD2, #EF9A9A); border: 1px solid #EF5350; }
+        @media (max-width: 600px) {
+            .choice-grid { grid-template-columns: 1fr; }
+            .data-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="molecule" style="top: 5%; left: 8%;">🧬</div>
+    <div class="molecule" style="top: 15%; right: 12%; animation-delay: 1s;">⚗️</div>
+    <div class="molecule" style="top: 35%; left: 5%; animation-delay: 2s;">🔬</div>
+    <div class="molecule" style="top: 55%; right: 8%; animation-delay: 3s;">💡</div>
+    <div class="molecule" style="top: 75%; left: 10%; animation-delay: 4s;">🧪</div>
+    <div class="molecule" style="top: 85%; right: 15%; animation-delay: 5s;">📊</div>
+    <div class="molecule" style="top: 45%; left: 90%; animation-delay: 1.5s;">🎯</div>
+    <div class="molecule" style="top: 25%; left: 92%; animation-delay: 3.5s;">📈</div>
+    <div class="container">
+        <header class="header">
+            <div class="header-icons"><span>🔬</span><span>🧪</span><span>💡</span></div>
+            <div class="header-badge">DIMIGO</div>
+            <h1>🔬 은또링쌤의 마케팅Lab</h1>
+            <p class="subtitle">📊 BCG 매트릭스와 GE 매트릭스</p>
+            <span class="week-info">🗓️ 3주차 3차시 | 마케팅 전략</span>
+        </header>
+        <div class="student-info">
+            <label>🧑‍🔬 연구원</label><input type="text" id="studentName" placeholder="이름 입력">
+            <label>🔢 연구원 번호</label><input type="text" id="studentId" placeholder="예: 10101">
+        </div>
+        <div class="tab-nav">
+            <button class="tab-btn active" data-tab="objectives">🎯 학습목표</button>
+            <button class="tab-btn" data-tab="concepts">🧬 개념정리</button>
+            <button class="tab-btn" data-tab="doctor">🩺 포트폴리오 닥터</button>
+            <button class="tab-btn" data-tab="quiz">🔍 형성평가</button>
+            <button class="tab-btn" data-tab="activity">⚗️ 실험실</button>
+        </div>
+        <div class="progress-section">
+            <div class="progress-header"><span class="progress-title">📈 연구 진행률</span></div>
+            <div class="progress-bar-container"><div class="progress-bar" id="progressBar" style="width:0%">0%</div></div>
+            <div class="progress-stats"><span>✅ 정답: <strong id="correctCount">0</strong>개</span><span>📋 진행: <strong id="answeredCount">0</strong> / <strong id="totalCount">0</strong></span></div>
+        </div>
+        <div class="tab-content active" id="tab-objectives"><div class="section-card"><h2 class="section-title"><span class="icon">🎯</span> 오늘의 연구 목표</h2><p style="font-size:0.9rem;color:#666;margin-bottom:18px;">연구를 시작하기 전, 오늘의 학습 목표를 확인하고 이해한 목표를 클릭해주세요!</p>
+                <div class="objective-item"><div class="objective-checkbox"></div><span class="objective-text">BCG 매트릭스의 개념과 4가지 사업 유형(별, 물음표, 자금젖소, 개)을 설명할 수 있다</span></div>
+                <div class="objective-item"><div class="objective-checkbox"></div><span class="objective-text">GE 매트릭스의 개념과 BCG 매트릭스와의 차이점을 설명할 수 있다</span></div>
+                <div class="objective-item"><div class="objective-checkbox"></div><span class="objective-text">BCG 매트릭스와 GE 매트릭스를 활용하여 기업의 사업 포트폴리오를 분석할 수 있다</span></div>
+            </div></div>
+
+        <!-- 탭 2: 개념정리 -->
+        <div class="tab-content" id="tab-concepts">
+            <div class="section-card">
+                <h2 class="section-title"><span class="icon">🧬</span> 핵심 개념 연구노트</h2>
+                <p style="font-size:0.9rem;color:#666;margin-bottom:18px;">빈칸에 알맞은 답을 선택하여 연구노트를 완성해보세요!</p>
+
+                <div class="concept-card">
+                    <div class="concept-header"><span class="concept-number">1</span><span class="concept-label">기업 포트폴리오 분석이란?</span></div>
+                    <p class="concept-text">기업 포트폴리오 분석이란 기업의 성과를 평가하는 방법에 있어 전략적 <select class="blank-select" data-answer="사업 분야별" data-type="concept"><option value="">선택</option><option value="사업 분야별">사업 분야별</option><option value="직원 개인별">직원 개인별</option><option value="지역 국가별">지역 국가별</option></select>로 분석 및 평가하는 것을 말한다.</p>
+                    <button class="btn btn-item-reset" onclick="resetConceptItem(this)">🔄 초기화</button>
+                </div>
+
+                <div class="concept-card">
+                    <div class="concept-header"><span class="concept-number">2</span><span class="concept-label">BCG 매트릭스의 개념</span></div>
+                    <p class="concept-text">BCG 매트릭스는 <select class="blank-select" data-answer="보스턴 컨설팅 그룹" data-type="concept"><option value="">선택</option><option value="보스턴 컨설팅 그룹">보스턴 컨설팅 그룹</option><option value="맥킨지 앤 컴퍼니">맥킨지 앤 컴퍼니</option><option value="제너럴 일렉트릭">제너럴 일렉트릭</option></select>(BCG)에서 개발한 도표로, 가로축은 <select class="blank-select" data-answer="상대적 시장 점유율" data-type="concept"><option value="">선택</option><option value="상대적 시장 점유율">상대적 시장 점유율</option><option value="시장 매력도">시장 매력도</option><option value="브랜드 인지도">브랜드 인지도</option></select>을, 세로축은 <select class="blank-select" data-answer="시장 성장률" data-type="concept"><option value="">선택</option><option value="시장 성장률">시장 성장률</option><option value="매출액">매출액</option><option value="사업 강점">사업 강점</option></select>을 나타낸다.</p>
+                    <button class="btn btn-item-reset" onclick="resetConceptItem(this)">🔄 초기화</button>
+                </div>
+
+                <div class="concept-card">
+                    <div class="concept-header"><span class="concept-number">3</span><span class="concept-label">BCG 매트릭스 구조도</span></div>
+                    <div style="text-align:center;font-size:0.85rem;color:#666;margin-bottom:8px;"><strong>세로축:</strong> 시장 성장률 | <strong>가로축:</strong> 상대적 시장 점유율</div>
+                    <div class="bcg-mini">
+                        <div class="bcg-mini-box star"><div class="bcg-mini-icon">⭐</div>별 (Star)<div class="bcg-mini-label">높은 성장률 + 높은 점유율<br>→ 지속적 투자</div></div>
+                        <div class="bcg-mini-box qmark"><div class="bcg-mini-icon">❓</div>물음표<div class="bcg-mini-label">높은 성장률 + 낮은 점유율<br>→ 확대 or 철수 결정</div></div>
+                        <div class="bcg-mini-box cow"><div class="bcg-mini-icon">🐄</div>자금젖소<div class="bcg-mini-label">낮은 성장률 + 높은 점유율<br>→ 현상 유지, 타 사업 지원</div></div>
+                        <div class="bcg-mini-box dog"><div class="bcg-mini-icon">🐕</div>개 (Dog)<div class="bcg-mini-label">낮은 성장률 + 낮은 점유율<br>→ 철수 / 사업 축소</div></div>
+                    </div>
+                    <p class="concept-text" style="margin-top:12px;">BCG 매트릭스는 <select class="blank-select" data-answer="4개" data-type="concept"><option value="">선택</option><option value="4개">4개</option><option value="6개">6개</option><option value="9개">9개</option></select>의 사분면으로 구성되며, 별(Star), 물음표(Question Mark), 자금젖소(Cash Cow), 개(Dog)로 구분한다.</p>
+                    <button class="btn btn-item-reset" onclick="resetConceptItem(this)">🔄 초기화</button>
+                </div>
+
+                <div class="concept-card">
+                    <div class="concept-header"><span class="concept-number">4</span><span class="concept-label">⭐ 별 (Star)</span></div>
+                    <p class="concept-text">별(Star)은 시장 성장률이 높고 상대적 시장 점유율도 높은 사업 분야이다. 수익은 높고 안정적이며, 현금 흐름은 중립적이다. 빠른 시장 성장률 속에서 높은 점유율을 유지하기 위해 <select class="blank-select" data-answer="지속적인 투자" data-type="concept"><option value="">선택</option><option value="지속적인 투자">지속적인 투자</option><option value="즉각적인 철수">즉각적인 철수</option><option value="투자 중단">투자 중단</option></select>가 필요하다.</p>
+                    <button class="btn btn-item-reset" onclick="resetConceptItem(this)">🔄 초기화</button>
+                </div>
+
+                <div class="concept-card">
+                    <div class="concept-header"><span class="concept-number">5</span><span class="concept-label">❓ 물음표 (Question Mark)</span></div>
+                    <p class="concept-text">물음표(Question Mark)는 시장 성장률은 높지만 시장 점유율은 <select class="blank-select" data-answer="낮은" data-type="concept"><option value="">선택</option><option value="낮은">낮은</option><option value="높은">높은</option><option value="보통인">보통인</option></select> 사업 분야이다. 수익은 낮고 불안정하며 적자 가능성이 있다. 사업을 확대하여 별로 이동시킬 것인지 혹은 철수할 것인지를 결정해야 한다.</p>
+                    <button class="btn btn-item-reset" onclick="resetConceptItem(this)">🔄 초기화</button>
+                </div>
+
+                <div class="concept-card">
+                    <div class="concept-header"><span class="concept-number">6</span><span class="concept-label">🐄 자금젖소 (Cash Cow)</span></div>
+                    <p class="concept-text">자금젖소(Cash Cow)는 시장 성장률은 낮지만 시장 점유율은 높은 사업 분야이다. 수익과 현금 흐름이 모두 높고 안정적이다. 전략은 <select class="blank-select" data-answer="현상 유지" data-type="concept"><option value="">선택</option><option value="현상 유지">현상 유지</option><option value="공격적 투자">공격적 투자</option><option value="즉시 철수">즉시 철수</option></select>하면서 다른 사업 단위를 지원하는 것이다.</p>
+                    <button class="btn btn-item-reset" onclick="resetConceptItem(this)">🔄 초기화</button>
+                </div>
+
+                <div class="concept-card">
+                    <div class="concept-header"><span class="concept-number">7</span><span class="concept-label">🐕 개 (Dog)</span></div>
+                    <p class="concept-text">개(Dog)는 시장 성장률과 시장 점유율이 모두 낮은 사업 분야이다. 수익은 낮고 현금 흐름은 중립적이거나 적자 가능성이 있다. 전략은 <select class="blank-select" data-answer="철수 또는 사업 축소" data-type="concept"><option value="">선택</option><option value="철수 또는 사업 축소">철수 또는 사업 축소</option><option value="대규모 투자 확대">대규모 투자 확대</option><option value="시장 진입 확대">시장 진입 확대</option></select>이다.</p>
+                    <button class="btn btn-item-reset" onclick="resetConceptItem(this)">🔄 초기화</button>
+                </div>
+
+                <div class="concept-card">
+                    <div class="concept-header"><span class="concept-number">8</span><span class="concept-label">GE 매트릭스의 개념</span></div>
+                    <p class="concept-text">GE 매트릭스는 BCG 매트릭스의 한계점을 보완하기 위해 <select class="blank-select" data-answer="GE사와 맥킨지" data-type="concept"><option value="">선택</option><option value="GE사와 맥킨지">GE사와 맥킨지</option><option value="삼성과 LG">삼성과 LG</option><option value="구글과 애플">구글과 애플</option></select>에서 공동 개발한 전략이다. 가로축은 <select class="blank-select" data-answer="사업 강점" data-type="concept"><option value="">선택</option><option value="사업 강점">사업 강점</option><option value="시장 점유율">시장 점유율</option><option value="매출 성장률">매출 성장률</option></select>, 세로축은 <select class="blank-select" data-answer="시장 매력도" data-type="concept"><option value="">선택</option><option value="시장 매력도">시장 매력도</option><option value="시장 성장률">시장 성장률</option><option value="브랜드 파워">브랜드 파워</option></select>를 나타내며, 3×3 = <select class="blank-select" data-answer="9개" data-type="concept"><option value="">선택</option><option value="4개">4개</option><option value="6개">6개</option><option value="9개">9개</option></select>의 셀로 구성된다.</p>
+                    <button class="btn btn-item-reset" onclick="resetConceptItem(this)">🔄 초기화</button>
+                </div>
+
+                <div class="concept-card">
+                    <div class="concept-header"><span class="concept-number">9</span><span class="concept-label">GE 매트릭스의 구성 요소</span></div>
+                    <p class="concept-text">시장 매력도는 시장 규모, 시장 성장률, 이익률, 경쟁도, 수요 변동, 규모의 경제 등을 고려하여 높음·중간·낮음으로 구분한다. 사업 강점은 상대적 시장 점유율, <select class="blank-select" data-answer="가격 경쟁력" data-type="concept"><option value="">선택</option><option value="가격 경쟁력">가격 경쟁력</option><option value="사원 수">사원 수</option><option value="설립 연도">설립 연도</option></select>, 품질, 판매 효율성, 고객 정보 등을 고려하여 강함·중간·약함으로 구분한다.</p>
+                    <button class="btn btn-item-reset" onclick="resetConceptItem(this)">🔄 초기화</button>
+                </div>
+
+                <div class="concept-card">
+                    <div class="concept-header"><span class="concept-number">10</span><span class="concept-label">BCG vs GE 매트릭스 비교</span></div>
+                    <p class="concept-text">BCG 매트릭스는 시장 성장률과 상대적 시장 점유율이라는 <select class="blank-select" data-answer="두 가지 변수만" data-type="concept"><option value="">선택</option><option value="두 가지 변수만">두 가지 변수만</option><option value="다섯 가지 변수를">다섯 가지 변수를</option><option value="열 가지 변수를">열 가지 변수를</option></select>을 고려하는 한계가 있다. GE 매트릭스는 이를 극복하기 위해 여러 내용 요소들을 토대로 더 세밀하게 분석한다.</p>
+                    <div class="ge-diagram-mini">
+                        <div class="ge-header-m"><span>강함</span><span>중간</span><span>약함</span></div>
+                        <div class="ge-ylabel-m">시장 매력도</div>
+                        <div class="ge-box-m ge-green-m" style="grid-column:2;grid-row:2;">유지, 방어</div><div class="ge-box-m ge-green-m" style="grid-column:3;grid-row:2;">성장 투자</div><div class="ge-box-m ge-yellow-m" style="grid-column:4;grid-row:2;">선택적 투자</div>
+                        <div class="ge-box-m ge-green-m" style="grid-column:2;grid-row:3;">선택적 성장</div><div class="ge-box-m ge-yellow-m" style="grid-column:3;grid-row:3;">수익 관리</div><div class="ge-box-m ge-red-m" style="grid-column:4;grid-row:3;">제한적 확장</div>
+                        <div class="ge-box-m ge-yellow-m" style="grid-column:2;grid-row:4;">초점 조정</div><div class="ge-box-m ge-red-m" style="grid-column:3;grid-row:4;">수익성 경영</div><div class="ge-box-m ge-red-m" style="grid-column:4;grid-row:4;">전환, 철수</div>
+                        <div class="ge-xlabel-m">사업 강점</div>
+                    </div>
+                    <button class="btn btn-item-reset" onclick="resetConceptItem(this)">🔄 초기화</button>
+                </div>
+
+                <div class="btn-group"><button class="btn btn-section-reset" onclick="resetConceptsTab()">🔄 개념정리 초기화</button></div>
+            </div>
+        </div>
+
+        <!-- 탭 3: 포트폴리오 닥터 -->
+        <div class="tab-content" id="tab-doctor"><div class="section-card">
+            <div class="doctor-header"><div class="doctor-icon">🩺</div><div class="doctor-title">포트폴리오 닥터에 오신 것을 환영합니다!</div><div class="doctor-desc">기업 환자의 시장 데이터를 분석하고, BCG 매트릭스로 진단한 뒤<br>올바른 전략을 처방해주세요.</div></div>
+            <button class="ref-toggle" onclick="toggleRef()">📋 BCG 매트릭스 참고 자료 ▼</button>
+            <div class="ref-section" id="refSection">
+                <div style="text-align:center;font-size:0.85rem;color:#666;margin-bottom:8px;"><strong>세로축:</strong> 시장 성장률 | <strong>가로축:</strong> 상대적 시장 점유율</div>
+                <div class="bcg-mini">
+                    <div class="bcg-mini-box star"><div class="bcg-mini-icon">⭐</div>별 (Star)<div class="bcg-mini-label">높은 성장률 + 높은 점유율<br>→ 지속적 투자</div></div>
+                    <div class="bcg-mini-box qmark"><div class="bcg-mini-icon">❓</div>물음표<div class="bcg-mini-label">높은 성장률 + 낮은 점유율<br>→ 확대 or 철수 결정</div></div>
+                    <div class="bcg-mini-box cow"><div class="bcg-mini-icon">🐄</div>자금젖소<div class="bcg-mini-label">낮은 성장률 + 높은 점유율<br>→ 현상 유지, 타 사업 지원</div></div>
+                    <div class="bcg-mini-box dog"><div class="bcg-mini-icon">🐕</div>개 (Dog)<div class="bcg-mini-label">낮은 성장률 + 낮은 점유율<br>→ 철수 / 사업 축소</div></div>
+                </div>
+            </div>
+            <div class="patient-nav"><span class="patient-nav-label">🏥 진료 현황</span><div class="patient-dots" id="patientDots"></div></div>
+            <div id="patientArea"></div>
+            <div class="ge-bonus" id="geBonus">
+                <div class="ge-bonus-header"><h3>🎓 보너스 라운드: GE 매트릭스</h3><p>BCG 매트릭스의 한계를 극복한 GE 매트릭스를 알아봅시다!</p></div>
+                <div style="background:linear-gradient(135deg,#FAFFFE,#F5FAFF);border-radius:15px;padding:18px;margin-bottom:12px;border-left:5px solid var(--lab-purple);">
+                    <p class="concept-text">BCG 매트릭스는 시장 성장률과 상대적 시장 점유율이라는 <select class="blank-select" data-answer="두 가지 변수만" data-type="concept"><option value="">선택</option><option value="두 가지 변수만">두 가지 변수만</option><option value="다섯 가지 변수를">다섯 가지 변수를</option><option value="열 가지 변수를">열 가지 변수를</option></select> 고려하는 한계가 있다. 이를 극복하기 위해 <select class="blank-select" data-answer="GE사와 맥킨지" data-type="concept"><option value="">선택</option><option value="GE사와 맥킨지">GE사와 맥킨지</option><option value="삼성과 LG">삼성과 LG</option><option value="구글과 애플">구글과 애플</option></select>에서 GE 매트릭스를 공동 개발했다.</p>
+                </div>
+                <div style="background:linear-gradient(135deg,#FAFFFE,#F5FAFF);border-radius:15px;padding:18px;margin-bottom:12px;border-left:5px solid var(--lab-blue);">
+                    <p class="concept-text">GE 매트릭스의 가로축은 <select class="blank-select" data-answer="사업 강점" data-type="concept"><option value="">선택</option><option value="사업 강점">사업 강점</option><option value="시장 점유율">시장 점유율</option><option value="매출 성장률">매출 성장률</option></select>, 세로축은 <select class="blank-select" data-answer="시장 매력도" data-type="concept"><option value="">선택</option><option value="시장 매력도">시장 매력도</option><option value="시장 성장률">시장 성장률</option><option value="브랜드 파워">브랜드 파워</option></select>를 나타내며, 3×3 = <select class="blank-select" data-answer="9개" data-type="concept"><option value="">선택</option><option value="4개">4개</option><option value="6개">6개</option><option value="9개">9개</option></select>의 셀로 구성된다.</p>
+                </div>
+                <div class="ge-diagram-mini">
+                    <div class="ge-header-m"><span>강함</span><span>중간</span><span>약함</span></div>
+                    <div class="ge-ylabel-m">시장 매력도</div>
+                    <div class="ge-box-m ge-green-m" style="grid-column:2;grid-row:2;">유지, 방어</div><div class="ge-box-m ge-green-m" style="grid-column:3;grid-row:2;">성장 투자</div><div class="ge-box-m ge-yellow-m" style="grid-column:4;grid-row:2;">선택적 투자</div>
+                    <div class="ge-box-m ge-green-m" style="grid-column:2;grid-row:3;">선택적 성장</div><div class="ge-box-m ge-yellow-m" style="grid-column:3;grid-row:3;">수익 관리</div><div class="ge-box-m ge-red-m" style="grid-column:4;grid-row:3;">제한적 확장</div>
+                    <div class="ge-box-m ge-yellow-m" style="grid-column:2;grid-row:4;">초점 조정</div><div class="ge-box-m ge-red-m" style="grid-column:3;grid-row:4;">수익성 경영</div><div class="ge-box-m ge-red-m" style="grid-column:4;grid-row:4;">전환, 철수</div>
+                    <div class="ge-xlabel-m">사업 강점</div>
+                </div>
+                <div style="background:linear-gradient(135deg,#FAFFFE,#F5FAFF);border-radius:15px;padding:18px;border-left:5px solid var(--lab-mint);">
+                    <p class="concept-text">시장 매력도는 시장 규모, 성장률, 이익률, 경쟁도 등을 종합 평가한다. 사업 강점은 시장 점유율, <select class="blank-select" data-answer="가격 경쟁력" data-type="concept"><option value="">선택</option><option value="가격 경쟁력">가격 경쟁력</option><option value="사원 수">사원 수</option><option value="설립 연도">설립 연도</option></select>, 품질, 판매 효율성 등을 종합 평가한다.</p>
+                </div>
+                <div class="btn-group" style="margin-top:15px;"><button class="btn btn-section-reset" onclick="resetConcepts()">🔄 개념정리 초기화</button></div>
+            </div>
+        </div></div>
+        <div class="tab-content" id="tab-quiz"><div class="section-card"><h2 class="section-title"><span class="icon">🔍</span> 연구 결과 확인</h2><p style="font-size:0.9rem;color:#666;margin-bottom:18px;">배운 내용을 확인해봅시다! 각 문항의 정답을 선택해주세요.</p>
+                <div class="quiz-card" data-quiz="1"><p class="quiz-question"><span class="quiz-badge">Q1</span>BCG 매트릭스의 가로축과 세로축은 각각 무엇인가?</p><div class="quiz-options">
+                    <div class="quiz-option" data-value="1">① 매출액 / 영업이익률</div>
+                    <div class="quiz-option" data-value="2" data-correct="true">② 상대적 시장 점유율 / 시장 성장률</div>
+                    <div class="quiz-option" data-value="3">③ 사업 강점 / 시장 매력도</div>
+                    <div class="quiz-option" data-value="4">④ 브랜드 인지도 / 고객 충성도</div>
+                </div></div>
+                <div class="quiz-card" data-quiz="2"><p class="quiz-question"><span class="quiz-badge">Q2</span>BCG 매트릭스에서 '자금젖소'의 특징으로 옳은 것은?</p><div class="quiz-options">
+                    <div class="quiz-option" data-value="1">① 성장률과 점유율 모두 높다</div>
+                    <div class="quiz-option" data-value="2">② 성장률과 점유율 모두 낮다</div>
+                    <div class="quiz-option" data-value="3" data-correct="true">③ 성장률은 낮지만 점유율은 높다</div>
+                    <div class="quiz-option" data-value="4">④ 성장률은 높지만 점유율은 낮다</div>
+                </div></div>
+                <div class="quiz-card" data-quiz="3"><p class="quiz-question"><span class="quiz-badge">Q3</span>'물음표'에 해당하는 사업의 전략으로 적절한 것은?</p><div class="quiz-options">
+                    <div class="quiz-option" data-value="1">① 현상 유지하며 다른 사업 지원</div>
+                    <div class="quiz-option" data-value="2" data-correct="true">② 사업 확대하여 별로 이동시키거나 철수 결정</div>
+                    <div class="quiz-option" data-value="3">③ 무조건 즉시 철수</div>
+                    <div class="quiz-option" data-value="4">④ 지속적 투자로 성장 유지</div>
+                </div></div>
+                <div class="quiz-card" data-quiz="4"><p class="quiz-question"><span class="quiz-badge">Q4</span>높은 시장 성장률과 높은 점유율의 사업은 BCG에서?</p><div class="quiz-options">
+                    <div class="quiz-option" data-value="1" data-correct="true">① 별 (Star)</div>
+                    <div class="quiz-option" data-value="2">② 물음표</div>
+                    <div class="quiz-option" data-value="3">③ 자금젖소</div>
+                    <div class="quiz-option" data-value="4">④ 개 (Dog)</div>
+                </div></div>
+                <div class="quiz-card" data-quiz="5"><p class="quiz-question"><span class="quiz-badge">Q5</span>'개(Dog)' 사업에 대한 전략은?</p><div class="quiz-options">
+                    <div class="quiz-option" data-value="1">① 대규모 투자로 점유율 확대</div>
+                    <div class="quiz-option" data-value="2">② 현상 유지하며 수익 창출</div>
+                    <div class="quiz-option" data-value="3" data-correct="true">③ 철수하거나 사업 분야를 축소</div>
+                    <div class="quiz-option" data-value="4">④ 새로운 시장에 진입 확대</div>
+                </div></div>
+                <div class="quiz-card" data-quiz="6"><p class="quiz-question"><span class="quiz-badge">Q6</span>GE 매트릭스를 개발한 곳은?</p><div class="quiz-options">
+                    <div class="quiz-option" data-value="1">① 보스턴 컨설팅 그룹</div>
+                    <div class="quiz-option" data-value="2" data-correct="true">② GE사와 맥킨지(McKinsey)</div>
+                    <div class="quiz-option" data-value="3">③ 하버드 비즈니스 스쿨</div>
+                    <div class="quiz-option" data-value="4">④ 삼성경제연구소</div>
+                </div></div>
+                <div class="quiz-card" data-quiz="7"><p class="quiz-question"><span class="quiz-badge">Q7</span>GE 매트릭스의 두 축은 무엇인가?</p><div class="quiz-options">
+                    <div class="quiz-option" data-value="1">① 시장 성장률 / 시장 점유율</div>
+                    <div class="quiz-option" data-value="2">② 매출액 / 영업이익</div>
+                    <div class="quiz-option" data-value="3" data-correct="true">③ 시장 매력도 / 사업 강점</div>
+                    <div class="quiz-option" data-value="4">④ 고객 만족도 / 브랜드 인지도</div>
+                </div></div>
+                <div class="quiz-card" data-quiz="8"><p class="quiz-question"><span class="quiz-badge">Q8</span>'시장 매력도' 평가 시 고려하지 않는 요소는?</p><div class="quiz-options">
+                    <div class="quiz-option" data-value="1">① 시장 규모</div>
+                    <div class="quiz-option" data-value="2">② 시장 성장률</div>
+                    <div class="quiz-option" data-value="3">③ 경쟁도</div>
+                    <div class="quiz-option" data-value="4" data-correct="true">④ 직원 만족도</div>
+                </div></div>
+                <div class="quiz-card" data-quiz="9"><p class="quiz-question"><span class="quiz-badge">Q9</span>BCG 매트릭스의 한계점으로 적절한 것은?</p><div class="quiz-options">
+                    <div class="quiz-option" data-value="1">① 너무 많은 변수를 사용</div>
+                    <div class="quiz-option" data-value="2" data-correct="true">② 두 가지 변수만 고려한다</div>
+                    <div class="quiz-option" data-value="3">③ 대기업에만 적용 가능</div>
+                    <div class="quiz-option" data-value="4">④ 내부 환경만 분석</div>
+                </div></div>
+                <div class="quiz-card" data-quiz="10"><p class="quiz-question"><span class="quiz-badge">Q10</span>GE에서 매력도 높음 + 강점 강함 영역의 전략은?</p><div class="quiz-options">
+                    <div class="quiz-option" data-value="1" data-correct="true">① 최대한 성장 투자, 경쟁력 유지</div>
+                    <div class="quiz-option" data-value="2">② 즉시 철수, 매도</div>
+                    <div class="quiz-option" data-value="3">③ 투자 최소화, 수익성 경영</div>
+                    <div class="quiz-option" data-value="4">④ 제한적 확장, 추수</div>
+                </div></div>
+                <div class="btn-group"><button class="btn btn-section-reset" onclick="resetQuiz()">🔄 형성평가 초기화</button></div>
+            </div></div>
+        <div class="tab-content" id="tab-activity"><div class="section-card">
+            <h2 class="section-title"><span class="icon">⚗️</span> 마케팅 실험실</h2>
+            <div class="activity-section">
+                <h3 class="activity-title">🧪 실험 1: BCG 매트릭스 사업 분류하기</h3>
+                <div class="activity-instruction">💡 PC: 드래그하여 해당 영역에 놓으세요 | 📱 모바일: 터치로 선택 후 영역 터치</div>
+                <div class="drag-container" id="dragContainer1">
+                    <div class="drag-item" data-category="star" draggable="true">전기차 시장 1위 업체</div>
+                    <div class="drag-item" data-category="cow" draggable="true">시장 포화된 라면 업계 1위</div>
+                    <div class="drag-item" data-category="question" draggable="true">AI 신사업 진출 스타트업</div>
+                    <div class="drag-item" data-category="dog" draggable="true">피처폰 제조 사업부</div>
+                    <div class="drag-item" data-category="star" draggable="true">급성장 OTT 플랫폼 1위</div>
+                    <div class="drag-item" data-category="cow" draggable="true">국내 생수 시장 점유율 1위</div>
+                    <div class="drag-item" data-category="question" draggable="true">메타버스 플랫폼 후발주자</div>
+                    <div class="drag-item" data-category="dog" draggable="true">MP3 플레이어 제조업체</div>
+                </div>
+                <div class="drop-zones">
+                    <div class="drop-zone" data-accept="star" style="border-color:#FFB300;background:rgba(255,179,0,0.05);"><div class="drop-zone-title">⭐ 별 (Star)</div></div>
+                    <div class="drop-zone" data-accept="question" style="border-color:#AB47BC;background:rgba(171,71,188,0.05);"><div class="drop-zone-title">❓ 물음표</div></div>
+                    <div class="drop-zone" data-accept="cow" style="border-color:#66BB6A;background:rgba(102,187,106,0.05);"><div class="drop-zone-title">🐄 자금젖소</div></div>
+                    <div class="drop-zone" data-accept="dog" style="border-color:#EF5350;background:rgba(239,83,80,0.05);"><div class="drop-zone-title">🐕 개 (Dog)</div></div>
+                </div>
+            </div>
+            <div class="activity-section" style="margin-top:30px;">
+                <h3 class="activity-title">🔗 실험 2: BCG & GE 핵심 개념 매칭</h3>
+                <div class="activity-instruction">💡 왼쪽 개념 클릭 → 오른쪽 설명 클릭하여 연결</div>
+                <div class="matching-container">
+                    <div class="matching-column" id="matchingLeft1">
+                        <div class="matching-item" data-match="bcg-axis">BCG 매트릭스 축</div>
+                        <div class="matching-item" data-match="ge-axis">GE 매트릭스 축</div>
+                        <div class="matching-item" data-match="cashcow">자금젖소 전략</div>
+                        <div class="matching-item" data-match="qmark">물음표 전략</div>
+                        <div class="matching-item" data-match="ge-limit">GE 개발 목적</div>
+                    </div>
+                    <div class="matching-lines" id="matchingLines1">
+                        <div class="match-indicator" data-for="bcg-axis"></div><div class="match-indicator" data-for="ge-axis"></div><div class="match-indicator" data-for="cashcow"></div><div class="match-indicator" data-for="qmark"></div><div class="match-indicator" data-for="ge-limit"></div>
+                    </div>
+                    <div class="matching-column" id="matchingRight1">
+                        <div class="matching-item" data-match="qmark">확대(→별) 또는 철수 결정</div>
+                        <div class="matching-item" data-match="ge-limit">BCG의 두 변수 한계 극복</div>
+                        <div class="matching-item" data-match="bcg-axis">시장 성장률 × 상대적 시장 점유율</div>
+                        <div class="matching-item" data-match="cashcow">현상 유지, 다른 사업 지원</div>
+                        <div class="matching-item" data-match="ge-axis">시장 매력도 × 사업 강점</div>
+                    </div>
+                </div>
+            </div>
+            <div class="btn-group"><button class="btn btn-section-reset" onclick="resetActivity()">🔄 실험실 초기화</button></div>
+        </div></div>
+        <div class="btn-group">
+            <button class="btn btn-save" onclick="saveToLocal()">💾 저장하기</button>
+            <button class="btn btn-submit" onclick="submitAll()">📤 제출하기</button>
+            <button class="btn btn-reset" onclick="resetAll()">🔄 초기화</button>
+        </div>
+        <div class="result-section" id="resultSection"><div class="result-icon">🏆</div><div class="result-grade" id="resultGrade">A+</div><p class="result-message" id="resultMessage">완벽해요!</p><div class="result-details" id="resultDetails"></div><div class="btn-group"><button class="btn btn-reset" onclick="resetAll()">🔄 다시 연구하기</button></div></div>
+        <footer class="footer"><p>🔬 은또링쌤의 마케팅Lab | 한국디지털미디어고등학교</p><p>Made with 💜 for DIMIGO Students</p></footer>
+    </div>
+    <div class="toast" id="toast">저장되었습니다!</div>
+    <div class="modal" id="confirmModal"><div class="modal-content"><h3>🔄 전체 초기화</h3><p>모든 연구 기록을 초기화하시겠습니까?</p><div class="modal-btns"><button class="btn btn-submit" onclick="doReset()">확인</button><button class="btn btn-section-reset" onclick="closeConfirm()">취소</button></div></div></div>
+    <script>
+    const patients = [{"id": 0, "emoji": "🍔", "name": "스타버거", "badge": "badge-hot", "badgeText": "급성장 시장", "desc": "배달 전문 프리미엄 햄버거 브랜드. 최근 3년간 폭발적으로 성장하며 시장 1위를 차지하고 있다.", "growthRate": 28, "growthHigh": true, "shareRate": 38, "shareHigh": true, "trend": "📈 매출 연 35% 상승", "cashflow": "💰 현금 흐름: 중립적", "answer": "star", "strategy": "invest", "diagFB": "시장 성장률(28%)과 점유율(38%) 모두 높으므로 ⭐ 별(Star)에 해당합니다!", "stratFB": "별(Star)은 빠른 성장 속에서 점유율을 유지하기 위해 지속적인 투자가 필요합니다."}, {"id": 1, "emoji": "🍗", "name": "국민치킨", "badge": "badge-stable", "badgeText": "성숙 시장", "desc": "30년 전통의 치킨 프랜차이즈. 전국 5,000개 매장을 보유한 업계 부동의 1위.", "growthRate": 2, "growthHigh": false, "shareRate": 42, "shareHigh": true, "trend": "➡️ 매출 안정적 유지", "cashflow": "💰💰💰 현금 흐름: 매우 높음", "answer": "cow", "strategy": "maintain", "diagFB": "시장 성장률(2%)은 낮지만 점유율(42%)이 높으므로 🐄 자금젖소입니다!", "stratFB": "자금젖소는 현상을 유지하면서 안정적인 수익으로 다른 신규 사업을 지원합니다."}, {"id": 2, "emoji": "🎮", "name": "드림VR", "badge": "badge-hot", "badgeText": "급성장 시장", "desc": "VR 게임 스타트업. 시장은 매년 급성장하지만 대형 업체에 밀려 점유율이 낮다.", "growthRate": 35, "growthHigh": true, "shareRate": 4, "shareHigh": false, "trend": "📈 매출 소폭 상승", "cashflow": "💸 현금 흐름: 적자 지속", "answer": "question", "strategy": "decide", "diagFB": "시장 성장률(35%)은 높지만 점유율(4%)이 낮으므로 ❓ 물음표입니다!", "stratFB": "물음표 사업은 투자를 확대하여 별로 성장시킬지, 철수할지 전략적 결정이 필요합니다."}, {"id": 3, "emoji": "📀", "name": "클래식DVD", "badge": "badge-declining", "badgeText": "축소 시장", "desc": "DVD 렌탈 체인. 스트리밍 서비스 등장으로 시장이 급격히 축소되고 있다.", "growthRate": -8, "growthHigh": false, "shareRate": 5, "shareHigh": false, "trend": "📉 매출 연 20% 하락", "cashflow": "💸 현금 흐름: 적자 전환", "answer": "dog", "strategy": "exit", "diagFB": "시장 성장률(-8%)과 점유율(5%) 모두 낮으므로 🐕 개(Dog)입니다!", "stratFB": "개(Dog) 사업은 투자 가치가 낮으므로 철수하거나 사업을 축소하는 것이 적합합니다."}, {"id": 4, "emoji": "💧", "name": "에코워터", "badge": "badge-stable", "badgeText": "성숙 시장", "desc": "정수기 렌탈 시장 1위. 시장은 포화 상태이나 안정적인 수익을 올리고 있다.", "growthRate": 3, "growthHigh": false, "shareRate": 45, "shareHigh": true, "trend": "➡️ 매출 안정적", "cashflow": "💰💰💰 현금 흐름: 매우 높음", "answer": "cow", "strategy": "maintain", "diagFB": "시장 성장률(3%)은 낮지만 점유율(45%)이 높으므로 🐄 자금젖소입니다!", "stratFB": "시장 1위의 안정적 수익원! 현상을 유지하며 수익으로 새로운 성장 사업을 지원합니다."}, {"id": 5, "emoji": "🤖", "name": "AI튜터", "badge": "badge-hot", "badgeText": "급성장 시장", "desc": "AI 기반 맞춤형 학습 플랫폼. 에듀테크 시장의 급성장 속에서 시장을 선도하고 있다.", "growthRate": 40, "growthHigh": true, "shareRate": 32, "shareHigh": true, "trend": "📈 매출 연 50% 폭증", "cashflow": "💰 현금 흐름: 중립적 (R&D 투자)", "answer": "star", "strategy": "invest", "diagFB": "시장 성장률(40%)과 점유율(32%) 모두 높으므로 ⭐ 별(Star)입니다!", "stratFB": "급성장 시장의 리더! 기술 개발과 마케팅에 지속적으로 투자하여 1위를 유지해야 합니다."}, {"id": 6, "emoji": "👗", "name": "메타패션", "badge": "badge-hot", "badgeText": "급성장 시장", "desc": "메타버스 가상 패션몰. 시장은 급성장 중이나 대형 플랫폼에 밀려 점유율 확보가 어렵다.", "growthRate": 30, "growthHigh": true, "shareRate": 6, "shareHigh": false, "trend": "📈 매출 소폭 상승", "cashflow": "💸 현금 흐름: 적자", "answer": "question", "strategy": "decide", "diagFB": "시장 성장률(30%)은 높지만 점유율(6%)이 낮으므로 ❓ 물음표입니다!", "stratFB": "성장 가능성은 있지만 불확실! 집중 투자로 별로 키울지, 철수할지 결정해야 합니다."}, {"id": 7, "emoji": "🖨️", "name": "프린트마스터", "badge": "badge-declining", "badgeText": "축소 시장", "desc": "가정용 프린터 전문 업체. 디지털화로 인쇄 수요가 급감하면서 시장과 점유율 모두 하락 중.", "growthRate": -3, "growthHigh": false, "shareRate": 7, "shareHigh": false, "trend": "📉 매출 연 15% 하락", "cashflow": "💸 현금 흐름: 적자 가능성", "answer": "dog", "strategy": "exit", "diagFB": "시장 성장률(-3%)과 점유율(7%) 모두 낮으므로 🐕 개(Dog)입니다!", "stratFB": "디지털 전환으로 시장 자체가 축소 중! 사업 정리 또는 축소가 합리적입니다."}];
+    const quadrants = [{id:'star',icon:'⭐',label:'별',sub:'높은 성장 + 높은 점유'},{id:'question',icon:'❓',label:'물음표',sub:'높은 성장 + 낮은 점유'},{id:'cow',icon:'🐄',label:'자금젖소',sub:'낮은 성장 + 높은 점유'},{id:'dog',icon:'🐕',label:'개',sub:'낮은 성장 + 낮은 점유'}];
+    const strategies = [{id:'invest',icon:'🚀',label:'지속적 투자',sub:'성장과 점유율 유지'},{id:'maintain',icon:'🛡️',label:'현상 유지',sub:'수익으로 타 사업 지원'},{id:'decide',icon:'🤔',label:'확대 or 철수 결정',sub:'별로 키울지 판단'},{id:'exit',icon:'🚪',label:'철수 / 사업 축소',sub:'손실 최소화'}];
+    let currentPatient=0;
+    let patientState=patients.map(()=>({diagAnswer:null,stratAnswer:null,diagCorrect:null,stratCorrect:null}));
+
+    function renderPatients(){const area=document.getElementById('patientArea'),dots=document.getElementById('patientDots');area.innerHTML='';dots.innerHTML='';patients.forEach((p,i)=>{const dot=document.createElement('div');dot.className='patient-dot'+(i===currentPatient?' current':'');dot.textContent=i+1;dot.onclick=()=>goToPatient(i);dots.appendChild(dot);const card=document.createElement('div');card.className='patient-card'+(i===currentPatient?' active':'');card.innerHTML=buildPatientHTML(p,i);area.appendChild(card);});updateDots();}
+
+    function buildPatientHTML(p,i){const s=patientState[i],dDone=s.diagAnswer!==null,sDone=s.stratAnswer!==null;let h=`<div class="chart-card"><div class="chart-card-header"><div class="chart-emoji">${p.emoji}</div><div class="chart-info"><h3>${p.name}</h3><p>${p.desc}</p><span class="chart-badge ${p.badge}">${p.badgeText}</span></div></div><div class="data-grid"><div class="data-item"><div class="data-label">📈 시장 성장률</div><div class="data-bar-bg"><div class="data-bar ${p.growthHigh?'high':'low'}" style="width:${Math.max(10,Math.abs(p.growthRate)*2)}%;"></div></div><div class="data-value">${p.growthRate}% <span class="${p.growthHigh?'arrow-up':'arrow-down'}">${p.growthHigh?'↑ 높음':'↓ 낮음'}</span></div></div><div class="data-item"><div class="data-label">🏆 상대적 시장 점유율</div><div class="data-bar-bg"><div class="data-bar ${p.shareHigh?'high':'low'}" style="width:${Math.max(10,p.shareRate*2)}%;"></div></div><div class="data-value">${p.shareRate}% <span class="${p.shareHigh?'arrow-up':'arrow-down'}">${p.shareHigh?'↑ 높음':'↓ 낮음'}</span></div></div></div><div class="extra-info"><div class="extra-chip">${p.trend}</div><div class="extra-chip">${p.cashflow}</div></div></div>`;h+=`<div class="step-section"><div class="step-label"><span class="step-badge">STEP 1</span> 진단: 이 기업은 BCG 매트릭스의 어디에 해당할까요?</div><div class="choice-grid">`;quadrants.forEach(q=>{let cls='choice-btn';if(dDone){cls+=' disabled';if(s.diagAnswer===q.id&&s.diagCorrect)cls+=' selected-correct';else if(s.diagAnswer===q.id&&!s.diagCorrect)cls+=' selected-wrong';else if(q.id===p.answer&&!s.diagCorrect)cls+=' reveal-correct';}h+=`<div class="${cls}" onclick="selectDiag(${i},'${q.id}')"><div class="choice-icon">${q.icon}</div>${q.label}<div class="choice-sub">${q.sub}</div></div>`;});h+=`</div>`;if(dDone)h+=`<div class="feedback-box ${s.diagCorrect?'feedback-correct':'feedback-wrong'} show">${s.diagCorrect?'✅':'❌'} ${p.diagFB}</div>`;h+=`</div>`;if(dDone){h+=`<div class="step-section" style="margin-top:15px;"><div class="step-label"><span class="step-badge">STEP 2</span> 처방: 이 기업에 어떤 전략을 추천하시겠습니까?</div><div class="choice-grid">`;strategies.forEach(st=>{let cls='choice-btn';if(sDone){cls+=' disabled';if(s.stratAnswer===st.id&&s.stratCorrect)cls+=' selected-correct';else if(s.stratAnswer===st.id&&!s.stratCorrect)cls+=' selected-wrong';else if(st.id===p.strategy&&!s.stratCorrect)cls+=' reveal-correct';}h+=`<div class="${cls}" onclick="selectStrat(${i},'${st.id}')"><div class="choice-icon">${st.icon}</div>${st.label}<div class="choice-sub">${st.sub}</div></div>`;});h+=`</div>`;if(sDone)h+=`<div class="feedback-box ${s.stratCorrect?'feedback-correct':'feedback-wrong'} show">${s.stratCorrect?'✅':'❌'} ${p.stratFB}</div>`;h+=`</div>`;}h+=`<div class="nav-btns"><button class="nav-btn nav-btn-prev" onclick="goToPatient(${i-1})" ${i===0?'disabled':''}>← 이전 환자</button>`;h+=i<patients.length-1?`<button class="nav-btn nav-btn-next" onclick="goToPatient(${i+1})">다음 환자 →</button>`:`<button class="nav-btn nav-btn-next" onclick="showGEBonus()">🎓 GE 매트릭스 보너스 →</button>`;h+=`</div>`;return h;}
+
+    function selectDiag(i,v){if(patientState[i].diagAnswer!==null)return;patientState[i].diagAnswer=v;patientState[i].diagCorrect=(v===patients[i].answer);renderPatients();updateProgress();saveState();}
+    function selectStrat(i,v){if(patientState[i].stratAnswer!==null)return;patientState[i].stratAnswer=v;patientState[i].stratCorrect=(v===patients[i].strategy);renderPatients();updateProgress();saveState();}
+    function goToPatient(i){if(i<0||i>=patients.length)return;currentPatient=i;document.getElementById('geBonus').classList.remove('active');renderPatients();saveState();}
+    function showGEBonus(){currentPatient=-1;document.querySelectorAll('.patient-card').forEach(c=>c.classList.remove('active'));document.querySelectorAll('.patient-dot').forEach(d=>d.classList.remove('current'));document.getElementById('geBonus').classList.add('active');document.getElementById('geBonus').scrollIntoView({behavior:'smooth',block:'start'});saveState();}
+    function updateDots(){document.querySelectorAll('.patient-dot').forEach((d,i)=>{d.classList.remove('current','done','done-wrong');if(i===currentPatient)d.classList.add('current');else if(patientState[i].diagAnswer!==null&&patientState[i].stratAnswer!==null)d.classList.add(patientState[i].diagCorrect&&patientState[i].stratCorrect?'done':'done-wrong');});}
+    function toggleRef(){const s=document.getElementById('refSection'),b=document.querySelector('.ref-toggle');s.classList.toggle('open');b.textContent=s.classList.contains('open')?'📋 BCG 매트릭스 참고 자료 ▲':'📋 BCG 매트릭스 참고 자료 ▼';}
+
+    document.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',function(){document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));this.classList.add('active');document.getElementById('tab-'+this.dataset.tab).classList.add('active');saveState();});});
+    document.querySelectorAll('.objective-item').forEach(item=>{item.addEventListener('click',function(){this.classList.toggle('checked');this.querySelector('.objective-checkbox').textContent=this.classList.contains('checked')?'✓':'';saveState();});});
+    document.querySelectorAll('.blank-select').forEach(sel=>{sel.addEventListener('change',function(){this.classList.remove('correct','wrong');if(this.value===this.dataset.answer)this.classList.add('correct');else if(this.value!=='')this.classList.add('wrong');updateProgress();saveState();});});
+    document.querySelectorAll('.quiz-option').forEach(opt=>{opt.addEventListener('click',function(){const card=this.closest('.quiz-card');if(card.classList.contains('answered'))return;card.classList.add('answered');card.querySelectorAll('.quiz-option').forEach(o=>{if(o.dataset.correct==='true')o.classList.add('correct');});if(this.dataset.correct!=='true')this.classList.add('wrong');updateProgress();saveState();});});
+
+    let selectedDragItem=null;
+    document.querySelectorAll('.drag-item').forEach(item=>{item.addEventListener('dragstart',function(e){e.dataTransfer.setData('text',this.textContent);e.dataTransfer.setData('category',this.dataset.category);});item.addEventListener('click',function(){if(this.classList.contains('placed'))return;document.querySelectorAll('.drag-item').forEach(i=>i.classList.remove('selected'));this.classList.add('selected');selectedDragItem=this;});});
+    document.querySelectorAll('.drop-zone').forEach(zone=>{zone.addEventListener('dragover',function(e){e.preventDefault();this.classList.add('drag-over');});zone.addEventListener('dragleave',function(){this.classList.remove('drag-over');});zone.addEventListener('drop',function(e){e.preventDefault();this.classList.remove('drag-over');addDroppedItem(this,e.dataTransfer.getData('text'),e.dataTransfer.getData('category'),this.dataset.accept);});zone.addEventListener('click',function(){if(selectedDragItem&&!selectedDragItem.classList.contains('placed')){addDroppedItem(this,selectedDragItem.textContent,selectedDragItem.dataset.category,this.dataset.accept);selectedDragItem.classList.remove('selected');selectedDragItem=null;}});});
+    function addDroppedItem(z,t,c,a){const d=document.createElement('div');d.className='dropped-item '+(c===a?'correct':'wrong');d.innerHTML=`${t} <button class="remove-btn" onclick="removeDropped(this,'${t}')">✕</button>`;z.appendChild(d);document.querySelectorAll('.drag-item').forEach(i=>{if(i.textContent===t){i.classList.add('placed');i.classList.remove('selected');}});updateProgress();saveState();}
+    function removeDropped(b,t){b.parentElement.remove();document.querySelectorAll('.drag-item').forEach(i=>{if(i.textContent===t)i.classList.remove('placed');});updateProgress();saveState();}
+
+    let selectedMatching=null;
+    document.querySelectorAll('.matching-item').forEach(item=>{item.addEventListener('click',function(){if(this.classList.contains('matched'))return;const isL=this.parentElement.id.includes('Left');if(!selectedMatching){this.classList.add('selected');selectedMatching={element:this,match:this.dataset.match,isLeft:isL};}else{if(selectedMatching.isLeft===isL){selectedMatching.element.classList.remove('selected');this.classList.add('selected');selectedMatching={element:this,match:this.dataset.match,isLeft:isL};}else{if(selectedMatching.match===this.dataset.match){selectedMatching.element.classList.remove('selected');selectedMatching.element.classList.add('matched');this.classList.add('matched');const ind=document.querySelector(`#matchingLines1 .match-indicator[data-for="${this.dataset.match}"]`);if(ind)ind.classList.add('connected');}else{this.classList.add('wrong-match');setTimeout(()=>this.classList.remove('wrong-match'),500);}selectedMatching.element.classList.remove('selected');selectedMatching=null;}}updateProgress();saveState();});});
+
+    function updateProgress(){let total=0,answered=0,correct=0;patientState.forEach(s=>{total+=2;if(s.diagAnswer!==null){answered++;if(s.diagCorrect)correct++;}if(s.stratAnswer!==null){answered++;if(s.stratCorrect)correct++;}});document.querySelectorAll('.blank-select').forEach(s=>{total++;if(s.value!==''){answered++;if(s.classList.contains('correct'))correct++;}});document.querySelectorAll('.quiz-card').forEach(c=>{total++;if(c.classList.contains('answered')){answered++;if(!c.querySelector('.quiz-option.wrong'))correct++;}});document.querySelectorAll('.dropped-item').forEach(i=>{total++;answered++;if(i.classList.contains('correct'))correct++;});const m=document.querySelectorAll('.matching-item.matched');total+=m.length/2;answered+=m.length/2;correct+=m.length/2;const pct=total>0?Math.round((answered/total)*100):0;document.getElementById('progressBar').style.width=pct+'%';document.getElementById('progressBar').textContent=pct+'%';document.getElementById('correctCount').textContent=correct;document.getElementById('answeredCount').textContent=answered;document.getElementById('totalCount').textContent=total;}
+
+    function submitAll(){const name=document.getElementById('studentName').value.trim(),id=document.getElementById('studentId').value.trim();if(!name||!id){showToast('⚠️ 이름과 연구원 번호를 입력해주세요!');return;}let total=0,correct=0;patientState.forEach(s=>{total+=2;if(s.diagCorrect)correct++;if(s.stratCorrect)correct++;});document.querySelectorAll('.blank-select').forEach(s=>{total++;if(s.classList.contains('correct'))correct++;});document.querySelectorAll('.quiz-card').forEach(c=>{total++;if(c.classList.contains('answered')&&!c.querySelector('.quiz-option.wrong'))correct++;});document.querySelectorAll('.dropped-item').forEach(i=>{total++;if(i.classList.contains('correct'))correct++;});const m=document.querySelectorAll('.matching-item.matched');total+=m.length/2;correct+=m.length/2;const pct=total>0?Math.round((correct/total)*100):0;let grade,message;if(pct>=90){grade='A+';message='완벽해요! 포트폴리오 분석 전문가! 🎉';}else if(pct>=80){grade='A';message='훌륭해요! 거의 완벽해요! ⭐';}else if(pct>=70){grade='B+';message='잘했어요! 조금만 더! 💪';}else if(pct>=60){grade='B';message='좋아요! 복습하면 완벽! 📚';}else{grade='C';message='힘내요! 다시 연구해봐요! 🔬';}const form=document.createElement('form');form.method='POST';form.action='https://script.google.com/macros/s/AKfycbw74Pv4jRMA_3aX-tOShm-Wca50XsW7VHQcQALyT8p26Z5TurhkBDWT0r2Mu-eLG30/exec';form.target='hidden_iframe';const fields={name,studentId:id,week:3,session:3,sessionTitle:'BCG 매트릭스와 GE 매트릭스',correct,total,percentage:pct,grade,timestamp:new Date().toISOString()};for(let k in fields){const inp=document.createElement('input');inp.type='hidden';inp.name=k;inp.value=fields[k];form.appendChild(inp);}let iframe=document.getElementById('hidden_iframe');if(!iframe){iframe=document.createElement('iframe');iframe.name='hidden_iframe';iframe.id='hidden_iframe';iframe.style.display='none';document.body.appendChild(iframe);}document.body.appendChild(form);form.submit();document.body.removeChild(form);showToast('📤 연구 보고서가 제출되었습니다!');document.getElementById('resultGrade').textContent=grade;document.getElementById('resultMessage').textContent=message;document.getElementById('resultDetails').innerHTML=`<h4>📊 ${name} 연구원 (${id}) 연구 결과</h4><ul><li><span>정답률</span><span>${pct}% (${correct}/${total})</span></li><li><span>연구 등급</span><span>${grade}</span></li><li><span>제출 시간</span><span>${new Date().toLocaleString('ko-KR')}</span></li></ul>`;document.getElementById('resultSection').classList.add('show');document.getElementById('resultSection').scrollIntoView({behavior:'smooth'});}
+
+    function resetAll(){document.getElementById('confirmModal').classList.add('show');}
+    function saveToLocal(){saveState();showToast('💾 진행 상황이 저장되었습니다!');}
+    function closeConfirm(){document.getElementById('confirmModal').classList.remove('show');}
+    function resetConceptItem(btn){const card=btn.closest('.concept-card');card.querySelectorAll('.blank-select').forEach(s=>{s.value='';s.classList.remove('correct','wrong');});updateProgress();saveState();showToast('🔄 해당 문제가 초기화되었습니다!');}
+    function resetConceptsTab(){document.querySelectorAll('#tab-concepts .blank-select').forEach(s=>{s.value='';s.classList.remove('correct','wrong');});updateProgress();saveState();showToast('🧬 개념정리가 초기화되었습니다!');}
+    function resetConcepts(){patientState=patients.map(()=>({diagAnswer:null,stratAnswer:null,diagCorrect:null,stratCorrect:null}));currentPatient=0;document.getElementById('geBonus').classList.remove('active');document.querySelectorAll('#tab-doctor .blank-select').forEach(s=>{s.value='';s.classList.remove('correct','wrong');});renderPatients();updateProgress();saveState();showToast('🩺 포트폴리오 닥터가 초기화되었습니다!');}
+    function resetQuiz(){document.querySelectorAll('.quiz-card').forEach(c=>{c.classList.remove('answered');c.querySelectorAll('.quiz-option').forEach(o=>o.classList.remove('selected','correct','wrong'));});updateProgress();saveState();showToast('🔍 형성평가가 초기화되었습니다!');}
+    function resetActivity(){document.querySelectorAll('.dropped-item').forEach(i=>i.remove());document.querySelectorAll('.drag-item').forEach(i=>i.classList.remove('placed','selected'));document.querySelectorAll('.matching-item').forEach(i=>i.classList.remove('matched','selected','wrong-match'));document.querySelectorAll('.match-indicator').forEach(i=>i.classList.remove('connected'));updateProgress();saveState();showToast('⚗️ 실험실이 초기화되었습니다!');}
+    function doReset(){closeConfirm();localStorage.removeItem('marketinglab_week3_class3');document.querySelectorAll('.objective-item').forEach(i=>{i.classList.remove('checked');i.querySelector('.objective-checkbox').textContent='';});resetConceptsTab();resetConcepts();resetQuiz();resetActivity();document.getElementById('resultSection').classList.remove('show');document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));document.querySelector('.tab-btn').classList.add('active');document.getElementById('tab-objectives').classList.add('active');showToast('🔄 전체 초기화되었습니다!');window.scrollTo({top:0,behavior:'smooth'});}
+    function showToast(msg){const t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+
+    function saveState(){const state={studentName:document.getElementById('studentName').value,studentId:document.getElementById('studentId').value,objectives:[],patientState,currentPatient,geBonusOpen:document.getElementById('geBonus').classList.contains('active'),geAnswers:[],quizzes:[],activeTab:document.querySelector('.tab-btn.active')?.dataset.tab};document.querySelectorAll('.objective-item').forEach((i,idx)=>{state.objectives[idx]=i.classList.contains('checked');});document.querySelectorAll('.blank-select').forEach((s,idx)=>{state.geAnswers[idx]={value:s.value,correct:s.classList.contains('correct'),wrong:s.classList.contains('wrong')};});document.querySelectorAll('.quiz-card').forEach((c,idx)=>{const sel=c.querySelector('.quiz-option.wrong');state.quizzes[idx]={answered:c.classList.contains('answered'),selectedValue:sel?.dataset.value};});localStorage.setItem('marketinglab_week3_class3',JSON.stringify(state));}
+    function loadState(){const saved=localStorage.getItem('marketinglab_week3_class3');if(!saved)return;try{const st=JSON.parse(saved);if(st.studentName)document.getElementById('studentName').value=st.studentName;if(st.studentId)document.getElementById('studentId').value=st.studentId;st.objectives?.forEach((c,i)=>{const item=document.querySelectorAll('.objective-item')[i];if(item&&c){item.classList.add('checked');item.querySelector('.objective-checkbox').textContent='✓';}});if(st.patientState)patientState=st.patientState;if(typeof st.currentPatient==='number')currentPatient=st.currentPatient;st.geAnswers?.forEach((d,i)=>{const s=document.querySelectorAll('.blank-select')[i];if(s&&d.value){s.value=d.value;if(d.correct)s.classList.add('correct');if(d.wrong)s.classList.add('wrong');}});st.quizzes?.forEach((d,i)=>{const c=document.querySelectorAll('.quiz-card')[i];if(c&&d.answered){c.classList.add('answered');c.querySelectorAll('.quiz-option').forEach(o=>{if(o.dataset.value===d.selectedValue){if(o.dataset.correct==='true')o.classList.add('correct');else o.classList.add('wrong');}if(o.dataset.correct==='true')o.classList.add('correct');});}});if(st.activeTab){document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));document.querySelector(`.tab-btn[data-tab="${st.activeTab}"]`)?.classList.add('active');document.getElementById('tab-'+st.activeTab)?.classList.add('active');}if(st.geBonusOpen&&currentPatient===-1)setTimeout(()=>document.getElementById('geBonus').classList.add('active'),100);}catch(e){console.log('불러오기 실패:',e);}}
+    document.getElementById('studentName').addEventListener('input',saveState);
+    document.getElementById('studentId').addEventListener('input',saveState);
+    loadState();renderPatients();
+    if(currentPatient===-1){document.querySelectorAll('.patient-card').forEach(c=>c.classList.remove('active'));document.getElementById('geBonus').classList.add('active');}
+    updateProgress();
+    </script>
+</body>
+</html>
